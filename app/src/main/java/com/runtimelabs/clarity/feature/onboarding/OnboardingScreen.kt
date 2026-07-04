@@ -3,7 +3,6 @@ package com.runtimelabs.clarity.feature.onboarding
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -165,8 +164,12 @@ private fun OnboardingTopBar(
             .height(56.dp)
             .padding(horizontal = MaterialTheme.spacing.sm),
     ) {
+        // Fixed 48dp slot so the progress bar never jumps when the button
+        // appears. NOTE: not AnimatedVisibility here — inside a Box nested in
+        // a Row, that call resolves to the RowScope extension via the OUTER
+        // receiver, which Kotlin's DslMarker rules reject (CI compile error).
         Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
-            AnimatedVisibility(visible = state.canGoBack, enter = fadeIn(), exit = fadeOut()) {
+            if (state.canGoBack) {
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,

@@ -55,6 +55,10 @@ env:
   GRADLE_VERSION: "8.10.2"  # MUST match gradle/wrapper/gradle-wrapper.properties
   ANDROID_API_LEVEL: "35"   # matches compileSdk
   ANDROID_BUILD_TOOLS: "35.0.0"
+  # GitHub forbids the `secrets` context inside `if:` expressions, so the
+  # presence check is evaluated here (env allows secrets) and exposed as a
+  # plain "true"/"false" string the steps below can branch on.
+  SIGNING_ENABLED: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
 
 jobs:
   build:
@@ -133,7 +137,7 @@ jobs:
       # Runs only when the keystore secret exists. Signs OUTSIDE Gradle so
       # the build script stays keystore-free; zipalign must precede apksigner.
       - name: Sign release APK
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: ${{ env.SIGNING_ENABLED == 'true' }}
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -173,7 +177,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload release APK (signed)
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: ${{ env.SIGNING_ENABLED == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: clarity-release-signed-${{ github.run_number }}
@@ -182,7 +186,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload release APK (unsigned — signing secrets not configured)
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 == '' }}
+        if: ${{ env.SIGNING_ENABLED != 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: clarity-release-unsigned-${{ github.run_number }}
