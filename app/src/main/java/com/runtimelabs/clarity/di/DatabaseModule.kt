@@ -6,6 +6,9 @@ import com.runtimelabs.clarity.core.security.DatabasePassphraseManager
 import com.runtimelabs.clarity.data.local.db.ALL_MIGRATIONS
 import com.runtimelabs.clarity.data.local.db.ClarityDatabase
 import com.runtimelabs.clarity.data.local.db.dao.AppMetadataDao
+import com.runtimelabs.clarity.data.local.db.dao.CheckInDao
+import com.runtimelabs.clarity.data.local.db.dao.JournalDao
+import com.runtimelabs.clarity.data.local.db.dao.JourneyDao
 import com.runtimelabs.clarity.data.local.db.dao.RecoveryProfileDao
 import dagger.Module
 import dagger.Provides
@@ -47,4 +50,16 @@ object DatabaseModule {
     @Provides
     fun provideRecoveryProfileDao(database: ClarityDatabase): RecoveryProfileDao =
         database.recoveryProfileDao()
+
+    @Provides
+    fun provideCheckInDao(database: ClarityDatabase): CheckInDao =
+        database.checkInDao()
+
+    @Provides
+    fun provideJournalDao(database: ClarityDatabase): JournalDao =
+        database.journalDao()
+
+    @Provides
+    fun provideJourneyDao(database: ClarityDatabase): JourneyDao =
+        database.journeyDao()
 }

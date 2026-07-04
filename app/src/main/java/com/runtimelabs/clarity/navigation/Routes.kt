@@ -16,5 +16,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object JournalRoute
 
+/** Journal editor. The default [entryId] of -1 creates a new entry. */
+@Serializable data class JournalEditorRoute(val entryId: Long = -1L)
+
 /** Urge toolkit. Full-screen, own back stack entry, reachable from anywhere. */
 @Serializable data object SosRoute

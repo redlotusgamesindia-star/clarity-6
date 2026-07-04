@@ -230,3 +230,37 @@ flash or a start-screen swap. Post-splash XML theme only sets
   flip the DataStore flag the shell observes. The shell swap *is* the success
   signal; a crash between the two leaves a completed profile and an
   incomplete flag — onboarding simply runs again, which is safe.
+
+## 17. Streaks, check-ins, journal (Phase A, step 2)
+
+- **The streak is derived, never stored** (AD-1 realized). `StreakCalculator`
+  folds the recovery start day + append-only RELAPSE events into a snapshot;
+  there is no counter anywhere that could drift from the truth. Semantics
+  (unit-pinned): a clean run starts the day *after* a relapse (relapse today
+  = 0, tomorrow = Day 1); the very first run starts *on* the recovery start
+  day (onboarding evening = Day 1); today counts while clean; a closed run
+  excludes its relapse day. "Today" is a parameter, never a clock read — the
+  midnight bug class is untestable-flaky by construction, so it's designed
+  out instead.
+- **Check-ins do not gate the streak.** Days clean accrue by being lived,
+  not by being logged; punishing a missed log would violate the no-shame
+  rule. Check-ins are their own signal: one upserted row per local day
+  (mood 1–5 required, urge 0–10), editable all day.
+- **No relapse UI yet, but full relapse math now** — the compassionate reset
+  flow later is "insert one event"; its semantics are already tested.
+- **Timezone policy:** every dated row stores `epochDay` computed in the
+  device zone at write time; reads never re-derive dates from millis. The
+  Home frame captures "today" at ViewModel init — a session held open across
+  midnight shows the old frame until re-entry (accepted v1 trade-off; writes
+  are exempt, stamping their own day at save time).
+- **Daily quote is pure math**: `epochDay % quotes.size` over an all-original
+  strings-array — same line all day, changes at local midnight, zero storage,
+  zero licensing exposure.
+- **Journal is deliberately titleless** — a title prompt is friction, and
+  friction kills the habit. Delete sits behind a confirm; back discards
+  unsaved edits (v1 trade-off, kept honest by Save being the only
+  persistence signal). The editor is a non-top-level destination, so the
+  bottom bar auto-hides — the shell design paying off unchanged.
+- **DB v2 -> v3** adds `daily_checkin`, `journal_entry`, `journey_event`
+  via hand-written migration; `journey_event` has no update/delete DAO
+  methods — append-only enforced at the API surface, not by convention.

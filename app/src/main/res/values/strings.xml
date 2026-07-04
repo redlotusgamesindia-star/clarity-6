@@ -181,4 +181,81 @@
     <string name="plan_channel_momentum_desc">You\'re starting strong — bank it. Set up your environment and routines this week while it\'s easy.</string>
     <string name="plan_streak_pattern_review_title">Review what ended past streaks</string>
     <string name="plan_streak_pattern_review_desc">You\'ve gone long stretches before. Write down what happened at the end — that\'s where your plan needs armor.</string>
+
+    <!-- Home: greeting + streak -->
+    <string name="home_greeting_morning">Good morning</string>
+    <string name="home_greeting_afternoon">Good afternoon</string>
+    <string name="home_greeting_evening">Good evening</string>
+    <plurals name="streak_days_label">
+        <item quantity="one">day clean</item>
+        <item quantity="other">days clean</item>
+    </plurals>
+    <string name="home_longest_streak">Longest: %1$d days</string>
+    <string name="home_milestone_reached">Milestone reached — keep going</string>
+
+    <!-- Home: daily check-in -->
+    <string name="checkin_card_title_todo">How are you feeling today?</string>
+    <string name="checkin_card_subtitle_todo">Takes ten seconds.</string>
+    <string name="checkin_card_title_done">Checked in for today</string>
+    <string name="checkin_card_edit">Tap to edit</string>
+    <string name="checkin_sheet_title">Daily check-in</string>
+    <string name="checkin_mood_label">Mood</string>
+    <string name="checkin_urge_label">Urge intensity</string>
+    <string name="checkin_urge_low">None</string>
+    <string name="checkin_urge_high">Intense</string>
+    <string name="checkin_save">Save check-in</string>
+    <string name="mood_struggling">Struggling</string>
+    <string name="mood_low">Low</string>
+    <string name="mood_okay">Okay</string>
+    <string name="mood_good">Good</string>
+    <string name="mood_great">Great</string>
+    <string name="home_week_label">This week</string>
+
+    <!-- Home: daily quote -->
+    <string name="home_quote_label">Today\'s reflection</string>
+
+    <!-- Journal -->
+    <string name="journal_empty_title">Your journal is empty</string>
+    <string name="journal_empty_description">Writing for two minutes can take an urge\'s power away.</string>
+    <string name="journal_new_entry">New entry</string>
+    <string name="journal_editor_hint">What\'s on your mind?</string>
+    <string name="journal_editor_new_title">New entry</string>
+    <string name="journal_save">Save</string>
+    <string name="journal_delete_title">Delete this entry?</string>
+    <string name="journal_delete_message">This can\'t be undone.</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="cd_delete_entry">Delete entry</string>
+
+    <!-- Daily reflections: all original copy (no licensing), one per day via epochDay modulo -->
+    <string-array name="daily_quotes">
+        <item>Every urge you outlast teaches your brain a new ending.</item>
+        <item>You are not starting over. You are starting stronger.</item>
+        <item>The craving is loud because it is losing.</item>
+        <item>Progress is quiet. Keep making it.</item>
+        <item>One honest day is worth more than a perfect week imagined.</item>
+        <item>Discomfort is the feeling of rewiring.</item>
+        <item>Urges peak, then pass. You only have to outlast the peak.</item>
+        <item>Small promises kept build unshakable trust — with yourself.</item>
+        <item>You can\'t control the wave, but you\'re learning to surf.</item>
+        <item>Today\'s boredom is tomorrow\'s peace, in disguise.</item>
+        <item>Healing isn\'t linear. It\'s still healing.</item>
+        <item>Every clean morning is proof, not luck.</item>
+        <item>You are allowed to find this hard and do it anyway.</item>
+        <item>Your attention is the most valuable thing you own. Reclaim it.</item>
+        <item>The streak is a side effect. The real win is who you\'re becoming.</item>
+        <item>The number grows on its own. Your job is just today.</item>
+        <item>Freedom feels like this: choosing, not being chosen for.</item>
+        <item>A slip is a data point, not a verdict.</item>
+        <item>Rest is part of recovery, not a break from it.</item>
+        <item>What you water grows. Stop watering the weeds.</item>
+        <item>Cravings are old echoes. You\'re writing new sound.</item>
+        <item>Real strength is asking for the tools before you need them.</item>
+        <item>Tonight\'s sleep is tomorrow\'s willpower.</item>
+        <item>Your hardest days so far all ended. This one will too.</item>
+        <item>Quiet consistency beats loud intensity.</item>
+        <item>You noticed the urge. That awareness is already a win.</item>
+        <item>Two minutes of writing can defuse an hour of wanting.</item>
+        <item>Be the person your first milestone believes you are.</item>
+    </string-array>
 </resources>

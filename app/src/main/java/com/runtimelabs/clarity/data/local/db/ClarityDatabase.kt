@@ -3,8 +3,14 @@ package com.runtimelabs.clarity.data.local.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.runtimelabs.clarity.data.local.db.dao.AppMetadataDao
+import com.runtimelabs.clarity.data.local.db.dao.CheckInDao
+import com.runtimelabs.clarity.data.local.db.dao.JournalDao
+import com.runtimelabs.clarity.data.local.db.dao.JourneyDao
 import com.runtimelabs.clarity.data.local.db.dao.RecoveryProfileDao
 import com.runtimelabs.clarity.data.local.db.entity.AppMetadataEntity
+import com.runtimelabs.clarity.data.local.db.entity.DailyCheckInEntity
+import com.runtimelabs.clarity.data.local.db.entity.JournalEntryEntity
+import com.runtimelabs.clarity.data.local.db.entity.JourneyEventEntity
 import com.runtimelabs.clarity.data.local.db.entity.RecoveryPlanItemEntity
 import com.runtimelabs.clarity.data.local.db.entity.RecoveryProfileEntity
 
@@ -22,8 +28,11 @@ import com.runtimelabs.clarity.data.local.db.entity.RecoveryProfileEntity
         AppMetadataEntity::class,
         RecoveryProfileEntity::class,
         RecoveryPlanItemEntity::class,
+        DailyCheckInEntity::class,
+        JournalEntryEntity::class,
+        JourneyEventEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class ClarityDatabase : RoomDatabase() {
@@ -31,6 +40,12 @@ abstract class ClarityDatabase : RoomDatabase() {
     abstract fun appMetadataDao(): AppMetadataDao
 
     abstract fun recoveryProfileDao(): RecoveryProfileDao
+
+    abstract fun checkInDao(): CheckInDao
+
+    abstract fun journalDao(): JournalDao
+
+    abstract fun journeyDao(): JourneyDao
 
     companion object {
         const val DATABASE_NAME = "clarity.db"

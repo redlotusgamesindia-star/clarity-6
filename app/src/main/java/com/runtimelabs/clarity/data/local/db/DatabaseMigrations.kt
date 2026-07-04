@@ -41,4 +41,32 @@ internal val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
-internal val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)
+internal val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `daily_checkin` (" +
+                "`epochDay` INTEGER NOT NULL, " +
+                "`mood` INTEGER NOT NULL, " +
+                "`urgeLevel` INTEGER NOT NULL, " +
+                "`updatedAtEpochMillis` INTEGER NOT NULL, " +
+                "PRIMARY KEY(`epochDay`))",
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `journal_entry` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`epochDay` INTEGER NOT NULL, " +
+                "`createdAtEpochMillis` INTEGER NOT NULL, " +
+                "`updatedAtEpochMillis` INTEGER NOT NULL, " +
+                "`body` TEXT NOT NULL)",
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `journey_event` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`type` TEXT NOT NULL, " +
+                "`occurredAtEpochMillis` INTEGER NOT NULL, " +
+                "`epochDay` INTEGER NOT NULL)",
+        )
+    }
+}
+
+internal val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3)

@@ -21,8 +21,12 @@ hand-written migration), settings persistence, theme/typography/dark mode,
 design-system components, navigation shell, splash, and the **full
 onboarding**: animated welcome, 11 questions, deterministic personalized
 plan generation (unit-tested — run `./gradlew testDebugUnitTest`), and
-profile+plan persistence in the encrypted database. Placeholder (loudly
-labeled in-app): the four tab screens and SOS — next per the project plan.
+profile+plan persistence in the encrypted database, and the **Phase A
+core**: Home dashboard (event-sourced streak ring, daily check-in with mood
++ urge tracking, week strip, deterministic daily reflection) and the full
+journal (list, editor, delete) — schema v3. Tests: plan generator + streak
+calculator (`./gradlew testDebugUnitTest`). Placeholder (loudly labeled
+in-app): Journey, Learn, and SOS.
 
 ## Notes
 

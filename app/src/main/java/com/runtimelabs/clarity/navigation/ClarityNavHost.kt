@@ -9,13 +9,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.runtimelabs.clarity.core.designsystem.components.PlaceholderScreen
+import com.runtimelabs.clarity.feature.home.HomeScreen
+import com.runtimelabs.clarity.feature.journal.JournalEditorScreen
+import com.runtimelabs.clarity.feature.journal.JournalListScreen
 import kotlin.reflect.KClass
 
 /**
- * The single navigation graph. Every destination currently renders a
- * clearly-marked [PlaceholderScreen]; each is replaced in its feature phase
- * (Home/SOS: Phase A, Journey/Journal: Phase B, Learn: Phase C) without any
- * change to this graph's structure.
+ * The single navigation graph. Home and Journal are live; the remaining
+ * destinations render a clearly-marked [PlaceholderScreen] until their
+ * phase (SOS: Phase A, Journey: Phase B, Learn: Phase C).
  */
 @Composable
 fun ClarityNavHost(
@@ -28,10 +30,7 @@ fun ClarityNavHost(
         modifier = modifier,
     ) {
         composable<HomeRoute> {
-            PlaceholderScreen(
-                title = "Home",
-                plannedPhase = "Dashboard — streak ring, check-in, daily quote. Ships in Phase A.",
-            )
+            HomeScreen()
         }
         composable<JourneyRoute> {
             PlaceholderScreen(
@@ -46,10 +45,13 @@ fun ClarityNavHost(
             )
         }
         composable<JournalRoute> {
-            PlaceholderScreen(
-                title = "Journal",
-                plannedPhase = "Private journal with tags and search. Ships in Phase B.",
+            JournalListScreen(
+                onOpenEntry = { id -> navController.navigate(JournalEditorRoute(entryId = id)) },
+                onNewEntry = { navController.navigate(JournalEditorRoute()) },
             )
+        }
+        composable<JournalEditorRoute> {
+            JournalEditorScreen(onDone = { navController.popBackStack() })
         }
         composable<SosRoute> {
             PlaceholderScreen(
