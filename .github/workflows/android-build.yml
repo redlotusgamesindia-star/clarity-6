@@ -1,0 +1,191 @@
+# =============================================================================
+# Clarity — Android CI
+#
+# Tests the domain logic, then assembles debug + release APKs and uploads
+# them as workflow artifacts. Release signing is optional: with no secrets
+# configured the workflow still succeeds and uploads the UNSIGNED release
+# APK; add the four secrets below and it signs + verifies automatically.
+#
+# Assumptions (all true for this repo today):
+#   - Project root == repository root (settings.gradle.kts at top level).
+#     If you nest it, add `defaults: { run: { working-directory: <dir> } }`.
+#   - gradle-wrapper.jar is NOT committed (deliberate, see README), so we
+#     provision Gradle via setup-gradle pinned to the SAME version as
+#     gradle/wrapper/gradle-wrapper.properties and call `gradle` directly.
+#     If you later commit the wrapper JAR: switch every `gradle` command to
+#     `./gradlew` and un-comment the wrapper-validation step.
+#   - No signingConfig in app/build.gradle.kts, so `assembleRelease` emits
+#     app-release-unsigned.apk; we zipalign + apksigner it in CI instead of
+#     teaching the build script about keystores.
+#
+# Required secrets for signing (Settings -> Secrets and variables -> Actions):
+#   ANDROID_KEYSTORE_BASE64    base64 of the .keystore file (see below)
+#   ANDROID_KEYSTORE_PASSWORD  keystore password
+#   ANDROID_KEY_ALIAS          key alias inside the keystore
+#   ANDROID_KEY_PASSWORD       key password (often same as keystore password)
+#
+# Creating a release keystore + the base64 secret value:
+#   keytool -genkeypair -v -keystore clarity-release.keystore \
+#     -alias clarity -keyalg RSA -keysize 4096 -validity 10000
+#   base64 -w0 clarity-release.keystore        # (macOS: base64 -i <file>)
+# Keep the .keystore file itself OUT of the repository, and back it up —
+# losing it means losing the ability to update the app on Play.
+# =============================================================================
+
+name: Android CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: this workflow only reads the repo and uploads artifacts.
+permissions:
+  contents: read
+
+# Cancel superseded runs of the same branch/PR; never cancel tag builds.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+env:
+  JAVA_VERSION: "17"        # matches compileOptions / kotlin jvmTarget
+  GRADLE_VERSION: "8.10.2"  # MUST match gradle/wrapper/gradle-wrapper.properties
+  ANDROID_API_LEVEL: "35"   # matches compileSdk
+  ANDROID_BUILD_TOOLS: "35.0.0"
+
+jobs:
+  build:
+    name: Test & assemble APKs
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ----------------------------------------------------------- toolchain
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          # No `cache: gradle` here on purpose — setup-gradle below owns
+          # caching; enabling both double-caches the same files.
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK packages
+        # The hosted runner pre-installs most of this; the explicit install
+        # makes the build reproducible if runner images change, and pins the
+        # build-tools that the signing step's zipalign/apksigner come from.
+        run: >
+          sdkmanager
+          "platforms;android-${{ env.ANDROID_API_LEVEL }}"
+          "build-tools;${{ env.ANDROID_BUILD_TOOLS }}"
+          "platform-tools"
+
+      - name: Set up Gradle ${{ env.GRADLE_VERSION }}
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+          # Write to the cache only from long-lived refs; PR builds read it.
+          # Keeps the cache stable and fast instead of churning per-branch.
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref_type != 'tag' }}
+          # gradle.properties enables the configuration cache; persisting it
+          # across runs requires encryption. Optional — uncomment + add the
+          # secret (any random string) if cold configuration time matters:
+          # cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      # Once gradle-wrapper.jar is committed, validate it (supply-chain
+      # protection) and switch the run steps to ./gradlew:
+      # - name: Validate Gradle wrapper
+      #   uses: gradle/actions/wrapper-validation@v4
+
+      # -------------------------------------------------------- quality gate
+      - name: Unit tests (plan generator)
+        run: gradle testDebugUnitTest --stacktrace
+
+      - name: Upload test reports (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ github.run_number }}
+          path: |
+            app/build/reports/tests/
+            app/build/test-results/
+          retention-days: 7
+
+      # -------------------------------------------------------------- builds
+      - name: Assemble debug APK
+        run: gradle assembleDebug --stacktrace
+
+      - name: Assemble release APK (unsigned)
+        run: gradle assembleRelease --stacktrace
+
+      - name: List APK outputs
+        run: find app/build/outputs/apk -name "*.apk" -exec ls -lh {} \;
+
+      # ------------------------------------------------------------- signing
+      # Runs only when the keystore secret exists. Signs OUTSIDE Gradle so
+      # the build script stays keystore-free; zipalign must precede apksigner.
+      - name: Sign release APK
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/${{ env.ANDROID_BUILD_TOOLS }}"
+          APK_DIR="app/build/outputs/apk/release"
+          KEYSTORE="$RUNNER_TEMP/release.keystore"
+
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE"
+
+          "$BT/zipalign" -f -p 4 \
+            "$APK_DIR/app-release-unsigned.apk" \
+            "$APK_DIR/app-release-aligned.apk"
+
+          "$BT/apksigner" sign \
+            --ks "$KEYSTORE" \
+            --ks-pass env:ANDROID_KEYSTORE_PASSWORD \
+            --ks-key-alias "$ANDROID_KEY_ALIAS" \
+            --key-pass env:ANDROID_KEY_PASSWORD \
+            --out "$APK_DIR/clarity-release-signed.apk" \
+            "$APK_DIR/app-release-aligned.apk"
+
+          "$BT/apksigner" verify --print-certs "$APK_DIR/clarity-release-signed.apk"
+
+          rm -f "$KEYSTORE" "$APK_DIR/app-release-aligned.apk"
+
+      # ----------------------------------------------------------- artifacts
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: clarity-debug-${{ github.run_number }}
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload release APK (signed)
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: clarity-release-signed-${{ github.run_number }}
+          path: app/build/outputs/apk/release/clarity-release-signed.apk
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload release APK (unsigned — signing secrets not configured)
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 == '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: clarity-release-unsigned-${{ github.run_number }}
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
+          retention-days: 14
+          if-no-files-found: error

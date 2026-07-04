@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Clarity</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_journey">Journey</string>
+    <string name="nav_learn">Learn</string>
+    <string name="nav_journal">Journal</string>
+    <string name="sos_button">Open urge toolkit</string>
+
+    <!-- Shared state screens -->
+    <string name="error_title">Something didn\'t load</string>
+    <string name="error_message">Your data is safe on this device. Try again in a moment.</string>
+    <string name="action_retry">Try again</string>
+    <string name="action_back">Back</string>
+    <string name="loading">Loading</string>
+
+    <!-- Onboarding: welcome -->
+    <string name="onboarding_title">Take back control</string>
+    <string name="onboarding_subtitle">A private, science-informed path to quit porn — built around you.</string>
+    <string name="onboarding_welcome_privacy">No account. No cloud. Everything stays on this device.</string>
+    <string name="onboarding_begin">Begin</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_start_recovery">Start my recovery</string>
+    <string name="onboarding_progress">Onboarding progress</string>
+
+    <!-- Onboarding: questions -->
+    <string name="q_age_title">How old are you?</string>
+    <string name="q_age_subtitle">Clarity is designed for adults.</string>
+    <string name="q_gender_title">How do you identify?</string>
+    <string name="q_gender_subtitle">Optional — choose \'Prefer not to say\' to skip.</string>
+    <string name="q_years_title">How long has porn felt like a problem?</string>
+    <string name="q_years_subtitle">There\'s no judgment here — this shapes your plan.</string>
+    <string name="q_frequency_title">On average, how often do you watch?</string>
+    <string name="q_frequency_subtitle">An honest answer sets the right starting intensity.</string>
+    <string name="q_trigger_title">What most often leads you to it?</string>
+    <string name="q_trigger_subtitle">Pick the strongest one — you can track others later.</string>
+    <string name="q_urge_time_title">When are urges strongest?</string>
+    <string name="q_sleep_title">What\'s your sleep like?</string>
+    <string name="q_sleep_subtitle">Late nights and urges are closely linked.</string>
+    <string name="q_prev_streak_title">What\'s the longest you\'ve gone without it?</string>
+    <string name="q_prev_streak_subtitle">Past attempts are data, not failures.</string>
+    <string name="q_goal_title">What are you here to do?</string>
+    <string name="q_reasons_title">Why does this matter to you?</string>
+    <string name="q_reasons_subtitle">Choose all that apply — this becomes your \'why\'.</string>
+    <string name="q_motivation_title">How ready are you, honestly?</string>
+    <string name="q_motivation_subtitle">There\'s no wrong answer — your plan meets you where you are.</string>
+    <string name="q_motivation_low">Testing the waters</string>
+    <string name="q_motivation_high">All in</string>
+
+    <!-- Onboarding: options -->
+    <string name="age_18_24">18–24</string>
+    <string name="age_25_34">25–34</string>
+    <string name="age_35_44">35–44</string>
+    <string name="age_45_54">45–54</string>
+    <string name="age_55_plus">55+</string>
+
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_non_binary">Non-binary</string>
+    <string name="gender_prefer_not">Prefer not to say</string>
+
+    <string name="years_lt_1">Less than a year</string>
+    <string name="years_1_3">1–3 years</string>
+    <string name="years_3_5">3–5 years</string>
+    <string name="years_5_10">5–10 years</string>
+    <string name="years_gt_10">More than 10 years</string>
+
+    <string name="freq_multiple_daily">Multiple times a day</string>
+    <string name="freq_daily">About once a day</string>
+    <string name="freq_several_week">A few times a week</string>
+    <string name="freq_weekly">About once a week</string>
+    <string name="freq_few_month">A few times a month</string>
+
+    <string name="trigger_stress">Stress or anxiety</string>
+    <string name="trigger_boredom">Boredom</string>
+    <string name="trigger_loneliness">Loneliness</string>
+    <string name="trigger_fatigue">Fatigue or insomnia</string>
+    <string name="trigger_social_media">Social media spirals</string>
+    <string name="trigger_emotions">Difficult emotions</string>
+
+    <string name="urge_morning">Morning</string>
+    <string name="urge_afternoon">Afternoon</string>
+    <string name="urge_evening">Evening</string>
+    <string name="urge_late_night">Late at night</string>
+    <string name="urge_unpredictable">It\'s unpredictable</string>
+
+    <string name="sleep_early">Before 10pm, consistent</string>
+    <string name="sleep_regular">Around 10pm–midnight</string>
+    <string name="sleep_night_owl">Usually after midnight</string>
+    <string name="sleep_irregular">All over the place</string>
+
+    <string name="streak_never">Never really tried</string>
+    <string name="streak_1_7">A few days</string>
+    <string name="streak_8_30">1–4 weeks</string>
+    <string name="streak_31_90">1–3 months</string>
+    <string name="streak_90_plus">More than 3 months</string>
+
+    <string name="goal_quit">Quit completely</string>
+    <string name="goal_quit_support">Zero porn, for good</string>
+    <string name="goal_reboot">Complete a 90-day reboot</string>
+    <string name="goal_reboot_support">A full reset, then reassess</string>
+    <string name="goal_reduce">Cut back gradually</string>
+    <string name="goal_reduce_support">Step down at your own pace</string>
+
+    <string name="reason_mental_clarity">Mental clarity &amp; focus</string>
+    <string name="reason_relationships">My relationship(s)</string>
+    <string name="reason_self_respect">Self-respect</string>
+    <string name="reason_energy">Energy &amp; productivity</string>
+    <string name="reason_faith">My faith or values</string>
+    <string name="reason_sexual_health">Sexual health</string>
+    <string name="reason_time">Reclaiming my time</string>
+
+    <!-- Onboarding: plan generation -->
+    <string name="gen_msg_1">Reading your answers…</string>
+    <string name="gen_msg_2">Choosing your focus areas…</string>
+    <string name="gen_msg_3">Building week one…</string>
+
+    <!-- Onboarding: plan reveal -->
+    <string name="plan_title">Your recovery plan</string>
+    <string name="plan_subtitle">Built from your answers. It adapts as you go.</string>
+    <string name="plan_first_milestone">First milestone: %1$d days</string>
+    <string name="plan_focus_label">Your focus areas</string>
+    <string name="plan_footnote">You can revisit and adjust this anytime from Settings.</string>
+
+    <string name="cat_foundation">Foundation</string>
+    <string name="cat_trigger_defense">Trigger defense</string>
+    <string name="cat_environment">Environment &amp; routines</string>
+    <string name="cat_sleep">Sleep</string>
+    <string name="cat_mindset">Mindset</string>
+
+    <!-- Plan items (code -> copy; DB stores codes only) -->
+    <string name="plan_daily_checkin_title">Daily check-in</string>
+    <string name="plan_daily_checkin_desc">Two minutes each day to log mood, urges, and wins. Consistency beats intensity.</string>
+    <string name="plan_learn_urge_toolkit_title">Learn the urge toolkit</string>
+    <string name="plan_learn_urge_toolkit_desc">Practice the breathing and delay tools once while calm, so they\'re familiar when it counts.</string>
+    <string name="plan_define_your_why_title">Write down your why</string>
+    <string name="plan_define_your_why_desc">Turn the reasons you chose into one sentence you\'ll see when it matters most.</string>
+    <string name="plan_first_milestone_focus_title">Focus on your first milestone</string>
+    <string name="plan_first_milestone_focus_desc">One clear target to start. Reaching it rewires what feels possible.</string>
+    <string name="plan_abstinence_identity_title">Build the identity, not just the streak</string>
+    <string name="plan_abstinence_identity_desc">You\'re not \'trying to stop\' — you\'re becoming someone who doesn\'t watch. Small daily proof compounds.</string>
+    <string name="plan_reboot_90_frame_title">Frame the 90-day reboot</string>
+    <string name="plan_reboot_90_frame_desc">Ninety days gives your brain\'s reward system a genuine reset. Week by week, not all at once.</string>
+    <string name="plan_reduction_ladder_title">Set your reduction ladder</string>
+    <string name="plan_reduction_ladder_desc">Define clear step-downs — fewer days, tighter limits — so progress is measurable, not vague.</string>
+    <string name="plan_high_risk_moment_map_title">Map your high-risk moments</string>
+    <string name="plan_high_risk_moment_map_desc">Daily habits hide in routines. Spot the exact times and places, then plan around them.</string>
+    <string name="plan_device_friction_setup_title">Add friction to your devices</string>
+    <string name="plan_device_friction_setup_desc">Blockers, app limits, grayscale after dark — make the easy path the healthy one.</string>
+    <string name="plan_stress_reset_breathing_title">Use breathing as your stress reset</string>
+    <string name="plan_stress_reset_breathing_desc">When stress spikes, ninety seconds of slow breathing beats willpower. It\'s built into your SOS button.</string>
+    <string name="plan_boredom_replacement_list_title">Build a boredom replacement list</string>
+    <string name="plan_boredom_replacement_list_desc">Five go-to activities you can start in under a minute. Boredom needs an answer ready.</string>
+    <string name="plan_connection_plan_title">Make a connection plan</string>
+    <string name="plan_connection_plan_desc">Loneliness is the trigger, so connection is the tool: one real interaction a day, even a message.</string>
+    <string name="plan_fatigue_energy_audit_title">Run an energy audit</string>
+    <string name="plan_fatigue_energy_audit_desc">Track when you\'re most drained this week. Fatigue urges are usually a sleep problem in disguise.</string>
+    <string name="plan_social_media_hygiene_title">Clean up your feeds</string>
+    <string name="plan_social_media_hygiene_desc">Unfollow and mute the accounts that start the spiral. The urge often begins three scrolls earlier.</string>
+    <string name="plan_emotion_journaling_title">Name the feeling first</string>
+    <string name="plan_emotion_journaling_desc">Before acting on an urge, write one line about what you\'re actually feeling. Naming it breaks the loop.</string>
+    <string name="plan_if_then_plans_title">Write if-then plans</string>
+    <string name="plan_if_then_plans_desc">\'If an urge hits, then I open the toolkit.\' Deciding in advance removes the hardest step.</string>
+    <string name="plan_late_night_device_curfew_title">Set a device curfew</string>
+    <string name="plan_late_night_device_curfew_desc">Phone out of the bedroom, or locked down after a set hour. Late-night urges lose their easiest doorway.</string>
+    <string name="plan_morning_launch_routine_title">Design a morning launch</string>
+    <string name="plan_morning_launch_routine_desc">Feet on the floor, phone stays down for the first 20 minutes. Momentum before temptation.</string>
+    <string name="plan_evening_transition_ritual_title">Create an evening transition</string>
+    <string name="plan_evening_transition_ritual_desc">A repeatable wind-down — shower, walk, music — that carries you through the risky hours.</string>
+    <string name="plan_afternoon_reset_walk_title">Take the afternoon reset</string>
+    <string name="plan_afternoon_reset_walk_desc">A short walk or stretch at your danger hour. Change your state before the urge chooses for you.</string>
+    <string name="plan_wind_down_routine_title">Build a wind-down routine</string>
+    <string name="plan_wind_down_routine_desc">Thirty screen-light minutes before bed. Calmer nights mean fewer late-night battles.</string>
+    <string name="plan_sleep_anchor_time_title">Anchor your sleep time</string>
+    <string name="plan_sleep_anchor_time_desc">Pick one consistent lights-out time. A stable schedule quietly removes dozens of risky hours a week.</string>
+    <string name="plan_start_tiny_commitment_title">Start tiny on purpose</string>
+    <string name="plan_start_tiny_commitment_desc">Motivation grows from evidence. Commit to the check-in and one tool — nothing more yet.</string>
+    <string name="plan_channel_momentum_title">Channel this momentum</string>
+    <string name="plan_channel_momentum_desc">You\'re starting strong — bank it. Set up your environment and routines this week while it\'s easy.</string>
+    <string name="plan_streak_pattern_review_title">Review what ended past streaks</string>
+    <string name="plan_streak_pattern_review_desc">You\'ve gone long stretches before. Write down what happened at the end — that\'s where your plan needs armor.</string>
+</resources>
