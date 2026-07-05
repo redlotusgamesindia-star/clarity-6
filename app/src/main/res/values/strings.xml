@@ -499,4 +499,18 @@
     <string name="achievement_stronger_than_before_desc">This comeback has real momentum.</string>
     <string name="achievement_beat_record">Beat Previous Record</string>
     <string name="achievement_beat_record_desc">You\'ve now gone longer than ever before.</string>
+
+    <!-- Ads: banner + UMP privacy options -->
+    <string name="privacy_options_link">Privacy &amp; ad choices</string>
+
+    <!-- Settings + Premium section -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_premium_section_title">Premium</string>
+    <string name="settings_current_status_label">Current status</string>
+    <string name="settings_status_free">Free</string>
+    <string name="settings_status_premium">Premium</string>
+    <string name="settings_remove_ads_title">Remove Ads</string>
+    <string name="settings_coming_soon">Coming soon</string>
+    <string name="settings_remove_ads_button">Remove Ads</string>
+    <string name="settings_restore_purchases_button">Restore Purchases</string>
 </resources>

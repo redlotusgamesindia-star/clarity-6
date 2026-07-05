@@ -3,12 +3,38 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-        Privacy posture (the manifest IS the policy):
-        - NO INTERNET permission, ever. Offline-only is structural, not a promise.
+        Privacy posture (the manifest IS the policy) — updated for banner
+        ads (ARCHITECTURE.md §23):
+
+        Until now this comment said "NO INTERNET permission, ever." That was
+        true through Phase E and is no longer true starting here — this is
+        the one deliberate, discussed exception, not an oversight:
+
+        - INTERNET / ACCESS_NETWORK_STATE / AD_ID: required by Google
+          Mobile Ads (AdMob) to serve a small banner ad, and by the User
+          Messaging Platform (UMP) SDK to gather consent before doing so.
+        - Ads NEVER appear during onboarding, breathing, guided grounding/
+          muscle exercises, the relapse recovery flow, the SOS toolkit, any
+          journal/thought-record/gratitude editor, or for premium users.
+          They are allow-listed onto Home, Journey, and the Journal list
+          only — see domain/ads/AdScreen.kt, whose closed enum membership
+          IS the allow-list (fail-closed: a screen with no AdScreen value
+          simply cannot show ads, rather than needing to be excluded).
+        - Consent is gathered via UMP before the ads SDK initializes at all
+          (ads/AdsManager.kt). UMP requires a reachable privacy-options
+          entry point; this app has no Settings screen to put one in, so
+          a small "Privacy & ad choices" link lives on Home instead,
+          visible only when UMP reports one is actually required.
         - POST_NOTIFICATIONS: local habit reminders only (runtime-gated, 13+).
         - RECEIVE_BOOT_COMPLETED: re-arms reminder alarms after reboot.
-        Nothing here can move data off the device. (ARCHITECTURE.md §14, §18)
+
+        Nothing else moves data off the device: the encrypted recovery
+        database, journal, and thought records are never touched by any of
+        this and stay exactly as private as before.
     -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -24,6 +50,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Clarity"
         tools:targetApi="35">
+
+        <!-- Production AdMob App ID — constant across build types; only the
+             banner AD UNIT id differs by build type (see AdsManager). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-9035742345664521~6617275584" />
 
         <activity
             android:name=".MainActivity"

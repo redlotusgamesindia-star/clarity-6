@@ -1,15 +1,19 @@
 package com.runtimelabs.clarity.di
 
+import com.runtimelabs.clarity.data.premium.NoOpBillingConnector
 import com.runtimelabs.clarity.data.repository.CheckInRepositoryImpl
 import com.runtimelabs.clarity.data.repository.GratitudeRepositoryImpl
 import com.runtimelabs.clarity.data.repository.HabitRepositoryImpl
 import com.runtimelabs.clarity.data.repository.JournalRepositoryImpl
 import com.runtimelabs.clarity.data.repository.JourneyRepositoryImpl
+import com.runtimelabs.clarity.data.repository.PremiumRepositoryImpl
 import com.runtimelabs.clarity.data.repository.RecoveryProfileRepositoryImpl
 import com.runtimelabs.clarity.data.repository.RelapseReflectionRepositoryImpl
 import com.runtimelabs.clarity.data.repository.SettingsRepositoryImpl
 import com.runtimelabs.clarity.data.repository.ThoughtRecordRepositoryImpl
 import com.runtimelabs.clarity.data.repository.WidgetSyncRepositoryImpl
+import com.runtimelabs.clarity.domain.premium.BillingConnector
+import com.runtimelabs.clarity.domain.premium.PremiumRepository
 import com.runtimelabs.clarity.domain.repository.CheckInRepository
 import com.runtimelabs.clarity.domain.repository.GratitudeRepository
 import com.runtimelabs.clarity.domain.repository.HabitRepository
@@ -73,4 +77,12 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindRelapseReflectionRepository(impl: RelapseReflectionRepositoryImpl): RelapseReflectionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPremiumRepository(impl: PremiumRepositoryImpl): PremiumRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBillingConnector(impl: NoOpBillingConnector): BillingConnector
 }

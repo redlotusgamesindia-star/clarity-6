@@ -8,10 +8,12 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.runtimelabs.clarity.ads.AdsManager
 import com.runtimelabs.clarity.core.designsystem.theme.ClarityTheme
 import com.runtimelabs.clarity.core.designsystem.theme.shouldUseDarkTheme
 import com.runtimelabs.clarity.ui.ClarityAppRoot
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Single-activity architecture: this is the only Activity in the app.
@@ -21,6 +23,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+
+    @Inject
+    lateinit var adsManager: AdsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -34,6 +39,11 @@ class MainActivity : ComponentActivity() {
         }
 
         enableEdgeToEdge()
+
+        // UMP consent, then (only if allowed) the ads SDK — every launch,
+        // per UMP's own documented guidance. Needs an Activity, so this
+        // can't live inside AdsManager's own construction.
+        adsManager.requestConsentAndInitialize(this)
 
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()

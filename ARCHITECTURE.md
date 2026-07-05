@@ -531,3 +531,143 @@ more honesty about what's actually being computed.
   assumed). `HomeViewModel` and `JourneyViewModel` both fold extra UI-only
   flows into one `Triple`/pair-producing inner `combine` to stay under that
   ceiling — reach for the same trick before reaching for a vararg array.
+
+## 23. Banner ads via AdMob (post-Phase-E)
+
+This is the one deliberate exception to the "no internet, ever" invariant
+maintained since the foundation build, added after an explicit trade-off
+conversation with the developer rather than silently. It's recorded here in
+the same spirit as every other decision in this log: not because it was
+free of cost, but so the cost is visible to whoever reads this next.
+
+- **What changes and what doesn't**: INTERNET, ACCESS_NETWORK_STATE, and
+  AD_ID are now requested, used exclusively to serve a small banner and to
+  gather UMP consent before doing so. Nothing about the encrypted Room
+  database, the journal, thought records, or check-ins changes — none of
+  that data has any path to the network, today or after this change.
+- **The real risk this doesn't fully solve**: restricting ads to non-
+  sensitive screens protects someone from an ad appearing mid-relapse; it
+  does not prevent Google's ad-tech pipeline from learning that a given
+  device runs a porn-recovery app at all, which happens the moment the SDK
+  initializes and any ad request goes out, regardless of which screen
+  triggered it. This was surfaced to the developer explicitly before
+  implementation, along with a recommendation to review AdMob's current
+  sensitive-content policy before shipping to production — that review is
+  the developer's to do; this codebase can't verify policy compliance for
+  them.
+- **The allow-list is enforced by type, not by a runtime check.**
+  `domain/ads/AdScreen` is a closed enum containing exactly the screens
+  ads may appear on. A screen that must never show ads simply has no
+  `AdScreen` value to construct — there is nothing to remember to exclude.
+  This is deliberately the opposite shape from a deny-list, where any
+  future screen would default to showing ads unless someone remembered to
+  add it to an exclusion set. Given the subject matter, fail-closed is the
+  only direction that makes sense.
+- **Current stable SDK, not the Next-Gen rewrite.** Google announced a
+  rewritten "GMA Next-Gen SDK" in January 2026; as of this integration its
+  latest published version is explicitly `0.24.0-beta01` — beta, not
+  something to build a monetization path on. This integrates the current
+  stable `play-services-ads:23.6.0` line instead (confirmed against
+  Google's own documentation, not memorized).
+- **Consent before initialization, always.** `AdsManager` sequences UMP's
+  `requestConsentInfoUpdate()` → `loadAndShowConsentFormIfRequired()` →
+  only then `MobileAds.initialize()`, on every launch. `canRequestAds()`
+  and the privacy-options requirement are both exposed as `StateFlow`, not
+  plain functions — consent resolution is asynchronous, and a banner gated
+  on a one-time synchronous read would never appear if consent resolved
+  after the banner's first composition.
+- **No Settings screen exists in this app**, so the UMP-required
+  privacy-options entry point lives as a small quiet link on Home instead
+  (visible only when UMP reports one is actually required) — the same
+  restrained visual treatment as the relapse entry link, not a new feature
+  in its own right.
+- **`isPremiumUser` is a real, wired, always-false stub** — a DataStore-
+  backed flow with no setter, since no billing/entitlement system exists
+  yet. This exists so `AdsManager`'s premium gate has a stable interface
+  from day one rather than needing a rewiring pass whenever billing lands.
+- **Fixed-size banner, not adaptive.** Google's current guidance favors
+  anchored adaptive banners; this ships the simpler fixed `AdSize.BANNER`
+  as a deliberate first pass, since adaptive sizing needs live
+  screen-width measurement this environment has no way to verify without a
+  device. A reasonable, non-urgent upgrade later.
+- **Pure logic extracted and tested as usual**: `AdPolicy` (the allow-list
+  premium gate and the debug/release ad-unit-id selection) has zero
+  Android or AdMob dependency and is unit tested exactly like every other
+  decision engine in this app. Everything UMP/SDK-specific lives in
+  `AdsManager`, which cannot be meaningfully unit tested (it needs a real
+  device, network, and Google's ad servers) — the same honest boundary
+  this project has drawn around every platform integration so far
+  (widgets, notifications).
+
+## 24. Premium architecture & Settings (post-Phase-D monetization pass)
+
+Prepares the app for Google Play Billing without implementing purchases —
+the explicit brief for this pass. Everything here is a real, wired seam,
+not aspirational scaffolding: every interface created has a genuine
+implementation bound through Hilt today, even where that implementation is
+honestly a no-op.
+
+- **`isPremiumUser` moved off `SettingsRepository` entirely.** It was
+  added there as an explicit, documented placeholder when banner ads first
+  shipped ("no setter yet... would need rewiring later" — that rewiring is
+  this section). It's superseded by a dedicated `domain/premium/` stack
+  with its own DataStore file (`PremiumPreferences`, `clarity_premium`),
+  keeping the premium/billing subsystem self-contained rather than
+  entangled with unrelated app settings. This is the one deliberate
+  departure from "don't rewrite existing architecture" in this pass,
+  called out explicitly for the same reason every other trade-off in this
+  log is: it completes something already flagged as temporary, rather than
+  disturbing something that was meant to last.
+- **`PremiumState` is a sealed type, not a raw Boolean.** Today the app
+  only distinguishes Free vs Premium, but this is exactly the shape of flag
+  that needs to grow (a trial, an expiring subscription, a pending
+  purchase) — a sealed type lets new cases arrive later without changing
+  every existing consumer's signature.
+- **The six pieces map to five small classes, not six** — `PremiumState`
+  is a type, not a class with behavior, so "Global premium state" doesn't
+  need its own separate holder: `PremiumManager.premiumState` (a
+  `@Singleton`, matching every other manager/repository's scope in this
+  app) *is* the global state, the one property everything else in the app
+  depends on.
+- **`BillingConnector` has zero Play Billing types in its signature** —
+  same "domain stays platform-free even though the only consumer is a
+  platform surface" reasoning as `WidgetSyncRepository`. Its only
+  implementation, `NoOpBillingConnector`, is genuinely bound via Hilt and
+  genuinely injected into `PremiumManager` (via `refreshFromBilling()`),
+  not merely declared-and-ignored — an interface with a binding nothing
+  ever calls is exactly the kind of orphaned placeholder this pass exists
+  to avoid repeating.
+- **`AdPolicy.isAdsAllowed(screen, isPremiumUser: Boolean)` needed zero
+  changes.** It already took a plain boolean, decoupled from where that
+  boolean came from — this is the whole reason "one Premium boolean hides
+  every ad" was already true by construction once `BannerAdViewModel` was
+  pointed at `PremiumManager` instead of the old settings stub. The
+  premium-gating logic itself was never the thing that needed building;
+  only its source of truth was.
+- **`ClarityBannerAd` now tracks real load state.** Previously it rendered
+  its `AndroidView` container the moment policy allowed an attempt,
+  regardless of whether an ad actually rendered — a network failure left a
+  blank box in the layout. An `AdListener` now drives `hasLoadedAd`;
+  nothing is shown until `onAdLoaded` fires, and `onAdFailedToLoad`
+  collapses the banner back to zero space. The reveal itself animates in
+  (fade + slight rise, `MotionTokens.STANDARD`) rather than popping in.
+  Placement is unchanged (inline within scrolling content, never a fixed
+  overlay) — this is what already satisfied "respects navigation bars" and
+  "never overlaps content" without needing a different, riskier pattern.
+- **`AdScreen.SETTINGS` was added exactly the way the enum's own doc
+  comment describes**: a one-line addition when Settings shipped, not a
+  restructuring of the allow-list's shape.
+- **Settings is reached via a gear icon on Home, not a sixth bottom-bar
+  tab.** `TopLevelDestination` and `ClarityBottomBar`'s layout are
+  hardcoded for exactly four tabs split 2+2 around the center SOS button;
+  adding a fifth tab would have forced a rework of that split, which is
+  precisely the kind of existing-architecture rewrite this pass was asked
+  to avoid. Settings pushes as an ordinary back-stack destination instead
+  — the bottom bar already hides for any non-`TopLevelDestination` route,
+  so no change was needed there either.
+- **Settings is deliberately minimal**: a Premium section and nothing
+  else. `SettingsRepository.themeMode`/`setThemeMode` has existed with no
+  UI anywhere since the foundation build — the same orphaned-placeholder
+  shape `isPremiumUser` was in — and this screen would be the natural home
+  for it, but that's out of scope for what was asked here and is left as
+  an explicit, flagged follow-up rather than bundled in silently.

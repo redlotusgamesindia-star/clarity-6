@@ -48,7 +48,21 @@ generator, streak calculator (now with previous/best-run and lifetime
 aggregate coverage), habit stats, insights, reminder timing, breathing
 state machine, widget snapshot math, recovery checklist, recovery score,
 motivation messages, comeback achievements (`./gradlew testDebugUnitTest`).
-Placeholder (loudly labeled in-app): Learn only.
+
+A banner ad (AdMob, via a centralized `AdsManager` + UMP consent) was added
+after Phase E on Home, Journey, and the Journal list only — see
+ARCHITECTURE.md §23 for the privacy trade-off this represents and why it
+was a deliberate, discussed exception rather than an oversight. Test ads
+show automatically in debug builds; release builds use the real ad unit.
+A follow-up monetization pass added a proper **Premium architecture**
+(`PremiumState`, `PremiumRepository`, `PremiumPreferences`, a
+`BillingConnector` seam with a genuine no-op implementation, and a
+global `PremiumManager` — see ARCHITECTURE.md §24) that supersedes the
+placeholder premium flag from the ads pass, plus a minimal **Settings**
+screen (reached from a gear icon on Home, not a new bottom tab) hosting
+the Premium section. `ClarityBannerAd` now only reveals once an ad
+genuinely loads, animates in, and auto-hides on failure. Placeholder
+(loudly labeled in-app): Learn only.
 
 ## Notes
 

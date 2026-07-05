@@ -39,6 +39,10 @@ android {
 
     buildFeatures {
         compose = true
+        // Lets AdsManager branch on BuildConfig.DEBUG to pick the test vs
+        // production banner ad unit id from one place (plan: "centralized
+        // AdsManager"). Off by default on AGP 8+, so this must be explicit.
+        buildConfig = true
     }
 }
 
@@ -101,6 +105,11 @@ dependencies {
     // (the widget hard-codes brand colors instead of Material/dynamic
     // color, see widget/WidgetColors.kt).
     implementation(libs.glance.appwidget)
+
+    // Ads (banner-only, non-sensitive screens; see ads/AdsManager.kt and
+    // ARCHITECTURE.md §23 for the privacy trade-off this represents).
+    implementation(libs.play.services.ads)
+    implementation(libs.user.messaging.platform)
 
     // Testing
     testImplementation(libs.junit)

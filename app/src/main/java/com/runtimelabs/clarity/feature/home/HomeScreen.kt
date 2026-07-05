@@ -1,8 +1,10 @@
 package com.runtimelabs.clarity.feature.home
 
+import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -21,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -28,9 +35,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.runtimelabs.clarity.R
+import com.runtimelabs.clarity.ads.ClarityBannerAd
+import com.runtimelabs.clarity.ads.PrivacyOptionsViewModel
 import com.runtimelabs.clarity.core.designsystem.components.LoadingScreen
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import com.runtimelabs.clarity.core.util.rememberReduceMotionEnabled
+import com.runtimelabs.clarity.domain.ads.AdScreen
 import com.runtimelabs.clarity.feature.recovery.RelapseConfirmDialog
 import com.runtimelabs.clarity.feature.recovery.textRes
 import java.time.LocalDate
@@ -47,6 +57,7 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     onNavigateToRecoveryFlow: (Long) -> Unit,
+    onNavigateToSettings: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -68,6 +79,7 @@ fun HomeScreen(
                 reduceMotion = reduceMotion,
                 onOpenCheckIn = viewModel::onOpenCheckIn,
                 onRelapseButtonTapped = viewModel::onRelapseButtonTapped,
+                onNavigateToSettings = onNavigateToSettings,
             )
             val sheet = current.checkInSheet
             if (sheet != null) {
@@ -99,6 +111,7 @@ private fun HomeContent(
     reduceMotion: Boolean,
     onOpenCheckIn: () -> Unit,
     onRelapseButtonTapped: () -> Unit,
+    onNavigateToSettings: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -107,7 +120,18 @@ private fun HomeContent(
             .padding(horizontal = MaterialTheme.spacing.screenHorizontal),
     ) {
         Spacer(Modifier.height(MaterialTheme.spacing.md))
-        GreetingHeader(todayEpochDay = state.todayEpochDay)
+        Row(verticalAlignment = Alignment.Top) {
+            Box(modifier = Modifier.weight(1f)) {
+                GreetingHeader(todayEpochDay = state.todayEpochDay)
+            }
+            IconButton(onClick = onNavigateToSettings) {
+                Icon(
+                    imageVector = Icons.Rounded.Settings,
+                    contentDescription = stringResource(R.string.settings_title),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
 
         Spacer(Modifier.height(MaterialTheme.spacing.xl))
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -134,6 +158,12 @@ private fun HomeContent(
         Spacer(Modifier.height(MaterialTheme.spacing.md))
         QuoteCard(todayEpochDay = state.todayEpochDay)
 
+        Spacer(Modifier.height(MaterialTheme.spacing.lg))
+        ClarityBannerAd(screen = AdScreen.HOME)
+
+        Spacer(Modifier.height(MaterialTheme.spacing.sm))
+        PrivacyOptionsLink()
+
         Spacer(Modifier.height(MaterialTheme.spacing.xxl))
     }
 }
@@ -153,6 +183,33 @@ private fun RelapseEntryLink(onClick: () -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textDecoration = TextDecoration.Underline,
             modifier = Modifier.clickable(onClick = onClick),
+        )
+    }
+}
+
+/**
+ * Only rendered when UMP reports a privacy-options entry point is actually
+ * required — matching UMP's own documented guidance to keep this invisible
+ * otherwise. There is no Settings screen in this app to put this in yet, so
+ * it lives here, next to the other small quiet link on this screen.
+ */
+@Composable
+private fun PrivacyOptionsLink(viewModel: PrivacyOptionsViewModel = hiltViewModel()) {
+    val isRequired by viewModel.isPrivacyOptionsRequired.collectAsStateWithLifecycle()
+    if (!isRequired) return
+
+    val context = LocalContext.current
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Text(
+            text = stringResource(R.string.privacy_options_link),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier.clickable {
+                (context as? Activity)?.let { activity ->
+                    viewModel.showPrivacyOptionsForm(activity) { }
+                }
+            },
         )
     }
 }

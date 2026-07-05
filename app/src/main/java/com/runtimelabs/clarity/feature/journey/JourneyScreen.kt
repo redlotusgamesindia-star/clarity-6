@@ -24,11 +24,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.runtimelabs.clarity.R
+import com.runtimelabs.clarity.ads.ClarityBannerAd
 import com.runtimelabs.clarity.core.designsystem.components.ClarityCard
 import com.runtimelabs.clarity.core.designsystem.components.EmptyState
 import com.runtimelabs.clarity.core.designsystem.components.LoadingScreen
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import com.runtimelabs.clarity.core.util.rememberReduceMotionEnabled
+import com.runtimelabs.clarity.domain.ads.AdScreen
 
 @Composable
 fun JourneyScreen(
@@ -170,6 +172,9 @@ private fun JourneyContent(
                     InsightRow(insight = insight)
                 }
             }
+
+            Spacer(Modifier.height(MaterialTheme.spacing.lg))
+            ClarityBannerAd(screen = AdScreen.JOURNEY)
 
             Spacer(Modifier.height(96.dp)) // FAB clearance
         }

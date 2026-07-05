@@ -42,10 +42,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.runtimelabs.clarity.R
+import com.runtimelabs.clarity.ads.ClarityBannerAd
 import com.runtimelabs.clarity.core.designsystem.components.ClarityCard
 import com.runtimelabs.clarity.core.designsystem.components.EmptyState
 import com.runtimelabs.clarity.core.designsystem.components.LoadingScreen
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
+import com.runtimelabs.clarity.domain.ads.AdScreen
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -114,6 +116,12 @@ private fun JournalListContent(
                             text = stringResource(R.string.nav_journal),
                             style = MaterialTheme.typography.headlineLarge,
                         )
+                        Spacer(Modifier.height(MaterialTheme.spacing.md))
+                    }
+                }
+                item {
+                    Column {
+                        ClarityBannerAd(screen = AdScreen.JOURNAL_LIST)
                         Spacer(Modifier.height(MaterialTheme.spacing.md))
                     }
                 }

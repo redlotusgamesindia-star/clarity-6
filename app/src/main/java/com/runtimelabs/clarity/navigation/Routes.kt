@@ -48,3 +48,6 @@ import kotlinx.serialization.Serializable
  * pass through to be "allowed" to move on.
  */
 @Serializable data class RelapseRecoveryRoute(val relapseJourneyEventId: Long)
+
+/** Reached via a settings-gear icon on Home, not a bottom-bar tab — see ARCHITECTURE.md §24. */
+@Serializable data object SettingsRoute

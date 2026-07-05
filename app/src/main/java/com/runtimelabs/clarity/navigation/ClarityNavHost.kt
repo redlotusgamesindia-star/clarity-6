@@ -19,6 +19,7 @@ import com.runtimelabs.clarity.feature.journal.ThoughtRecordScreen
 import com.runtimelabs.clarity.feature.journey.HabitEditorScreen
 import com.runtimelabs.clarity.feature.journey.JourneyScreen
 import com.runtimelabs.clarity.feature.recovery.RecoveryFlowScreen
+import com.runtimelabs.clarity.feature.settings.SettingsScreen
 import com.runtimelabs.clarity.feature.toolkit.BreathingScreen
 import com.runtimelabs.clarity.feature.toolkit.EXERCISE_GROUNDING as EXERCISE_GROUNDING_CODE
 import com.runtimelabs.clarity.feature.toolkit.EXERCISE_MUSCLE as EXERCISE_MUSCLE_CODE
@@ -47,6 +48,7 @@ fun ClarityNavHost(
                 onNavigateToRecoveryFlow = { eventId ->
                     navController.navigate(RelapseRecoveryRoute(relapseJourneyEventId = eventId))
                 },
+                onNavigateToSettings = { navController.navigate(SettingsRoute) },
             )
         }
         composable<JourneyRoute> {
@@ -134,6 +136,9 @@ fun ClarityNavHost(
                 onOpenBreathing = { navController.navigate(BreathingRoute) },
                 onOpenJournal = { navController.navigate(JournalEditorRoute()) },
             )
+        }
+        composable<SettingsRoute> {
+            SettingsScreen(onBack = { navController.popBackStack() })
         }
     }
 }
