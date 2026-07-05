@@ -96,6 +96,12 @@ dependencies {
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
 
+    // Home-screen widget (Phase D). glance-appwidget alone is sufficient —
+    // it transitively brings in core androidx.glance; no glance-material3
+    // (the widget hard-codes brand colors instead of Material/dynamic
+    // color, see widget/WidgetColors.kt).
+    implementation(libs.glance.appwidget)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

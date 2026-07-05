@@ -32,8 +32,22 @@ a Canvas weekly progress chart, and deterministic weekly insights, plus the
 (auto-starting guided breathing with 3 patterns, 5-4-3-2-1 grounding,
 muscle release, and "remember your why"), a CBT thought record and a
 gratitude exercise as first-class Journal entry kinds in a unified hub —
-schema v5. Tests: plan generator, streak calculator, habit stats, insights,
-reminder timing, breathing state machine (`./gradlew testDebugUnitTest`).
+schema v5. Phase D adds a **home-screen widget** (Glance, two responsive
+sizes, self-healing daily refresh, zero new Room schema — a separate
+unencrypted DataStore cache backs it, see ARCHITECTURE.md §20) and an
+animation polish pass (shared `MotionTokens`, animated habit/mood/chart
+transitions, a staggered SOS entrance, and the first real use of the
+long-defined `celebration` color on the streak ring). Phase E adds the
+**relapse & recovery system**: a low-key relapse entry point on Home, a
+five-step supportive recovery flow (accept, optional reflection, common-
+pattern education, a personalized checklist, restart), the Rebuild System's
+"Recovery Day N / previous streak / best streak" framing, a daily Motivation
+Engine, a Recovery Score blending lifetime consistency with momentum, and
+five comeback achievements — schema v6, no new permissions. Tests: plan
+generator, streak calculator (now with previous/best-run and lifetime
+aggregate coverage), habit stats, insights, reminder timing, breathing
+state machine, widget snapshot math, recovery checklist, recovery score,
+motivation messages, comeback achievements (`./gradlew testDebugUnitTest`).
 Placeholder (loudly labeled in-app): Learn only.
 
 ## Notes

@@ -9,6 +9,10 @@ import com.runtimelabs.clarity.domain.insight.InsightGenerator
 import com.runtimelabs.clarity.domain.model.Habit
 import com.runtimelabs.clarity.domain.model.JourneyEventType
 import com.runtimelabs.clarity.domain.model.isScheduledOn
+import com.runtimelabs.clarity.domain.recovery.ComebackAchievement
+import com.runtimelabs.clarity.domain.recovery.RecoveryScore
+import com.runtimelabs.clarity.domain.recovery.RecoveryScoreCalculator
+import com.runtimelabs.clarity.domain.recovery.unlockedComebackAchievements
 import com.runtimelabs.clarity.domain.repository.CheckInRepository
 import com.runtimelabs.clarity.domain.repository.HabitRepository
 import com.runtimelabs.clarity.domain.repository.JourneyRepository
@@ -46,6 +50,9 @@ sealed interface JourneyUiState {
         val weekCompleted: Int,
         val weekScheduled: Int,
         val insights: List<Insight>,
+        val recoveryScore: RecoveryScore,
+        /** Empty until the first relapse — the section is hidden entirely until then. */
+        val comebackAchievements: List<ComebackAchievement>,
     ) : JourneyUiState {
         val hasHabits: Boolean get() = todaysHabits.isNotEmpty() || otherHabits.isNotEmpty()
     }
@@ -60,6 +67,7 @@ class JourneyViewModel @Inject constructor(
     streakCalculator: StreakCalculator,
     statsCalculator: HabitStatsCalculator,
     insightGenerator: InsightGenerator,
+    recoveryScoreCalculator: RecoveryScoreCalculator,
 ) : ViewModel() {
 
     private val todayEpochDay: Long = LocalDate.now().toEpochDay()
@@ -140,6 +148,8 @@ class JourneyViewModel @Inject constructor(
                 milestoneDays = plan?.firstMilestoneDays ?: 7,
                 todayEpochDay = todayEpochDay,
             ),
+            recoveryScore = recoveryScoreCalculator.compute(streak),
+            comebackAchievements = streak.unlockedComebackAchievements(),
         ) as JourneyUiState
     }.stateIn(
         scope = viewModelScope,

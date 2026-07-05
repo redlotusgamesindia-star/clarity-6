@@ -6,16 +6,20 @@ import com.runtimelabs.clarity.data.repository.HabitRepositoryImpl
 import com.runtimelabs.clarity.data.repository.JournalRepositoryImpl
 import com.runtimelabs.clarity.data.repository.JourneyRepositoryImpl
 import com.runtimelabs.clarity.data.repository.RecoveryProfileRepositoryImpl
+import com.runtimelabs.clarity.data.repository.RelapseReflectionRepositoryImpl
 import com.runtimelabs.clarity.data.repository.SettingsRepositoryImpl
 import com.runtimelabs.clarity.data.repository.ThoughtRecordRepositoryImpl
+import com.runtimelabs.clarity.data.repository.WidgetSyncRepositoryImpl
 import com.runtimelabs.clarity.domain.repository.CheckInRepository
 import com.runtimelabs.clarity.domain.repository.GratitudeRepository
 import com.runtimelabs.clarity.domain.repository.HabitRepository
 import com.runtimelabs.clarity.domain.repository.JournalRepository
 import com.runtimelabs.clarity.domain.repository.JourneyRepository
 import com.runtimelabs.clarity.domain.repository.RecoveryProfileRepository
+import com.runtimelabs.clarity.domain.repository.RelapseReflectionRepository
 import com.runtimelabs.clarity.domain.repository.SettingsRepository
 import com.runtimelabs.clarity.domain.repository.ThoughtRecordRepository
+import com.runtimelabs.clarity.domain.repository.WidgetSyncRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -61,4 +65,12 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindGratitudeRepository(impl: GratitudeRepositoryImpl): GratitudeRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindWidgetSyncRepository(impl: WidgetSyncRepositoryImpl): WidgetSyncRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRelapseReflectionRepository(impl: RelapseReflectionRepositoryImpl): RelapseReflectionRepository
 }

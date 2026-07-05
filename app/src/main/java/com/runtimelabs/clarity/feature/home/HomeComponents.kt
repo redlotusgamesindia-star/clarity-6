@@ -1,6 +1,7 @@
 package com.runtimelabs.clarity.feature.home
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
@@ -47,6 +48,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import com.runtimelabs.clarity.R
 import com.runtimelabs.clarity.core.designsystem.components.ClarityCard
+import com.runtimelabs.clarity.core.designsystem.theme.MotionTokens
+import com.runtimelabs.clarity.core.designsystem.theme.extended
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import com.runtimelabs.clarity.domain.model.DailyCheckIn
 import com.runtimelabs.clarity.domain.model.MoodLevel
@@ -100,6 +103,8 @@ fun StreakRing(
     currentDays: Int,
     milestoneDays: Int,
     reduceMotion: Boolean,
+    isRebuilding: Boolean = false,
+    hasBeatenPreviousRecord: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val target = if (milestoneDays <= 0) 0f else (currentDays / milestoneDays.toFloat()).coerceIn(0f, 1f)
@@ -109,7 +114,27 @@ fun StreakRing(
         label = "streakRingProgress",
     )
     val trackColor = MaterialTheme.colorScheme.surfaceVariant
-    val barColor = MaterialTheme.colorScheme.primary
+    // The one place the celebration token (defined all the way back in the
+    // foundation theme, never used until Phase D) finally does its job: the
+    // arc turns dawn-amber once EITHER the onboarding milestone is reached
+    // OR (Phase E) a post-relapse comeback has beaten its own previous
+    // record — both are genuinely worth marking the same way. A color
+    // DIFFERENCE is the actual payoff here — it's correct even on a fresh
+    // app open where there's no transition to see; animateColorAsState just
+    // means the rare live transition (open past midnight, watching it tick
+    // over) is smooth too. Deliberately NOT a looping/pulsing celebration —
+    // this screen is viewed many times a day, and a perpetual animation
+    // would read as gamified rather than premium the tenth time you see it.
+    val milestoneReached = (milestoneDays > 0 && currentDays >= milestoneDays) || hasBeatenPreviousRecord
+    val barColor by animateColorAsState(
+        targetValue = if (milestoneReached) {
+            MaterialTheme.extended.celebration
+        } else {
+            MaterialTheme.colorScheme.primary
+        },
+        animationSpec = if (reduceMotion) snap() else tween(MotionTokens.EMPHASIZED),
+        label = "streakRingColor",
+    )
 
     Box(modifier = modifier.size(210.dp), contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -141,7 +166,14 @@ fun StreakRing(
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = pluralStringResource(R.plurals.streak_days_label, currentDays),
+                // "Recovery Day N" replaces the plain "days clean" label
+                // while rebuilding — the number above already carries the
+                // count, so this just names what kind of day it is.
+                text = if (isRebuilding) {
+                    stringResource(R.string.home_recovery_day_label)
+                } else {
+                    pluralStringResource(R.plurals.streak_days_label, currentDays)
+                },
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

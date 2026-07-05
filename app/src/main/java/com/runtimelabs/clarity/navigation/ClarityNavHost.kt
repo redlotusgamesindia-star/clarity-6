@@ -18,6 +18,7 @@ import com.runtimelabs.clarity.feature.journal.JournalListScreen
 import com.runtimelabs.clarity.feature.journal.ThoughtRecordScreen
 import com.runtimelabs.clarity.feature.journey.HabitEditorScreen
 import com.runtimelabs.clarity.feature.journey.JourneyScreen
+import com.runtimelabs.clarity.feature.recovery.RecoveryFlowScreen
 import com.runtimelabs.clarity.feature.toolkit.BreathingScreen
 import com.runtimelabs.clarity.feature.toolkit.EXERCISE_GROUNDING as EXERCISE_GROUNDING_CODE
 import com.runtimelabs.clarity.feature.toolkit.EXERCISE_MUSCLE as EXERCISE_MUSCLE_CODE
@@ -42,7 +43,11 @@ fun ClarityNavHost(
         modifier = modifier,
     ) {
         composable<HomeRoute> {
-            HomeScreen()
+            HomeScreen(
+                onNavigateToRecoveryFlow = { eventId ->
+                    navController.navigate(RelapseRecoveryRoute(relapseJourneyEventId = eventId))
+                },
+            )
         }
         composable<JourneyRoute> {
             JourneyScreen(
@@ -114,6 +119,21 @@ fun ClarityNavHost(
         }
         composable<WhyRoute> {
             WhyScreen(onDone = { navController.popBackStack() })
+        }
+        composable<RelapseRecoveryRoute> { entry ->
+            val route: RelapseRecoveryRoute = entry.toRoute()
+            RecoveryFlowScreen(
+                relapseJourneyEventId = route.relapseJourneyEventId,
+                onDone = {
+                    // Pop all the way back to Home, not just one step — the
+                    // flow's own back button already lets someone revisit
+                    // earlier steps, but "done" should never leave the
+                    // five-step flow sitting on the back stack to return to.
+                    navController.popBackStack(HomeRoute, inclusive = false)
+                },
+                onOpenBreathing = { navController.navigate(BreathingRoute) },
+                onOpenJournal = { navController.navigate(JournalEditorRoute()) },
+            )
         }
     }
 }

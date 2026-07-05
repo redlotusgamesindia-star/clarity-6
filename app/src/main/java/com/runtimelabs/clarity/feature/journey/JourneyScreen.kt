@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -29,6 +28,7 @@ import com.runtimelabs.clarity.core.designsystem.components.ClarityCard
 import com.runtimelabs.clarity.core.designsystem.components.EmptyState
 import com.runtimelabs.clarity.core.designsystem.components.LoadingScreen
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
+import com.runtimelabs.clarity.core.util.rememberReduceMotionEnabled
 
 @Composable
 fun JourneyScreen(
@@ -37,11 +37,13 @@ fun JourneyScreen(
     viewModel: JourneyViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val reduceMotion = rememberReduceMotionEnabled()
 
     when (val current = state) {
         JourneyUiState.Loading -> LoadingScreen()
         is JourneyUiState.Ready -> JourneyContent(
             state = current,
+            reduceMotion = reduceMotion,
             onNewHabit = onNewHabit,
             onEditHabit = onEditHabit,
             onToggleToday = viewModel::onToggleToday,
@@ -52,22 +54,12 @@ fun JourneyScreen(
 @Composable
 private fun JourneyContent(
     state: JourneyUiState.Ready,
+    reduceMotion: Boolean,
     onNewHabit: () -> Unit,
     onEditHabit: (Long) -> Unit,
     onToggleToday: (Long, Boolean) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        if (!state.hasHabits) {
-            EmptyState(
-                icon = Icons.Rounded.TaskAlt,
-                title = stringResource(R.string.journey_empty_title),
-                description = stringResource(R.string.journey_empty_description),
-                actionLabel = stringResource(R.string.habit_new),
-                onAction = onNewHabit,
-            )
-            return
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -79,6 +71,30 @@ private fun JourneyContent(
                 text = stringResource(R.string.nav_journey),
                 style = MaterialTheme.typography.headlineLarge,
             )
+
+            // Recovery Score and its achievements are about the streak/
+            // relapse journey specifically — unrelated to whether any habit
+            // has been set up yet, so they always render here rather than
+            // living behind the habit empty-state below.
+            Spacer(Modifier.height(MaterialTheme.spacing.lg))
+            RecoveryScoreCard(score = state.recoveryScore)
+            if (state.comebackAchievements.isNotEmpty()) {
+                Spacer(Modifier.height(MaterialTheme.spacing.md))
+                ComebackAchievementsSection(achievements = state.comebackAchievements)
+            }
+
+            if (!state.hasHabits) {
+                Spacer(Modifier.height(MaterialTheme.spacing.xl))
+                EmptyState(
+                    icon = Icons.Rounded.TaskAlt,
+                    title = stringResource(R.string.journey_empty_title),
+                    description = stringResource(R.string.journey_empty_description),
+                    actionLabel = stringResource(R.string.habit_new),
+                    onAction = onNewHabit,
+                )
+                Spacer(Modifier.height(MaterialTheme.spacing.xxl))
+                return@Column
+            }
 
             Spacer(Modifier.height(MaterialTheme.spacing.lg))
             Text(
@@ -128,7 +144,7 @@ private fun JourneyContent(
             )
             Spacer(Modifier.height(MaterialTheme.spacing.sm))
             ClarityCard {
-                WeekBarChart(days = state.weekDays)
+                WeekBarChart(days = state.weekDays, reduceMotion = reduceMotion)
                 Spacer(Modifier.height(MaterialTheme.spacing.md))
                 Text(
                     text = stringResource(
@@ -158,13 +174,15 @@ private fun JourneyContent(
             Spacer(Modifier.height(96.dp)) // FAB clearance
         }
 
-        ExtendedFloatingActionButton(
-            onClick = onNewHabit,
-            icon = { Icon(Icons.Rounded.Add, contentDescription = null) },
-            text = { Text(stringResource(R.string.habit_new)) },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(MaterialTheme.spacing.lg),
-        )
+        if (state.hasHabits) {
+            ExtendedFloatingActionButton(
+                onClick = onNewHabit,
+                icon = { Icon(Icons.Rounded.Add, contentDescription = null) },
+                text = { Text(stringResource(R.string.habit_new)) },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(MaterialTheme.spacing.lg),
+            )
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.runtimelabs.clarity.feature.home
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +21,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.runtimelabs.clarity.R
 import com.runtimelabs.clarity.core.designsystem.components.ClarityPrimaryButton
+import com.runtimelabs.clarity.core.designsystem.theme.MotionTokens
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import com.runtimelabs.clarity.domain.model.MoodLevel
 import kotlin.math.roundToInt
@@ -118,19 +122,40 @@ private fun MoodOption(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    val borderColor = if (selected) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-    }
-    Surface(
-        onClick = onClick,
-        shape = CircleShape,
-        color = if (selected) {
+    // Same quiet color-transition idiom as the bottom nav's selected tab
+    // (ClarityAppRoot.ClarityNavItem) — selecting a mood should feel like
+    // the same kind of "quiet state change" as everything else in the app.
+    val borderColor by animateColorAsState(
+        targetValue = if (selected) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        },
+        animationSpec = tween(MotionTokens.QUICK),
+        label = "moodBorderColor",
+    )
+    val containerColor by animateColorAsState(
+        targetValue = if (selected) {
             MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
         } else {
             Color.Transparent
         },
+        animationSpec = tween(MotionTokens.QUICK),
+        label = "moodContainerColor",
+    )
+    val iconTint by animateColorAsState(
+        targetValue = if (selected) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
+        animationSpec = tween(MotionTokens.QUICK),
+        label = "moodIconTint",
+    )
+    Surface(
+        onClick = onClick,
+        shape = CircleShape,
+        color = containerColor,
         border = BorderStroke(if (selected) 1.5.dp else 1.dp, borderColor),
         modifier = Modifier.size(52.dp),
     ) {
@@ -138,11 +163,7 @@ private fun MoodOption(
             Icon(
                 imageVector = mood.icon(),
                 contentDescription = stringResource(mood.labelRes()),
-                tint = if (selected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
+                tint = iconTint,
                 modifier = Modifier.size(26.dp),
             )
         }

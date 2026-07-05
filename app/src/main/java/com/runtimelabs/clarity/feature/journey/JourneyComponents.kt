@@ -1,6 +1,12 @@
 package com.runtimelabs.clarity.feature.journey
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -40,10 +46,13 @@ import androidx.compose.material.icons.rounded.TrendingUp
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,16 +60,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.runtimelabs.clarity.R
+import com.runtimelabs.clarity.core.designsystem.components.ClarityCard
+import com.runtimelabs.clarity.core.designsystem.theme.MotionTokens
+import com.runtimelabs.clarity.core.designsystem.theme.extended
 import com.runtimelabs.clarity.domain.habit.DayStat
 import com.runtimelabs.clarity.domain.insight.Insight
 import com.runtimelabs.clarity.domain.insight.InsightCode
+import com.runtimelabs.clarity.feature.recovery.descriptionRes
+import com.runtimelabs.clarity.feature.recovery.icon
+import com.runtimelabs.clarity.feature.recovery.titleRes
 import com.runtimelabs.clarity.domain.model.Habit
+import com.runtimelabs.clarity.domain.recovery.ComebackAchievement
+import com.runtimelabs.clarity.domain.recovery.RecoveryScore
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -68,6 +86,24 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.util.Locale
+
+/**
+ * Grows from zero the first time this exact bar (keyed by epochDay in the
+ * caller) enters composition; later target changes transition smoothly from
+ * wherever the bar currently is, never replaying the entrance.
+ */
+@Composable
+private fun animatedBarFraction(target: Float, reduceMotion: Boolean): Float {
+    val animatable = remember { Animatable(if (reduceMotion) target else 0f) }
+    LaunchedEffect(target, reduceMotion) {
+        if (reduceMotion) {
+            animatable.snapTo(target)
+        } else {
+            animatable.animateTo(target, animationSpec = tween(MotionTokens.SETTLE, easing = MotionTokens.Standard))
+        }
+    }
+    return animatable.value
+}
 
 // ------------------------------------------------------------ icon catalog --
 
@@ -176,7 +212,14 @@ private fun DoneToggle(done: Boolean, onToggle: (Boolean) -> Unit) {
             .semantics { contentDescription = actionLabel },
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            if (done) {
+            // Was an instant appear/disappear; now the mark pops in the same
+            // way OptionCard's selection check does, so the two "you chose
+            // this" moments in the app feel like one language (MotionTokens.QUICK).
+            AnimatedVisibility(
+                visible = done,
+                enter = fadeIn(tween(MotionTokens.QUICK)) + scaleIn(initialScale = 0.6f),
+                exit = fadeOut(tween(MotionTokens.QUICK)),
+            ) {
                 Icon(
                     imageVector = Icons.Rounded.Check,
                     contentDescription = null, // the Surface carries the action label
@@ -243,14 +286,25 @@ fun HabitOtherDayRow(
 /**
  * Seven bars of completion fraction. Empty days keep a soft track so the
  * week's shape stays readable; nothing is red, a missed day is just shorter.
+ *
+ * Bars grow in from zero the first time this chart enters composition, then
+ * transition smoothly (never replaying from zero) as habit toggles change
+ * the underlying data — same "compute the animated value as composable
+ * state, then read it inside Canvas" shape as [HomeComponents.StreakRing].
  */
 @Composable
 fun WeekBarChart(
     days: List<DayStat>,
+    reduceMotion: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val track = MaterialTheme.colorScheme.surfaceVariant
     val bar = MaterialTheme.colorScheme.primary
+
+    val animatedFractions = days.map { day ->
+        val target = if (day.scheduled == 0) 0f else day.completed.toFloat() / day.scheduled
+        key(day.epochDay) { animatedBarFraction(target, reduceMotion) }
+    }
 
     Column(modifier = modifier.fillMaxWidth()) {
         Canvas(
@@ -262,7 +316,7 @@ fun WeekBarChart(
             val slot = size.width / days.size
             val barWidth = slot * 0.42f
             val corner = CornerRadius(barWidth / 2f, barWidth / 2f)
-            days.forEachIndexed { index, day ->
+            animatedFractions.forEachIndexed { index, fraction ->
                 val left = slot * index + (slot - barWidth) / 2f
                 drawRoundRect(
                     color = track,
@@ -271,7 +325,6 @@ fun WeekBarChart(
                     cornerRadius = corner,
                     alpha = 0.4f,
                 )
-                val fraction = if (day.scheduled == 0) 0f else day.completed.toFloat() / day.scheduled
                 if (fraction > 0f) {
                     val barHeight = size.height * fraction
                     drawRoundRect(
@@ -353,5 +406,138 @@ fun InsightRow(insight: Insight, modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
+    }
+}
+
+// --------------------------------------------------------- recovery score --
+
+/**
+ * "Instead of only tracking streaks" (§22): a linear bar for the blended
+ * score, then the four supporting counts in a plain 2x2 grid. No component
+ * breakdown shown here — the score's transparency lives in code/tests
+ * (RecoveryScoreCalculator's doc comment); the UI stays as simple as the
+ * request itself: a bar, a percent, four numbers.
+ */
+@Composable
+fun RecoveryScoreCard(score: RecoveryScore, modifier: Modifier = Modifier) {
+    ClarityCard(modifier = modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(R.string.recovery_score_title),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = stringResource(R.string.recovery_score_percent, score.percent),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+        Spacer(Modifier.height(MaterialTheme.spacing.sm))
+        LinearProgressIndicator(
+            progress = { score.percent / 100f },
+            strokeCap = StrokeCap.Round,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp),
+        )
+        Spacer(Modifier.height(MaterialTheme.spacing.lg))
+        Row(modifier = Modifier.fillMaxWidth()) {
+            RecoveryScoreStat(
+                value = score.totalCleanDays,
+                labelRes = R.string.recovery_score_total_clean_days,
+                modifier = Modifier.weight(1f),
+            )
+            RecoveryScoreStat(
+                value = score.totalRelapses,
+                labelRes = R.string.recovery_score_relapses,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(Modifier.height(MaterialTheme.spacing.md))
+        Row(modifier = Modifier.fillMaxWidth()) {
+            RecoveryScoreStat(
+                value = score.bestStreakDays,
+                labelRes = R.string.recovery_score_best_streak,
+                modifier = Modifier.weight(1f),
+            )
+            RecoveryScoreStat(
+                value = score.currentStreakDays,
+                labelRes = R.string.recovery_score_current_streak,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun RecoveryScoreStat(value: Int, labelRes: Int, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            text = value.toString(),
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        Text(
+            text = stringResource(labelRes),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+// --------------------------------------------------- comeback achievements --
+
+/**
+ * Hidden entirely until the first relapse — these badges describe THIS
+ * comeback (§22), so there is nothing honest to show before one exists.
+ * Deliberately understated: small cards, no unlock animation, no sound —
+ * consistent with the "not gamified" restraint already applied to the
+ * streak ring's own celebration color (§21).
+ */
+@Composable
+fun ComebackAchievementsSection(
+    achievements: List<ComebackAchievement>,
+    modifier: Modifier = Modifier,
+) {
+    if (achievements.isEmpty()) return
+    Column(modifier = modifier.fillMaxWidth()) {
+        achievements.forEachIndexed { index, achievement ->
+            if (index > 0) Spacer(Modifier.height(MaterialTheme.spacing.sm))
+            AchievementRow(achievement)
+        }
+    }
+}
+
+@Composable
+private fun AchievementRow(achievement: ComebackAchievement) {
+    ClarityCard(modifier = Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(MaterialTheme.extended.celebration.copy(alpha = 0.15f), CircleShape),
+            ) {
+                Icon(
+                    imageVector = achievement.icon(),
+                    contentDescription = null,
+                    tint = MaterialTheme.extended.celebration,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+            Spacer(Modifier.width(MaterialTheme.spacing.md))
+            Column {
+                Text(
+                    text = stringResource(achievement.titleRes()),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+                Text(
+                    text = stringResource(achievement.descriptionRes()),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
     }
 }

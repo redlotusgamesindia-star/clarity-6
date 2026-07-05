@@ -14,5 +14,5 @@ interface JourneyDao {
     fun observeEventDays(type: String): Flow<List<Long>>
 
     @Insert
-    suspend fun insert(event: JourneyEventEntity)
+    suspend fun insert(event: JourneyEventEntity): Long
 }

@@ -343,3 +343,191 @@ flash or a start-screen swap. Post-splash XML theme only sets
   exercise's target, not its gate.
 - **DB v4 -> v5** adds `thought_record` + `gratitude_entry`. No change to
   `journey_event`'s schema for the new event type — see above.
+
+## 20. Home-screen widget (Phase D, part 1)
+
+- **A new top-level `widget/` package**, sibling to `feature/`, `data/`,
+  `domain/`. A Glance `GlanceAppWidget` is not a nav-graph screen (it
+  doesn't belong under `feature/`) and it's a rendering surface, not a data
+  concern — it earns its own home.
+- **The cache is deliberately unencrypted**, unlike every other user-data
+  store (§5, §14) — the ONE intentional exception to "user data lives only
+  in the encrypted DB." This is not a privacy regression: the two numbers
+  cached (days clean, milestone target) are exactly what the widget renders
+  in cleartext on the home screen the instant the user places it.
+  Encrypting a cache of a number already shown in the open protects
+  nothing. Everything with actual content — journal text, thought records,
+  feelings, triggers — stays exclusively in SQLCipher and never reaches this
+  file. `WidgetSnapshotStore`'s doc comment carries this reasoning verbatim
+  so it reads as a decision, not an oversight.
+- **The widget reads the same DataStore file via its own delegate, not
+  dependency injection.** `GlanceAppWidget` instances are recreated on every
+  update and are meant to stay stateless (Google's own guidance); rather
+  than fight that with Hilt EntryPoints or lifecycle-timing workarounds,
+  `ClarityWidget` declares its own `private val Context.widgetSnapshotDataStore`
+  with the identical file name `WidgetSnapshotStore` uses. DataStore
+  coordinates multiple same-named delegates safely — this is the documented,
+  intended pattern for sharing a DataStore between an app and its widget,
+  not a workaround.
+- **Refresh reuses, rather than reinvents, the reminder system's scheduling
+  primitives.** `WidgetRefreshScheduler` is a second inexact, self-chaining
+  `AlarmManager` alarm (same rationale as §18: exact alarms are
+  Play-restricted, WorkManager's periodic drift is wrong for "at a specific
+  local time"), and it calls the SAME tested `ReminderTimeCalculator` habit
+  reminders already use — new scheduling math was never needed.
+- **One method, four call sites.** `WidgetSyncRepository.refresh()` recomputes
+  the true streak via the existing `StreakCalculator`, writes the cache,
+  calls Glance's `updateAll`, AND re-arms its own next alarm — all in one
+  call, mirroring the reminder receiver's fire-then-rechain idiom. It's
+  invoked from app start, boot, the daily alarm firing, and the moment
+  onboarding completes (so a widget placed right after onboarding shows Day
+  1 immediately rather than waiting for the next midnight).
+- **`exported="true"` on the widget's receiver, `exported="false"` on
+  everything else that listens for a broadcast.** This looks inconsistent
+  until you know why: `BOOT_COMPLETED` is a protected system broadcast — the
+  OS can deliver it to a non-exported receiver regardless, since `exported`
+  only gates whether *other apps* could also trigger it (verified against
+  Android Developer Relations' own guidance before trusting this, given how
+  much noise exists on this exact question online). `APPWIDGET_UPDATE`, by
+  contrast, is delivered by the launcher/AppWidgetHost — a genuinely
+  different app/process — which needs ordinary exported access, matching
+  Google's own Glance sample exactly.
+- **No determinate circular progress in Glance 1.1.0** — RemoteViews has no
+  arbitrary Canvas, so the app's Home ring can't be reproduced as-is. The
+  large widget size uses a horizontal `LinearProgressIndicator` toward the
+  milestone instead: an honest adaptation to the platform, not a downgrade
+  nobody decided on.
+- **Colors are hand-mirrored from `Color.kt`, not pulled from
+  `glance-material3`.** Glance's own team recommends hard-coded
+  `ColorProvider(day, night)` values for apps with a custom, non-dynamic
+  palette (exactly this app's stance since §9) — pulling in the interop
+  artifact to reuse `MaterialTheme` would fight that, not honor it.
+  `WidgetColors.kt` is intentionally small and flags itself for updates if
+  the app palette ever changes.
+- **Tap opens the app to its normal start destination — no deep link into
+  a specific screen.** Deep-linking the widget straight into breathing or
+  SOS was considered and deliberately deferred: it's a genuinely separate
+  feature (intent-filter design, NavHost deep-link wiring, testing) with its
+  own risk surface, not a natural extension of this one.
+
+## 21. Motion tokens & animation polish (Phase D, part 2)
+
+- **`MotionTokens`** (durations: QUICK/STANDARD/EMPHASIZED/SETTLE, plus a
+  shared easing) is the timing equivalent of `Spacing` — named values instead
+  of every screen hand-rolling its own millisecond constants. New Phase-D
+  motion reads from it; a handful of clearly-equivalent existing call sites
+  were left as bare numbers on purpose (retrofitting every already-shipped
+  animation for cosmetic consistency was judged not worth the compile risk
+  of touching working code this late, with no compiler in the loop — noted
+  here as a deliberate non-goal, not an oversight).
+- **Habit done-toggle** now pops its checkmark the same way onboarding's
+  `OptionCard` does (fade + scale-in) instead of appearing instantly — the
+  two "you chose this" moments in the app now share one motion language.
+- **The week chart's bars grow in from zero on first view**, then transition
+  smoothly (never replaying from zero) as habit toggles change the data —
+  an explicit `Animatable` + `LaunchedEffect(Unit)` per bar, since plain
+  `animateFloatAsState` initializes directly at its target with no animation
+  on first composition (correct, standard behavior — worth naming since it's
+  the exact subtlety that makes the pre-existing streak-ring "sweep" mostly
+  invisible on a cold app open too, and deliberately left as-is there: a
+  screen opened dozens of times a day should show the correct number
+  instantly, not make you wait through a sweep every single time).
+- **Mood selection in the check-in sheet** now animates its border/fill/icon
+  tint instead of snapping, the same quiet-transition idiom the bottom nav's
+  selected tab already used.
+- **The SOS toolkit hub** settles in with a staggered fade-and-rise entrance
+  across its hero card and four tool cards — arguably the single screen most
+  worth feeling calm and considered, since it's the one someone opens
+  mid-crisis.
+- **The streak ring's arc finally uses `ExtendedColors.celebration`** —
+  defined in the very first foundation build, never used until now. Once the
+  milestone is reached the arc renders in dawn-amber instead of teal, with
+  the transition animated for the rare case it happens live. Deliberately
+  NOT a looping or pulsing celebration: this is one of the most-viewed
+  screens in the app, and a perpetual animation would read as gamified
+  rather than premium by the tenth time someone sees it. A persisted
+  "have I celebrated this milestone before" flag was considered and
+  rejected for the same reason plus real complexity it doesn't earn yet
+  (there's no relapse-recording UI to reset it against): the color
+  difference is the actual payoff, correct even on a cold app open with no
+  transition to watch.
+
+## 22. Relapse & recovery (Phase E)
+
+The most emotionally consequential surface in the app. Several choices here
+deliberately depart from a purely literal reading of the brief, in the same
+direction the app has leaned since onboarding: less friction, less shame,
+more honesty about what's actually being computed.
+
+- **The relapse entry point is a quiet text link under the streak, not a
+  button.** A prominent always-visible "log a relapse" CTA would itself work
+  against the point — it would make the screen you open to feel good about
+  your progress also a daily reminder that failure is one tap away.
+  Findable in one tap; never the loudest thing on the screen.
+- **The relapse is recorded the instant it's confirmed, before the recovery
+  flow even opens.** The five-step flow that follows is entirely supportive
+  — closing the app mid-flow must never leave the streak half-reset. This
+  mirrors onboarding's "persist first, let observed state drive what happens
+  next," and means the flow's own failure to complete has zero effect on
+  data correctness.
+- **Every reflection field is optional**, exactly like check-ins, gratitude,
+  and thought records already are. Forcing detailed introspection
+  immediately after a setback can itself feel like an interrogation.
+  Reflection reuses `MainTrigger`, `UrgeTime`, and `MoodLevel` verbatim
+  rather than inventing near-duplicate enums — one `RelapseLocation` enum is
+  the only genuinely new vocabulary this step needed.
+- **The checklist is a third deterministic generator**, same contract as the
+  onboarding plan and the weekly insights: pure, tested, typed codes (never
+  raw strings), five universal foundations plus up to three personalized
+  additions from what Reflection offered. Checkmarks are deliberately
+  ephemeral (not persisted) — this is a one-time show of momentum, not a
+  habit tracker; two items deep-link to the real Breathing and Journal
+  screens rather than just describing them in text.
+- **`StreakSnapshot` gained four fields** (`previousRunDays`,
+  `bestClosedRunDays`, `totalRelapses`, `totalCleanDays`) — all derived
+  inside the same walk `StreakCalculator` already did for `longestDays`,
+  none of it new state. `previousRunDays` (the run that just ended) and
+  `bestClosedRunDays` (the record to beat) are deliberately two different
+  numbers, matching the Rebuild System's own "Previous streak" vs "Best
+  streak" distinction — collapsing them into one would have been wrong the
+  moment someone's most recent run isn't their longest one.
+- **The Rebuild System is a state machine with exactly one derived
+  boolean.** `isRebuilding` (`totalRelapses > 0 && !hasBeatenPreviousRecord`)
+  drives everything: the ring's label swaps from "days clean" to "Recovery
+  Day," the caption swaps to the two-stat framing, and the Motivation
+  Engine's line appears. The moment `hasBeatenPreviousRecord` flips true,
+  every one of those reverts automatically to the original framing — no
+  separate transition to code, because `isRebuilding` becoming false *is*
+  the transition.
+- **The streak ring's celebration color (§21) now also fires on beating a
+  previous record**, not just the onboarding milestone — both are genuinely
+  worth the same visual treatment. Still no looping animation, same
+  reasoning as before: this screen is opened many times a day.
+- **Recovery Score weights lifetime clean rate at 60%, current momentum at
+  20% (capped at 30 days), and proven capability at 20% (capped at 90 days,
+  echoing the reboot framing already used at onboarding).** The weighting is
+  deliberately shaped so a strong history doesn't collapse after one new
+  relapse, and so a brand-new user with a perfect record doesn't see a
+  falsely low number just for being new. The score was NOT tuned to
+  reproduce this brief's illustrative "84%" example exactly — that number
+  reads as flavor text, not a spec to reverse-engineer, and contorting the
+  formula to hit one example would have made it less defensible everywhere
+  else.
+- **Comeback achievements are computed live from `StreakSnapshot`, with zero
+  persisted "unlocked" state** — same "derive, don't store" discipline as
+  the streak itself, which sidesteps an entire class of sync bugs. The
+  honest trade-off: they describe *this* comeback, not a lifetime
+  collection. Relapse again, and they recompute fresh for the new one —
+  treated as thematically correct (each comeback earns its own pride), not
+  a limitation, and it avoids real complexity a lifetime model would need
+  with no unlock-tracking table to match it against.
+- **DB v5 -> v6** adds `relapse_reflection`, linked to its `journey_event`
+  row by id (`JourneyRepository.record()` now returns the new row's id —
+  the one interface signature change this phase, verified against its
+  single existing caller before making it).
+- **Engineering note for future contributors touching these ViewModels**:
+  `kotlinx.coroutines`'s `combine()` has no overload past 5 named flow
+  arguments (confirmed against the maintainers' own issue tracker, not
+  assumed). `HomeViewModel` and `JourneyViewModel` both fold extra UI-only
+  flows into one `Triple`/pair-producing inner `combine` to stay under that
+  ceiling — reach for the same trick before reaching for a vararg array.

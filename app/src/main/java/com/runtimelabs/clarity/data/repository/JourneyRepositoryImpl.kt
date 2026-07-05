@@ -18,7 +18,7 @@ class JourneyRepositoryImpl @Inject constructor(
     override fun observeEventDays(type: JourneyEventType): Flow<List<Long>> =
         dao.observeEventDays(type.storageValue).distinctUntilChanged()
 
-    override suspend fun record(event: JourneyEvent) {
+    override suspend fun record(event: JourneyEvent): Long =
         dao.insert(
             JourneyEventEntity(
                 type = event.type.storageValue,
@@ -26,5 +26,4 @@ class JourneyRepositoryImpl @Inject constructor(
                 epochDay = event.epochDay,
             ),
         )
-    }
 }

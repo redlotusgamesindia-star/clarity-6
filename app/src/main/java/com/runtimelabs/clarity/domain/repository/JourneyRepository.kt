@@ -8,6 +8,10 @@ interface JourneyRepository {
     /** Epoch days of all events of [type], ascending. Streak input. */
     fun observeEventDays(type: JourneyEventType): Flow<List<Long>>
 
-    /** Append a fact to the timeline. Events are never edited or deleted. */
-    suspend fun record(event: JourneyEvent)
+    /**
+     * Append a fact to the timeline. Events are never edited or deleted.
+     * Returns the new row's id, needed when something else (a relapse's
+     * reflection) needs to link back to this specific event.
+     */
+    suspend fun record(event: JourneyEvent): Long
 }

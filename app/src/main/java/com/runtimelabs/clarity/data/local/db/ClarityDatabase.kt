@@ -9,6 +9,7 @@ import com.runtimelabs.clarity.data.local.db.dao.HabitCompletionDao
 import com.runtimelabs.clarity.data.local.db.dao.HabitDao
 import com.runtimelabs.clarity.data.local.db.dao.JournalDao
 import com.runtimelabs.clarity.data.local.db.dao.JourneyDao
+import com.runtimelabs.clarity.data.local.db.dao.RelapseReflectionDao
 import com.runtimelabs.clarity.data.local.db.dao.ThoughtRecordDao
 import com.runtimelabs.clarity.data.local.db.dao.RecoveryProfileDao
 import com.runtimelabs.clarity.data.local.db.entity.AppMetadataEntity
@@ -18,6 +19,7 @@ import com.runtimelabs.clarity.data.local.db.entity.HabitCompletionEntity
 import com.runtimelabs.clarity.data.local.db.entity.HabitEntity
 import com.runtimelabs.clarity.data.local.db.entity.JournalEntryEntity
 import com.runtimelabs.clarity.data.local.db.entity.JourneyEventEntity
+import com.runtimelabs.clarity.data.local.db.entity.RelapseReflectionEntity
 import com.runtimelabs.clarity.data.local.db.entity.ThoughtRecordEntity
 import com.runtimelabs.clarity.data.local.db.entity.RecoveryPlanItemEntity
 import com.runtimelabs.clarity.data.local.db.entity.RecoveryProfileEntity
@@ -43,8 +45,9 @@ import com.runtimelabs.clarity.data.local.db.entity.RecoveryProfileEntity
         HabitCompletionEntity::class,
         ThoughtRecordEntity::class,
         GratitudeEntryEntity::class,
+        RelapseReflectionEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = true,
 )
 abstract class ClarityDatabase : RoomDatabase() {
@@ -66,6 +69,8 @@ abstract class ClarityDatabase : RoomDatabase() {
     abstract fun thoughtRecordDao(): ThoughtRecordDao
 
     abstract fun gratitudeDao(): GratitudeDao
+
+    abstract fun relapseReflectionDao(): RelapseReflectionDao
 
     companion object {
         const val DATABASE_NAME = "clarity.db"

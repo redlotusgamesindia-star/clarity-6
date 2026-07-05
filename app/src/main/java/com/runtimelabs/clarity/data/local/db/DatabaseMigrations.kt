@@ -116,4 +116,21 @@ internal val MIGRATION_4_5 = object : Migration(4, 5) {
     }
 }
 
-internal val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+internal val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `relapse_reflection` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`journeyEventId` INTEGER NOT NULL, " +
+                "`epochDay` INTEGER NOT NULL, " +
+                "`createdAtEpochMillis` INTEGER NOT NULL, " +
+                "`trigger` TEXT, " +
+                "`timeOfDay` TEXT, " +
+                "`mood` INTEGER, " +
+                "`location` TEXT, " +
+                "`notes` TEXT NOT NULL)",
+        )
+    }
+}
+
+internal val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)

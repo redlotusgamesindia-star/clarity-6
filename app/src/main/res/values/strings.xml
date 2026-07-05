@@ -400,4 +400,103 @@
     <string name="gratitude_hint_3">And one more…</string>
     <string name="gratitude_save">Save gratitude</string>
     <string name="gratitude_delete_title">Delete this entry?</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_description">See your streak at a glance.</string>
+    <string name="widget_days_clean_label">days clean</string>
+    <string name="widget_milestone_caption">%1$d of %2$d days</string>
+
+    <!-- Relapse: entry point + confirmation -->
+    <string name="relapse_entry_link">Had a setback?</string>
+    <string name="relapse_confirm_title">Log this setback?</string>
+    <string name="relapse_confirm_message">This resets your current streak, but nothing is erased — your history and best streak are always saved. You\'ll be guided through what comes next.</string>
+    <string name="relapse_confirm_action">Yes, log it</string>
+
+    <!-- Home: rebuild framing + motivation engine -->
+    <string name="home_recovery_day_label">Recovery Day</string>
+    <string name="home_previous_streak">Previous streak: %1$d days</string>
+    <string name="home_best_streak">Best streak: %1$d days</string>
+    <string name="motivation_day_1">Your comeback starts today.</string>
+    <string name="motivation_day_2">You\'re already doing better than yesterday.</string>
+    <string name="motivation_day_3">Momentum is returning.</string>
+    <string name="motivation_day_4">Four days in. This is becoming real.</string>
+    <string name="motivation_day_5">Halfway to a full week back.</string>
+    <string name="motivation_day_6">One more day to a full week.</string>
+    <string name="motivation_day_7">A week ago you chose to restart.</string>
+    <string name="motivation_week_2">Two weeks of showing up for yourself.</string>
+    <string name="motivation_week_3">Three weeks — new habits are taking root.</string>
+    <string name="motivation_month_1">A full month since you chose to begin again.</string>
+    <string name="motivation_ongoing">Every day back is proof, not luck.</string>
+
+    <!-- Recovery flow: Accept -->
+    <string name="recovery_accept_title">One relapse doesn\'t erase your progress.</string>
+    <string name="recovery_accept_subtitle">Your history is still yours. Let\'s figure out what comes next.</string>
+    <string name="recovery_previous_streak_label">Previous streak</string>
+    <string name="recovery_best_streak_label">Best streak</string>
+
+    <!-- Recovery flow: Reflection (all fields optional) -->
+    <string name="recovery_reflection_title">What led up to it?</string>
+    <string name="recovery_reflection_subtitle">Answer as much or as little as you want — this is for you, not a report.</string>
+    <string name="recovery_reflection_trigger_label">What triggered it?</string>
+    <string name="recovery_reflection_time_label">Time of day</string>
+    <string name="recovery_reflection_mood_label">Mood</string>
+    <string name="recovery_reflection_location_label">Location</string>
+    <string name="recovery_reflection_notes_label">Anything else worth remembering?</string>
+    <string name="recovery_reflection_notes_hint">Optional notes…</string>
+    <string name="relapse_location_home">Home</string>
+    <string name="relapse_location_work">Work or school</string>
+    <string name="relapse_location_traveling">Traveling</string>
+    <string name="relapse_location_other">Somewhere else</string>
+
+    <!-- Recovery flow: Learn (common relapse patterns) -->
+    <string name="recovery_learn_title">Common patterns</string>
+    <string name="recovery_learn_subtitle">Most relapses trace back to one of these. Recognizing the pattern is most of the fight.</string>
+    <string name="pattern_boredom_title">Boredom</string>
+    <string name="pattern_boredom_desc">Unstructured time is one of the most common triggers. A pre-decided replacement activity removes the decision fatigue in the moment.</string>
+    <string name="pattern_stress_title">Stress</string>
+    <string name="pattern_stress_desc">Stress narrows focus toward fast relief. A short breathing reset lowers the physical intensity before it turns into an urge.</string>
+    <string name="pattern_loneliness_title">Loneliness</string>
+    <string name="pattern_loneliness_desc">When the trigger is disconnection, the tool is connection — even one honest message to someone you trust changes the moment.</string>
+    <string name="pattern_social_media_title">Social media</string>
+    <string name="pattern_social_media_desc">The spiral often starts a few scrolls before the urge itself. Notice which feeds tend to lead there.</string>
+    <string name="pattern_nighttime_title">Nighttime</string>
+    <string name="pattern_nighttime_desc">Late hours combine tiredness, privacy, and low willpower. A consistent wind-down routine removes much of the risk before it starts.</string>
+
+    <!-- Recovery flow: Plan (checklist) -->
+    <string name="recovery_plan_title">Right now, try this</string>
+    <string name="recovery_plan_subtitle">A short list to help reset — check off what you do.</string>
+    <string name="checklist_drink_water">Drink a glass of water</string>
+    <string name="checklist_take_walk">Take a 10-minute walk</string>
+    <string name="checklist_shower">Take a shower</string>
+    <string name="checklist_journal">Write it down</string>
+    <string name="checklist_breathing">Do a breathing exercise</string>
+    <string name="checklist_reach_out">Message someone you trust</string>
+    <string name="checklist_plan_next_hour">Decide what you\'re doing for the next hour</string>
+    <string name="checklist_wind_down">Put your phone away and lie down</string>
+    <string name="checklist_open_tool">Open</string>
+
+    <!-- Recovery flow: Restart -->
+    <string name="recovery_restart_title">Ready when you are</string>
+    <string name="recovery_restart_subtitle">Day 1 starts the moment you close this. That\'s all it takes.</string>
+    <string name="recovery_restart_button">Begin new streak</string>
+
+    <!-- Recovery score (Journey tab) -->
+    <string name="recovery_score_title">Recovery Score</string>
+    <string name="recovery_score_percent">%1$d%%</string>
+    <string name="recovery_score_total_clean_days">Total clean days</string>
+    <string name="recovery_score_relapses">Relapses</string>
+    <string name="recovery_score_best_streak">Best streak</string>
+    <string name="recovery_score_current_streak">Current streak</string>
+
+    <!-- Comeback achievements -->
+    <string name="achievement_started_again">Started Again</string>
+    <string name="achievement_started_again_desc">You chose to come back. That\'s the hardest part.</string>
+    <string name="achievement_didnt_quit">Didn\'t Quit After Relapse</string>
+    <string name="achievement_didnt_quit_desc">Three days in and still going.</string>
+    <string name="achievement_first_week_back">First Week Back</string>
+    <string name="achievement_first_week_back_desc">A full week since you restarted.</string>
+    <string name="achievement_stronger_than_before">Stronger Than Before</string>
+    <string name="achievement_stronger_than_before_desc">This comeback has real momentum.</string>
+    <string name="achievement_beat_record">Beat Previous Record</string>
+    <string name="achievement_beat_record_desc">You\'ve now gone longer than ever before.</string>
 </resources>

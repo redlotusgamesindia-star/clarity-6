@@ -40,3 +40,11 @@ import kotlinx.serialization.Serializable
 @Serializable data class GuidedStepsRoute(val exerciseCode: String)
 
 @Serializable data object WhyRoute
+
+/**
+ * The five-step recovery flow shown right after a relapse is confirmed on
+ * Home. The relapse event itself is already recorded by the time this
+ * opens — this route is entirely about support, never a gate someone must
+ * pass through to be "allowed" to move on.
+ */
+@Serializable data class RelapseRecoveryRoute(val relapseJourneyEventId: Long)

@@ -17,6 +17,7 @@ import com.runtimelabs.clarity.domain.model.YearsAddicted
 import com.runtimelabs.clarity.domain.plan.RecoveryPlanGenerator
 import com.runtimelabs.clarity.domain.repository.RecoveryProfileRepository
 import com.runtimelabs.clarity.domain.repository.SettingsRepository
+import com.runtimelabs.clarity.domain.repository.WidgetSyncRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.delay
@@ -97,6 +98,7 @@ class OnboardingViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val recoveryProfileRepository: RecoveryProfileRepository,
     private val planGenerator: RecoveryPlanGenerator,
+    private val widgetSyncRepository: WidgetSyncRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OnboardingUiState())
@@ -160,6 +162,9 @@ class OnboardingViewModel @Inject constructor(
             // shell observes — the shell swap is the success signal.
             recoveryProfileRepository.saveProfileAndPlan(profile, plan)
             settingsRepository.setOnboardingCompleted(true)
+            // So a widget placed right after onboarding shows Day 1 immediately
+            // rather than waiting for the next midnight refresh.
+            widgetSyncRepository.refresh()
         }
     }
 

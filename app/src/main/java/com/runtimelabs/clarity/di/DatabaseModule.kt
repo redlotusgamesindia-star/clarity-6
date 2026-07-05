@@ -12,6 +12,7 @@ import com.runtimelabs.clarity.data.local.db.dao.HabitCompletionDao
 import com.runtimelabs.clarity.data.local.db.dao.HabitDao
 import com.runtimelabs.clarity.data.local.db.dao.JournalDao
 import com.runtimelabs.clarity.data.local.db.dao.JourneyDao
+import com.runtimelabs.clarity.data.local.db.dao.RelapseReflectionDao
 import com.runtimelabs.clarity.data.local.db.dao.ThoughtRecordDao
 import com.runtimelabs.clarity.data.local.db.dao.RecoveryProfileDao
 import dagger.Module
@@ -82,4 +83,8 @@ object DatabaseModule {
     @Provides
     fun provideGratitudeDao(database: ClarityDatabase): GratitudeDao =
         database.gratitudeDao()
+
+    @Provides
+    fun provideRelapseReflectionDao(database: ClarityDatabase): RelapseReflectionDao =
+        database.relapseReflectionDao()
 }
