@@ -7,10 +7,12 @@ import com.runtimelabs.clarity.data.local.db.ALL_MIGRATIONS
 import com.runtimelabs.clarity.data.local.db.ClarityDatabase
 import com.runtimelabs.clarity.data.local.db.dao.AppMetadataDao
 import com.runtimelabs.clarity.data.local.db.dao.CheckInDao
+import com.runtimelabs.clarity.data.local.db.dao.GratitudeDao
 import com.runtimelabs.clarity.data.local.db.dao.HabitCompletionDao
 import com.runtimelabs.clarity.data.local.db.dao.HabitDao
 import com.runtimelabs.clarity.data.local.db.dao.JournalDao
 import com.runtimelabs.clarity.data.local.db.dao.JourneyDao
+import com.runtimelabs.clarity.data.local.db.dao.ThoughtRecordDao
 import com.runtimelabs.clarity.data.local.db.dao.RecoveryProfileDao
 import dagger.Module
 import dagger.Provides
@@ -72,4 +74,12 @@ object DatabaseModule {
     @Provides
     fun provideHabitCompletionDao(database: ClarityDatabase): HabitCompletionDao =
         database.habitCompletionDao()
+
+    @Provides
+    fun provideThoughtRecordDao(database: ClarityDatabase): ThoughtRecordDao =
+        database.thoughtRecordDao()
+
+    @Provides
+    fun provideGratitudeDao(database: ClarityDatabase): GratitudeDao =
+        database.gratitudeDao()
 }

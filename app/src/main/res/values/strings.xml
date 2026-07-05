@@ -316,4 +316,88 @@
     <string name="insight_checkin_streak">%1$d-day check-in streak — the picture is getting clearer.</string>
     <string name="insight_milestone_near">%1$d days to your milestone. Stay close to your plan.</string>
     <string name="insight_getting_started">Log a few days of habits and check-ins and your weekly insights will appear here.</string>
+
+    <!-- Toolkit (SOS destination) -->
+    <string name="toolkit_title">You\'re safe. Let\'s ride this out.</string>
+    <string name="toolkit_subtitle">Urges and anxiety peak, then pass. Pick a tool.</string>
+    <string name="toolkit_breathe_title">Guided breathing</string>
+    <string name="toolkit_breathe_subtitle">Slow the body first — the mind follows.</string>
+    <string name="toolkit_breathe_action">Start breathing</string>
+    <string name="toolkit_grounding_title">5-4-3-2-1 grounding</string>
+    <string name="toolkit_grounding_subtitle">Come back to the room through your senses.</string>
+    <string name="toolkit_muscle_title">Muscle release</string>
+    <string name="toolkit_muscle_subtitle">Unclench, head to toe.</string>
+    <string name="toolkit_reframe_title">Quick reframe</string>
+    <string name="toolkit_reframe_subtitle">Catch the thought. Answer it kindly.</string>
+    <string name="toolkit_why_title">Remember your why</string>
+    <string name="toolkit_why_subtitle">The reasons you chose, in your own words.</string>
+    <string name="toolkit_disclaimer">These are self-help tools, not a substitute for professional support.</string>
+
+    <!-- Guided breathing -->
+    <string name="breathing_title">Breathe</string>
+    <string name="breath_in">Breathe in</string>
+    <string name="breath_hold">Hold</string>
+    <string name="breath_out">Breathe out</string>
+    <string name="breathing_cycles">%1$d cycles</string>
+    <string name="breathing_end">End session</string>
+    <string name="pattern_calm">Calm</string>
+    <string name="pattern_box">Box</string>
+    <string name="pattern_relax">4-7-8</string>
+
+    <!-- Guided step exercises -->
+    <string name="guided_step_progress">%1$d of %2$d</string>
+    <string name="guided_next">Next</string>
+    <string name="guided_done">Done</string>
+    <string-array name="grounding_steps">
+        <item>Look around. Name five things you can see — anything at all.</item>
+        <item>Notice four things you can feel. Your feet on the floor. Fabric. Air.</item>
+        <item>Listen. Find three sounds, near or far.</item>
+        <item>Two things you can smell — or two smells you like.</item>
+        <item>One thing you can taste. Take a slow breath.</item>
+        <item>You\'re here. The wave is already passing.</item>
+    </string-array>
+    <string-array name="muscle_steps">
+        <item>Sit or stand comfortably. Take one slow breath.</item>
+        <item>Make fists. Squeeze for five seconds — then let go completely.</item>
+        <item>Shrug your shoulders up to your ears. Hold… and drop them.</item>
+        <item>Scrunch your face gently. Hold… and soften everything.</item>
+        <item>Tense your stomach. Hold… release, and breathe out long.</item>
+        <item>Press your feet into the floor. Hold… and let your legs go heavy.</item>
+        <item>Scan head to toe. Wherever you find tension, breathe into it and let it drop.</item>
+    </string-array>
+
+    <!-- Remember your why -->
+    <string name="why_header">You chose this because:</string>
+    <string name="why_goal_label">Your goal</string>
+    <string name="why_empty">Complete onboarding to see your reasons here.</string>
+
+    <!-- Journal hub -->
+    <string name="journal_kind_free">Free write</string>
+    <string name="journal_kind_thought">Thought record</string>
+    <string name="journal_kind_gratitude">Gratitude</string>
+    <string name="journal_new_sheet_title">New entry</string>
+    <string name="journal_new_free_desc">Blank page, your pace.</string>
+    <string name="journal_new_thought_desc">Catch a thought and reframe it.</string>
+    <string name="journal_new_gratitude_desc">Three good things from today.</string>
+
+    <!-- Thought record editor -->
+    <string name="thought_situation_label">What happened?</string>
+    <string name="thought_situation_hint">The situation, briefly.</string>
+    <string name="thought_thought_label">What went through your mind?</string>
+    <string name="thought_thought_hint">The automatic thought, word for word.</string>
+    <string name="thought_feeling_label">How did it feel?</string>
+    <string name="thought_feeling_hint">e.g. ashamed, anxious, restless</string>
+    <string name="thought_intensity_label">How strong? (%1$d/10)</string>
+    <string name="thought_reframe_label">A kinder, truer way to see it</string>
+    <string name="thought_reframe_hint">What would you tell a friend in the same spot?</string>
+    <string name="thought_save">Save record</string>
+    <string name="thought_delete_title">Delete this record?</string>
+
+    <!-- Gratitude editor -->
+    <string name="gratitude_prompt">Three good things about today</string>
+    <string name="gratitude_hint_1">One thing, however small…</string>
+    <string name="gratitude_hint_2">Another, if it comes…</string>
+    <string name="gratitude_hint_3">And one more…</string>
+    <string name="gratitude_save">Save gratitude</string>
+    <string name="gratitude_delete_title">Delete this entry?</string>
 </resources>

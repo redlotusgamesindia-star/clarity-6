@@ -27,10 +27,14 @@ core**: Home dashboard (event-sourced streak ring, daily check-in with mood
 journal (list, editor, delete), and the **Phase B habit system**: habit
 creation with weekday scheduling and curated icons, self-healing inexact
 reminder notifications (POST_NOTIFICATIONS runtime flow; still NO INTERNET),
-a Canvas weekly progress chart, and deterministic weekly insights — schema
-v4. Tests: plan generator, streak calculator, habit stats, insights,
-reminder timing (`./gradlew testDebugUnitTest`). Placeholder (loudly
-labeled in-app): Learn and SOS.
+a Canvas weekly progress chart, and deterministic weekly insights, plus the
+**Phase C mental health toolkit**: the SOS button now opens a real toolkit
+(auto-starting guided breathing with 3 patterns, 5-4-3-2-1 grounding,
+muscle release, and "remember your why"), a CBT thought record and a
+gratitude exercise as first-class Journal entry kinds in a unified hub —
+schema v5. Tests: plan generator, streak calculator, habit stats, insights,
+reminder timing, breathing state machine (`./gradlew testDebugUnitTest`).
+Placeholder (loudly labeled in-app): Learn only.
 
 ## Notes
 

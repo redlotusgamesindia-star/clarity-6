@@ -89,4 +89,31 @@ internal val MIGRATION_3_4 = object : Migration(3, 4) {
     }
 }
 
-internal val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+internal val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `thought_record` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`epochDay` INTEGER NOT NULL, " +
+                "`createdAtEpochMillis` INTEGER NOT NULL, " +
+                "`updatedAtEpochMillis` INTEGER NOT NULL, " +
+                "`situation` TEXT NOT NULL, " +
+                "`automaticThought` TEXT NOT NULL, " +
+                "`feeling` TEXT NOT NULL, " +
+                "`feelingIntensity` INTEGER NOT NULL, " +
+                "`reframe` TEXT NOT NULL)",
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `gratitude_entry` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`epochDay` INTEGER NOT NULL, " +
+                "`createdAtEpochMillis` INTEGER NOT NULL, " +
+                "`updatedAtEpochMillis` INTEGER NOT NULL, " +
+                "`first` TEXT NOT NULL, " +
+                "`second` TEXT, " +
+                "`third` TEXT)",
+        )
+    }
+}
+
+internal val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)

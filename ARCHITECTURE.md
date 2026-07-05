@@ -300,3 +300,46 @@ flash or a start-screen swap. Post-splash XML theme only sets
   never turns anything red.
 - **DB v3 -> v4** adds `habit` + `habit_completion` (composite PK); habit
   deletion cascades completions inside one transaction.
+
+## 19. Mental health toolkit (Phase C)
+
+- **The SOS button gets its destination.** Since the foundation, the amber
+  center button has pushed `SosRoute`; that route was a placeholder until
+  now. `ToolkitScreen` is what it always pointed to: breathing (hero, one
+  tap), grounding, muscle release, a reframe shortcut into the thought
+  record editor, and "remember your why" — reading the user's own
+  onboarding reasons back to them. One footer line is explicit that these
+  are self-help tools, not a substitute for professional support.
+- **Breathing auto-starts.** A settings screen before help is friction
+  nobody in a spike needs. Three patterns (Calm 4-6 extended-exhale
+  default, Box 4-4-4-4, Relax 4-7-8) switch mid-session. The state machine
+  (`advanceOneSecond`) is pure and unit-tested — the ViewModel supplies a
+  1 Hz clock and nothing else, so phase transitions and cycle counting are
+  tested without coroutines or timing flakiness.
+- **The circle animates over the exact phase duration**, so the visual IS
+  the pacing instruction, not decoration next to it. Reduce-motion holds a
+  static circle at fixed scale; the countdown number still carries the
+  guidance.
+- **Sessions ≥30s log a BREATHING_SESSION journey event — zero migration.**
+  `JourneyEventType` is a closed enum on an already-append-only table; a new
+  case is the entire schema change. AD-1 (event sourcing) paying rent
+  exactly as designed: the insight engine can pick this signal up later
+  without touching storage.
+- **Grounding and muscle release are self-paced**, advanced by the user, no
+  per-step timers. Racing someone anxious against a countdown works against
+  the exercise; a Next button doesn't.
+- **CBT thought record and gratitude are first-class Journal entry kinds**,
+  not text templates inside free entries — structured fields (situation,
+  thought, feeling, intensity, reframe / three good things) stay queryable
+  for any future insight that wants them, the same reasoning that keeps
+  plan items and habits as codes rather than strings.
+- **Journal is now a hub**: one merged, sorted timeline across free/thought/
+  gratitude, each row kind-badged; the FAB opens a chooser bottom sheet
+  instead of guessing which kind "new" means.
+- **Reframe's reframe field is optional at save time.** Naming the thought
+  and the feeling is already most of the exercise; forcing an answer before
+  someone has one would turn a coping tool into a quiz.
+- **Gratitude requires only the first entry.** Three is the classic
+  exercise's target, not its gate.
+- **DB v4 -> v5** adds `thought_record` + `gratitude_entry`. No change to
+  `journey_event`'s schema for the new event type — see above.

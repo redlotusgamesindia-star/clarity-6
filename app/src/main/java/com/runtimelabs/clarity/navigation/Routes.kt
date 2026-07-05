@@ -22,5 +22,21 @@ import kotlinx.serialization.Serializable
 /** Habit editor. The default [habitId] of -1 creates a new habit. */
 @Serializable data class HabitEditorRoute(val habitId: Long = -1L)
 
-/** Urge toolkit. Full-screen, own back stack entry, reachable from anywhere. */
+/** CBT thought record editor. Default [recordId] of -1 creates a new record. */
+@Serializable data class ThoughtRecordEditorRoute(val recordId: Long = -1L)
+
+/** Gratitude editor. Default [entryId] of -1 creates a new entry. */
+@Serializable data class GratitudeEditorRoute(val entryId: Long = -1L)
+
+/**
+ * Urge/anxiety toolkit hub. Full-screen, own back stack entry, reachable
+ * from anywhere via the SOS button.
+ */
 @Serializable data object SosRoute
+
+@Serializable data object BreathingRoute
+
+/** One of [com.runtimelabs.clarity.feature.toolkit.EXERCISE_GROUNDING] / EXERCISE_MUSCLE. */
+@Serializable data class GuidedStepsRoute(val exerciseCode: String)
+
+@Serializable data object WhyRoute

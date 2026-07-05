@@ -7,7 +7,8 @@ package com.runtimelabs.clarity.domain.model
  * survivals) are new rows, not schema changes.
  */
 enum class JourneyEventType(val storageValue: String) {
-    RELAPSE("relapse");
+    RELAPSE("relapse"),
+    BREATHING_SESSION("breathing_session");
 
     companion object {
         fun fromStorageValue(value: String?): JourneyEventType? =

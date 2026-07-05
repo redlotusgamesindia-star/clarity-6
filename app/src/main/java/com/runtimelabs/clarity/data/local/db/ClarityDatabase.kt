@@ -4,17 +4,21 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.runtimelabs.clarity.data.local.db.dao.AppMetadataDao
 import com.runtimelabs.clarity.data.local.db.dao.CheckInDao
+import com.runtimelabs.clarity.data.local.db.dao.GratitudeDao
 import com.runtimelabs.clarity.data.local.db.dao.HabitCompletionDao
 import com.runtimelabs.clarity.data.local.db.dao.HabitDao
 import com.runtimelabs.clarity.data.local.db.dao.JournalDao
 import com.runtimelabs.clarity.data.local.db.dao.JourneyDao
+import com.runtimelabs.clarity.data.local.db.dao.ThoughtRecordDao
 import com.runtimelabs.clarity.data.local.db.dao.RecoveryProfileDao
 import com.runtimelabs.clarity.data.local.db.entity.AppMetadataEntity
 import com.runtimelabs.clarity.data.local.db.entity.DailyCheckInEntity
+import com.runtimelabs.clarity.data.local.db.entity.GratitudeEntryEntity
 import com.runtimelabs.clarity.data.local.db.entity.HabitCompletionEntity
 import com.runtimelabs.clarity.data.local.db.entity.HabitEntity
 import com.runtimelabs.clarity.data.local.db.entity.JournalEntryEntity
 import com.runtimelabs.clarity.data.local.db.entity.JourneyEventEntity
+import com.runtimelabs.clarity.data.local.db.entity.ThoughtRecordEntity
 import com.runtimelabs.clarity.data.local.db.entity.RecoveryPlanItemEntity
 import com.runtimelabs.clarity.data.local.db.entity.RecoveryProfileEntity
 
@@ -37,8 +41,10 @@ import com.runtimelabs.clarity.data.local.db.entity.RecoveryProfileEntity
         JourneyEventEntity::class,
         HabitEntity::class,
         HabitCompletionEntity::class,
+        ThoughtRecordEntity::class,
+        GratitudeEntryEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 abstract class ClarityDatabase : RoomDatabase() {
@@ -56,6 +62,10 @@ abstract class ClarityDatabase : RoomDatabase() {
     abstract fun habitDao(): HabitDao
 
     abstract fun habitCompletionDao(): HabitCompletionDao
+
+    abstract fun thoughtRecordDao(): ThoughtRecordDao
+
+    abstract fun gratitudeDao(): GratitudeDao
 
     companion object {
         const val DATABASE_NAME = "clarity.db"

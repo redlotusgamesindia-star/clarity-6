@@ -8,18 +8,28 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.runtimelabs.clarity.core.designsystem.components.PlaceholderScreen
 import com.runtimelabs.clarity.feature.home.HomeScreen
+import com.runtimelabs.clarity.feature.journal.GratitudeScreen
 import com.runtimelabs.clarity.feature.journal.JournalEditorScreen
+import com.runtimelabs.clarity.feature.journal.JournalEntryKind
 import com.runtimelabs.clarity.feature.journal.JournalListScreen
+import com.runtimelabs.clarity.feature.journal.ThoughtRecordScreen
 import com.runtimelabs.clarity.feature.journey.HabitEditorScreen
 import com.runtimelabs.clarity.feature.journey.JourneyScreen
+import com.runtimelabs.clarity.feature.toolkit.BreathingScreen
+import com.runtimelabs.clarity.feature.toolkit.EXERCISE_GROUNDING as EXERCISE_GROUNDING_CODE
+import com.runtimelabs.clarity.feature.toolkit.EXERCISE_MUSCLE as EXERCISE_MUSCLE_CODE
+import com.runtimelabs.clarity.feature.toolkit.GuidedStepsScreen
+import com.runtimelabs.clarity.feature.toolkit.ToolkitScreen
+import com.runtimelabs.clarity.feature.toolkit.WhyScreen
 import kotlin.reflect.KClass
 
 /**
- * The single navigation graph. Home and Journal are live; the remaining
- * destinations render a clearly-marked [PlaceholderScreen] until their
- * phase (SOS: Phase A, Journey: Phase B, Learn: Phase C).
+ * The single navigation graph. Home, Journey, Journal, and the SOS toolkit
+ * subgraph are all live; only Learn remains a [PlaceholderScreen]
+ * (Phase C, educational library).
  */
 @Composable
 fun ClarityNavHost(
@@ -51,19 +61,59 @@ fun ClarityNavHost(
         }
         composable<JournalRoute> {
             JournalListScreen(
-                onOpenEntry = { id -> navController.navigate(JournalEditorRoute(entryId = id)) },
-                onNewEntry = { navController.navigate(JournalEditorRoute()) },
+                onOpenEntry = { entry ->
+                    val route = when (entry.kind) {
+                        JournalEntryKind.FREE -> JournalEditorRoute(entryId = entry.id)
+                        JournalEntryKind.THOUGHT -> ThoughtRecordEditorRoute(recordId = entry.id)
+                        JournalEntryKind.GRATITUDE -> GratitudeEditorRoute(entryId = entry.id)
+                    }
+                    navController.navigate(route)
+                },
+                onNewEntry = { kind ->
+                    val route = when (kind) {
+                        JournalEntryKind.FREE -> JournalEditorRoute()
+                        JournalEntryKind.THOUGHT -> ThoughtRecordEditorRoute()
+                        JournalEntryKind.GRATITUDE -> GratitudeEditorRoute()
+                    }
+                    navController.navigate(route)
+                },
             )
         }
         composable<JournalEditorRoute> {
             JournalEditorScreen(onDone = { navController.popBackStack() })
         }
+        composable<ThoughtRecordEditorRoute> {
+            ThoughtRecordScreen(onDone = { navController.popBackStack() })
+        }
+        composable<GratitudeEditorRoute> {
+            GratitudeScreen(onDone = { navController.popBackStack() })
+        }
         composable<SosRoute> {
-            PlaceholderScreen(
-                title = "Urge toolkit",
-                plannedPhase = "Breathing, delay timer, grounding, redirection. Ships in Phase A.",
+            ToolkitScreen(
                 onBack = { navController.popBackStack() },
+                onBreathe = { navController.navigate(BreathingRoute) },
+                onGrounding = {
+                    navController.navigate(GuidedStepsRoute(EXERCISE_GROUNDING_CODE))
+                },
+                onMuscle = {
+                    navController.navigate(GuidedStepsRoute(EXERCISE_MUSCLE_CODE))
+                },
+                onReframe = { navController.navigate(ThoughtRecordEditorRoute()) },
+                onWhy = { navController.navigate(WhyRoute) },
             )
+        }
+        composable<BreathingRoute> {
+            BreathingScreen(onDone = { navController.popBackStack() })
+        }
+        composable<GuidedStepsRoute> { entry ->
+            val route: GuidedStepsRoute = entry.toRoute()
+            GuidedStepsScreen(
+                exerciseCode = route.exerciseCode,
+                onDone = { navController.popBackStack() },
+            )
+        }
+        composable<WhyRoute> {
+            WhyScreen(onDone = { navController.popBackStack() })
         }
     }
 }
