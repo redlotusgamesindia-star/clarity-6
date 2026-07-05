@@ -7,6 +7,8 @@ import com.runtimelabs.clarity.data.local.db.ALL_MIGRATIONS
 import com.runtimelabs.clarity.data.local.db.ClarityDatabase
 import com.runtimelabs.clarity.data.local.db.dao.AppMetadataDao
 import com.runtimelabs.clarity.data.local.db.dao.CheckInDao
+import com.runtimelabs.clarity.data.local.db.dao.HabitCompletionDao
+import com.runtimelabs.clarity.data.local.db.dao.HabitDao
 import com.runtimelabs.clarity.data.local.db.dao.JournalDao
 import com.runtimelabs.clarity.data.local.db.dao.JourneyDao
 import com.runtimelabs.clarity.data.local.db.dao.RecoveryProfileDao
@@ -62,4 +64,12 @@ object DatabaseModule {
     @Provides
     fun provideJourneyDao(database: ClarityDatabase): JourneyDao =
         database.journeyDao()
+
+    @Provides
+    fun provideHabitDao(database: ClarityDatabase): HabitDao =
+        database.habitDao()
+
+    @Provides
+    fun provideHabitCompletionDao(database: ClarityDatabase): HabitCompletionDao =
+        database.habitCompletionDao()
 }

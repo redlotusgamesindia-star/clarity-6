@@ -1,11 +1,13 @@
 package com.runtimelabs.clarity.di
 
 import com.runtimelabs.clarity.data.repository.CheckInRepositoryImpl
+import com.runtimelabs.clarity.data.repository.HabitRepositoryImpl
 import com.runtimelabs.clarity.data.repository.JournalRepositoryImpl
 import com.runtimelabs.clarity.data.repository.JourneyRepositoryImpl
 import com.runtimelabs.clarity.data.repository.RecoveryProfileRepositoryImpl
 import com.runtimelabs.clarity.data.repository.SettingsRepositoryImpl
 import com.runtimelabs.clarity.domain.repository.CheckInRepository
+import com.runtimelabs.clarity.domain.repository.HabitRepository
 import com.runtimelabs.clarity.domain.repository.JournalRepository
 import com.runtimelabs.clarity.domain.repository.JourneyRepository
 import com.runtimelabs.clarity.domain.repository.RecoveryProfileRepository
@@ -43,4 +45,8 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindJourneyRepository(impl: JourneyRepositoryImpl): JourneyRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindHabitRepository(impl: HabitRepositoryImpl): HabitRepository
 }

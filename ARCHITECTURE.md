@@ -264,3 +264,39 @@ flash or a start-screen swap. Post-splash XML theme only sets
 - **DB v2 -> v3** adds `daily_checkin`, `journal_entry`, `journey_event`
   via hand-written migration; `journey_event` has no update/delete DAO
   methods — append-only enforced at the API surface, not by convention.
+
+## 18. Habit system & reminders (Phase B)
+
+- **The permission line moved, deliberately.** POST_NOTIFICATIONS (runtime,
+  13+) and RECEIVE_BOOT_COMPLETED enter the manifest for local reminders.
+  The real privacy guarantee — NO INTERNET, ever — is untouched; nothing in
+  this app can move data off the device. The manifest comment says exactly
+  this.
+- **Inexact alarms, chained.** `setAndAllowWhileIdle` one-shots that re-arm
+  on fire. Not exact alarms (USE_EXACT_ALARM is Play-restricted to
+  alarm-clock apps; SCHEDULE_EXACT_ALARM is user-revocable and default-denied
+  on 14+) and not WorkManager (15-minute periodic drift is wrong for "9 PM").
+  A habit nudge landing within Doze's batching window is exactly as useful.
+  Next-trigger math is a pure, unit-tested function of (mask, minute, now).
+- **Reminders are self-healing**: re-armed on boot (receiver), on app start
+  (Application scope), and on every fire (chain). The fire path reads the
+  habit fresh from the DB, so deleted/muted habits drop silently instead of
+  resurrecting from stale intent extras.
+- **Notification copy rule enforced in code**: title = the user's own habit
+  name, body = neutral encouragement. Nothing clinical, nothing explicit.
+- **Schedule = 7-bit ISO weekday mask.** Compact, exhaustively testable, and
+  `Habit` refuses an empty mask (the editor allows a zero-mask *draft*; the
+  disabled Save button is the explanation).
+- **One aggregation, two consumers**: `HabitStatsCalculator` feeds both the
+  week chart and `InsightGenerator`, so the graph and the words can never
+  disagree. Habits created mid-window only count from their creation day —
+  a habit made Thursday can't "miss" Monday.
+- **Insights are typed codes with conservative thresholds** (same contract as
+  plan items). An insight that fires on noise teaches users to ignore
+  insights, so every rule needs a real sample size, rules run in priority
+  order, and at most three surface.
+- **Week-strip dots have no failure color**: DONE is filled, not-done is a
+  neutral outline, unscheduled is blank. Missing a habit shortens a bar; it
+  never turns anything red.
+- **DB v3 -> v4** adds `habit` + `habit_completion` (composite PK); habit
+  deletion cascades completions inside one transaction.

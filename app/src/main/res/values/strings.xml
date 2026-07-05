@@ -258,4 +258,62 @@
         <item>Two minutes of writing can defuse an hour of wanting.</item>
         <item>Be the person your first milestone believes you are.</item>
     </string-array>
+
+    <!-- Journey: habit system -->
+    <string name="journey_today">Today</string>
+    <string name="journey_rest_today">Nothing scheduled today — rest is part of the plan.</string>
+    <string name="journey_other_days">Other days</string>
+    <string name="journey_this_week">This week</string>
+    <string name="journey_week_summary">%1$d of %2$d completed</string>
+    <string name="journey_insights_label">Weekly insights</string>
+    <string name="journey_empty_title">Build your routine</string>
+    <string name="journey_empty_description">Small daily habits are what carry a recovery. Start with one.</string>
+    <string name="habit_new">New habit</string>
+    <string name="cd_habit_done">Mark done</string>
+    <string name="cd_habit_undone">Mark not done</string>
+
+    <!-- Habit editor -->
+    <string name="habit_editor_new_title">New habit</string>
+    <string name="habit_editor_edit_title">Edit habit</string>
+    <string name="habit_name_label">Name</string>
+    <string name="habit_name_hint">e.g. Evening walk</string>
+    <string name="habit_icon_label">Icon</string>
+    <string name="habit_days_label">Days</string>
+    <string name="habit_reminder_label">Daily reminder</string>
+    <string name="habit_reminder_off">Off</string>
+    <string name="habit_save">Save habit</string>
+    <string name="habit_delete_title">Delete this habit?</string>
+    <string name="habit_delete_message">Its history will be deleted too. This can\'t be undone.</string>
+    <string name="cd_delete_habit">Delete habit</string>
+    <string name="habit_notifications_hint">Allow notifications in system settings to receive this reminder.</string>
+    <string name="action_ok">OK</string>
+
+    <!-- Habit icon labels (picker accessibility) -->
+    <string name="icon_spa">Calm</string>
+    <string name="icon_walk">Walk</string>
+    <string name="icon_book">Read</string>
+    <string name="icon_water">Hydrate</string>
+    <string name="icon_gym">Exercise</string>
+    <string name="icon_meditate">Meditate</string>
+    <string name="icon_sleep">Sleep</string>
+    <string name="icon_phone_off">Phone-free</string>
+    <string name="icon_journal">Write</string>
+    <string name="icon_sun">Morning</string>
+
+    <!-- Reminder notifications (respectful, private copy) -->
+    <string name="reminder_channel_name">Habit reminders</string>
+    <string name="reminder_channel_description">Gentle reminders for the habits you schedule.</string>
+    <string name="reminder_notification_body">A small step keeps the momentum.</string>
+
+    <!-- Weekly insights (code -> copy; logic emits codes only) -->
+    <string name="insight_perfect_week">A perfect week — every scheduled habit done. That\'s momentum.</string>
+    <string name="insight_best_habit">\'%1$s\' is your anchor — %2$d%% this week.</string>
+    <string name="insight_focus_habit">\'%1$s\' could use some love. Try attaching it to a routine you already have.</string>
+    <string name="insight_consistency_up">Habit completion is up %1$d points on last week.</string>
+    <string name="insight_consistency_down">A lighter week than last — that\'s okay. Restart with just one habit.</string>
+    <string name="insight_mood_up">Your average mood is trending up this week.</string>
+    <string name="insight_urges_easing">Urges are running quieter than last week.</string>
+    <string name="insight_checkin_streak">%1$d-day check-in streak — the picture is getting clearer.</string>
+    <string name="insight_milestone_near">%1$d days to your milestone. Stay close to your plan.</string>
+    <string name="insight_getting_started">Log a few days of habits and check-ins and your weekly insights will appear here.</string>
 </resources>

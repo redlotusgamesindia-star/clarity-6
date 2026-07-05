@@ -4,11 +4,15 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.runtimelabs.clarity.data.local.db.dao.AppMetadataDao
 import com.runtimelabs.clarity.data.local.db.dao.CheckInDao
+import com.runtimelabs.clarity.data.local.db.dao.HabitCompletionDao
+import com.runtimelabs.clarity.data.local.db.dao.HabitDao
 import com.runtimelabs.clarity.data.local.db.dao.JournalDao
 import com.runtimelabs.clarity.data.local.db.dao.JourneyDao
 import com.runtimelabs.clarity.data.local.db.dao.RecoveryProfileDao
 import com.runtimelabs.clarity.data.local.db.entity.AppMetadataEntity
 import com.runtimelabs.clarity.data.local.db.entity.DailyCheckInEntity
+import com.runtimelabs.clarity.data.local.db.entity.HabitCompletionEntity
+import com.runtimelabs.clarity.data.local.db.entity.HabitEntity
 import com.runtimelabs.clarity.data.local.db.entity.JournalEntryEntity
 import com.runtimelabs.clarity.data.local.db.entity.JourneyEventEntity
 import com.runtimelabs.clarity.data.local.db.entity.RecoveryPlanItemEntity
@@ -31,8 +35,10 @@ import com.runtimelabs.clarity.data.local.db.entity.RecoveryProfileEntity
         DailyCheckInEntity::class,
         JournalEntryEntity::class,
         JourneyEventEntity::class,
+        HabitEntity::class,
+        HabitCompletionEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 abstract class ClarityDatabase : RoomDatabase() {
@@ -46,6 +52,10 @@ abstract class ClarityDatabase : RoomDatabase() {
     abstract fun journalDao(): JournalDao
 
     abstract fun journeyDao(): JourneyDao
+
+    abstract fun habitDao(): HabitDao
+
+    abstract fun habitCompletionDao(): HabitCompletionDao
 
     companion object {
         const val DATABASE_NAME = "clarity.db"

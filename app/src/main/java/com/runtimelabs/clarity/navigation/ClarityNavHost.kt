@@ -12,6 +12,8 @@ import com.runtimelabs.clarity.core.designsystem.components.PlaceholderScreen
 import com.runtimelabs.clarity.feature.home.HomeScreen
 import com.runtimelabs.clarity.feature.journal.JournalEditorScreen
 import com.runtimelabs.clarity.feature.journal.JournalListScreen
+import com.runtimelabs.clarity.feature.journey.HabitEditorScreen
+import com.runtimelabs.clarity.feature.journey.JourneyScreen
 import kotlin.reflect.KClass
 
 /**
@@ -33,10 +35,13 @@ fun ClarityNavHost(
             HomeScreen()
         }
         composable<JourneyRoute> {
-            PlaceholderScreen(
-                title = "Journey",
-                plannedPhase = "Timeline, analytics, achievements. Ships in Phase B.",
+            JourneyScreen(
+                onNewHabit = { navController.navigate(HabitEditorRoute()) },
+                onEditHabit = { id -> navController.navigate(HabitEditorRoute(habitId = id)) },
             )
+        }
+        composable<HabitEditorRoute> {
+            HabitEditorScreen(onDone = { navController.popBackStack() })
         }
         composable<LearnRoute> {
             PlaceholderScreen(

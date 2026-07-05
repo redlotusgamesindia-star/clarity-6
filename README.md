@@ -24,9 +24,13 @@ plan generation (unit-tested — run `./gradlew testDebugUnitTest`), and
 profile+plan persistence in the encrypted database, and the **Phase A
 core**: Home dashboard (event-sourced streak ring, daily check-in with mood
 + urge tracking, week strip, deterministic daily reflection) and the full
-journal (list, editor, delete) — schema v3. Tests: plan generator + streak
-calculator (`./gradlew testDebugUnitTest`). Placeholder (loudly labeled
-in-app): Journey, Learn, and SOS.
+journal (list, editor, delete), and the **Phase B habit system**: habit
+creation with weekday scheduling and curated icons, self-healing inexact
+reminder notifications (POST_NOTIFICATIONS runtime flow; still NO INTERNET),
+a Canvas weekly progress chart, and deterministic weekly insights — schema
+v4. Tests: plan generator, streak calculator, habit stats, insights,
+reminder timing (`./gradlew testDebugUnitTest`). Placeholder (loudly
+labeled in-app): Learn and SOS.
 
 ## Notes
 

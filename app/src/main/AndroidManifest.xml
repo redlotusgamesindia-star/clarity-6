@@ -3,10 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-        Deliberately NO permissions. The app is offline-only by design:
-        no INTERNET, no analytics, no ads. This is the strongest privacy
-        guarantee we can make and it is a core product decision (see plan §14).
+        Privacy posture (the manifest IS the policy):
+        - NO INTERNET permission, ever. Offline-only is structural, not a promise.
+        - POST_NOTIFICATIONS: local habit reminders only (runtime-gated, 13+).
+        - RECEIVE_BOOT_COMPLETED: re-arms reminder alarms after reboot.
+        Nothing here can move data off the device. (ARCHITECTURE.md §14, §18)
     -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".ClarityApp"
@@ -31,5 +35,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Reminder alarms fire here; reads the habit fresh, posts, re-chains. -->
+        <receiver
+            android:name=".data.notifications.HabitReminderReceiver"
+            android:exported="false" />
+
+        <!-- Alarms don't survive reboot; this re-arms every enabled reminder. -->
+        <receiver
+            android:name=".data.notifications.BootCompletedReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
