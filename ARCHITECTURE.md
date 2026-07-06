@@ -706,3 +706,28 @@ opens and closes per function body, resetting the stack at each new
 clean across the whole project — a meaningful upgrade from the earlier
 fixed-line-window heuristic, which is exactly what missed this instance
 the first time.
+
+## 26. Process note: sweep every construction site when a data class grows
+
+`StreakSnapshot` gained four new required fields in §22. I updated the one
+test file I was directly editing at the time (`StreakCalculatorTest`) and
+verified the real production call site (`StreakCalculator.compute`), but
+never grepped the whole project for *other* test files constructing
+`StreakSnapshot(...)` by hand. `InsightGeneratorTest.kt` — written back in
+Phase B, before those fields existed — had four positional-only call sites
+that only compiled because Kotlin data class constructors are positional
+by default; adding required fields silently broke every one of them the
+moment CI actually compiled the test source set.
+
+The fix: a small `streakSnapshot(currentDays, longestDays, cleanSinceEpochDay)`
+helper local to that file, supplying inert defaults for the four newer
+fields (`InsightGenerator` itself only ever reads `currentDays` — confirmed
+by reading its source before assuming the defaults were safe, not after).
+
+The durable lesson: **when a shared data class gains required constructor
+parameters, grep the entire tree (`grep -rn "TypeName("`) for every
+construction site, not just the files already open for the change at
+hand.** `main` and `test` are compiled as separate source sets by Gradle,
+which is exactly why `compileDebugKotlin` can go green while
+`compileDebugUnitTestKotlin` fails right after — a clean main build is not
+evidence the test tree still compiles.

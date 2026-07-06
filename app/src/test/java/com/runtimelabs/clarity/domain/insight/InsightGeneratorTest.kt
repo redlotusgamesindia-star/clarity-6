@@ -23,12 +23,27 @@ class InsightGeneratorTest {
     private fun checkIn(day: Long, mood: MoodLevel = MoodLevel.OKAY, urge: Int = 5) =
         DailyCheckIn(epochDay = day, mood = mood, urgeLevel = urge, updatedAtEpochMillis = 0)
 
+    // None of these tests are relapse-related, so the four fields added to
+    // StreakSnapshot after this file was first written (previousRunDays,
+    // bestClosedRunDays, totalRelapses, totalCleanDays — see ARCHITECTURE.md
+    // §22) get simple, internally-consistent defaults here rather than being
+    // threaded through every call site.
+    private fun streakSnapshot(currentDays: Int, longestDays: Int, cleanSinceEpochDay: Long) = StreakSnapshot(
+        currentDays = currentDays,
+        longestDays = longestDays,
+        cleanSinceEpochDay = cleanSinceEpochDay,
+        previousRunDays = null,
+        bestClosedRunDays = 0,
+        totalRelapses = 0,
+        totalCleanDays = currentDays,
+    )
+
     private fun generate(
         thisWeek: HabitWindowStats = stats(0, 0),
         lastWeek: HabitWindowStats = stats(0, 0),
         checkInsThis: List<DailyCheckIn> = emptyList(),
         checkInsLast: List<DailyCheckIn> = emptyList(),
-        streak: StreakSnapshot = StreakSnapshot(1, 1, 0),
+        streak: StreakSnapshot = streakSnapshot(1, 1, 0),
         milestone: Int = 7,
         today: Long = 100,
     ) = generator.generate(thisWeek, lastWeek, checkInsThis, checkInsLast, streak, milestone, today)
@@ -46,14 +61,14 @@ class InsightGeneratorTest {
 
     @Test
     fun `milestone near carries days remaining`() {
-        val result = generate(streak = StreakSnapshot(5, 5, 0), milestone = 7)
+        val result = generate(streak = streakSnapshot(5, 5, 0), milestone = 7)
         val insight = result.first { it.code == InsightCode.MILESTONE_NEAR }
         assertEquals(2, insight.value)
     }
 
     @Test
     fun `milestone already reached does not fire`() {
-        val result = generate(streak = StreakSnapshot(9, 9, 0), milestone = 7)
+        val result = generate(streak = streakSnapshot(9, 9, 0), milestone = 7)
         assertTrue(InsightCode.MILESTONE_NEAR !in codes(result))
     }
 
@@ -154,7 +169,7 @@ class InsightGeneratorTest {
             thisWeek = stats(6, 6),
             lastWeek = stats(10, 5),
             checkInsThis = listOf(checkIn(98), checkIn(99), checkIn(100)),
-            streak = StreakSnapshot(5, 5, 0),
+            streak = streakSnapshot(5, 5, 0),
             milestone = 7,
             today = 100,
         )
