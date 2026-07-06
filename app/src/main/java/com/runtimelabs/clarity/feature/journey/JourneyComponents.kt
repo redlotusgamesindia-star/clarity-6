@@ -70,6 +70,7 @@ import com.runtimelabs.clarity.R
 import com.runtimelabs.clarity.core.designsystem.components.ClarityCard
 import com.runtimelabs.clarity.core.designsystem.theme.MotionTokens
 import com.runtimelabs.clarity.core.designsystem.theme.extended
+import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import com.runtimelabs.clarity.domain.habit.DayStat
 import com.runtimelabs.clarity.domain.insight.Insight
 import com.runtimelabs.clarity.domain.insight.InsightCode

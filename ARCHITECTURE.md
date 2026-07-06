@@ -671,3 +671,38 @@ honestly a no-op.
   shape `isPremiumUser` was in — and this screen would be the natural home
   for it, but that's out of scope for what was asked here and is left as
   an explicit, flagged follow-up rather than bundled in silently.
+
+## 25. A more precise rule for the AnimatedVisibility/DslMarker trap
+
+Two separate CI failures now trace to the same underlying issue, and the
+second occurrence revealed the first rule (§16, §21: "don't put
+`AnimatedVisibility` in a `Box` directly inside a `Row`/`Column`") was too
+narrow. The precise rule:
+
+**The collision happens when `Row`/`Column` and `Box` are both open in the
+same lexical function body, no matter what sits between them** — including
+non-scope-introducing wrappers like `Surface` or `ClarityCard`, which don't
+shadow an enclosing `RowScope`/`ColumnScope`. `ChecklistRow`'s
+`Row { Surface { Box { AnimatedVisibility } } }` broke for exactly this
+reason: `Surface` introduces no scope of its own, so `RowScope` stayed
+visible all the way down to the `AnimatedVisibility` call, colliding with
+the `BoxScope` right above it.
+
+**What actually makes it safe is a function-call boundary, not visual
+nesting.** `DoneToggle`'s identical-looking `Surface { Box { AnimatedVisibility } }`
+is fine because `DoneToggle` is called as a separate function from its
+caller's `Row` — a function call resets which implicit receivers are
+visible (unless the function's own signature declares a receiver, e.g.
+`fun RowScope.Foo(...)`), so the caller's `RowScope` never reaches inside.
+Writing the same three composables directly inline within one function
+body, with a `Row` anywhere in its enclosing lexical scope, does not get
+that reset.
+
+The fix in both cases is the same and cheaper than restructuring: replace
+`AnimatedVisibility` with a plain `if (condition) { ... }` wherever this
+shape occurs. A brace-depth-aware checker (tracking `Row`/`Column`/`Box`
+opens and closes per function body, resetting the stack at each new
+`fun` boundary unless it declares a scope receiver) now exists and passes
+clean across the whole project — a meaningful upgrade from the earlier
+fixed-line-window heuristic, which is exactly what missed this instance
+the first time.

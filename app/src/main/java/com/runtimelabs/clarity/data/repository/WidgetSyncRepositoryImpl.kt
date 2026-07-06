@@ -1,6 +1,7 @@
 package com.runtimelabs.clarity.data.repository
 
 import android.content.Context
+import androidx.glance.appwidget.updateAll
 import com.runtimelabs.clarity.data.local.datastore.WidgetSnapshotStore
 import com.runtimelabs.clarity.data.widget.WidgetRefreshScheduler
 import com.runtimelabs.clarity.domain.model.JourneyEventType

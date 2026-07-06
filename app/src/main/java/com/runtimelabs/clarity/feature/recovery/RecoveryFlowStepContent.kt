@@ -1,10 +1,5 @@
 package com.runtimelabs.clarity.feature.recovery
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,7 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.runtimelabs.clarity.R
 import com.runtimelabs.clarity.core.designsystem.components.ClarityCard
-import com.runtimelabs.clarity.core.designsystem.theme.MotionTokens
 import com.runtimelabs.clarity.core.designsystem.theme.extended
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import com.runtimelabs.clarity.domain.model.MainTrigger
@@ -395,11 +389,14 @@ private fun ChecklistRow(
                 modifier = Modifier.size(28.dp),
             ) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    AnimatedVisibility(
-                        visible = checked,
-                        enter = fadeIn(tween(MotionTokens.QUICK)) + scaleIn(initialScale = 0.6f),
-                        exit = fadeOut(tween(MotionTokens.QUICK)),
-                    ) {
+                    // Plain conditional, not AnimatedVisibility: this Box sits
+                    // inside a Surface inside a Row, all within ChecklistRow's
+                    // own body — Surface introduces no scope of its own, so
+                    // RowScope stays lexically visible all the way down and
+                    // collides with BoxScope at this call site. Function-call
+                    // boundaries (like DoneToggle's) reset that; inline
+                    // nesting within one function body does not.
+                    if (checked) {
                         Icon(
                             imageVector = Icons.Rounded.Check,
                             contentDescription = null,

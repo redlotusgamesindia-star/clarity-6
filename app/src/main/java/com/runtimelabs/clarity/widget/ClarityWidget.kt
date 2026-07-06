@@ -1,6 +1,7 @@
 package com.runtimelabs.clarity.widget
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -10,6 +11,7 @@ import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
+import com.runtimelabs.clarity.MainActivity
 import com.runtimelabs.clarity.R
 import com.runtimelabs.clarity.data.local.datastore.WIDGET_SNAPSHOT_DATASTORE_NAME
 import com.runtimelabs.clarity.domain.model.WidgetSnapshot
@@ -56,6 +58,16 @@ class ClarityWidget : GlanceAppWidget() {
             snapshot.milestoneDays,
         )
 
+        // Built here, not inside ClarityWidgetContent: actionStartActivity in
+        // this Glance version takes an Intent directly (confirmed against
+        // the compiler's own overload-resolution error, not guessed), and
+        // context is already in scope in provideGlance. FLAG_ACTIVITY_NEW_TASK
+        // is required since this launches from outside any Activity context
+        // (a widget tap, dispatched by the launcher process).
+        val launchIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+
         provideContent {
             val isSmall = LocalSize.current.width < LARGE_SIZE.width
             ClarityWidgetContent(
@@ -63,6 +75,7 @@ class ClarityWidget : GlanceAppWidget() {
                 isSmall = isSmall,
                 daysCleanLabel = daysCleanLabel,
                 milestoneCaption = milestoneCaption,
+                launchIntent = launchIntent,
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.runtimelabs.clarity.widget
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,7 +23,6 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import com.runtimelabs.clarity.MainActivity
 import com.runtimelabs.clarity.domain.model.WidgetSnapshot
 
 /*
@@ -47,11 +47,12 @@ internal fun ClarityWidgetContent(
     isSmall: Boolean,
     daysCleanLabel: String,
     milestoneCaption: String,
+    launchIntent: Intent,
 ) {
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .clickable(actionStartActivity<MainActivity>())
+            .clickable(actionStartActivity(launchIntent))
             .background(WidgetColors.background)
             .appWidgetBackground()
             .padding(if (isSmall) 12.dp else 16.dp),
