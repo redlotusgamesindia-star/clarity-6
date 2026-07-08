@@ -435,18 +435,29 @@
     <string name="recovery_best_streak_label">Best streak</string>
 
     <!-- Recovery flow: Reflection (all fields optional) -->
-    <string name="recovery_reflection_title">What led up to it?</string>
-    <string name="recovery_reflection_subtitle">Answer as much or as little as you want — this is for you, not a report.</string>
-    <string name="recovery_reflection_trigger_label">What triggered it?</string>
-    <string name="recovery_reflection_time_label">Time of day</string>
-    <string name="recovery_reflection_mood_label">Mood</string>
-    <string name="recovery_reflection_location_label">Location</string>
-    <string name="recovery_reflection_notes_label">Anything else worth remembering?</string>
-    <string name="recovery_reflection_notes_hint">Optional notes…</string>
-    <string name="relapse_location_home">Home</string>
-    <string name="relapse_location_work">Work or school</string>
-    <string name="relapse_location_traveling">Traveling</string>
-    <string name="relapse_location_other">Somewhere else</string>
+    <string name="recovery_what_happened_title">What happened?</string>
+    <string name="recovery_what_happened_subtitle">This stays between you and this app.</string>
+    <string name="setback_type_porn">Porn</string>
+    <string name="setback_type_masturbation">Masturbation</string>
+    <string name="setback_type_both">Both</string>
+    <string name="setback_type_urge_only">Urge only</string>
+    <string name="recovery_feelings_title">How do you feel?</string>
+    <string name="recovery_feelings_subtitle">Naming it is part of moving through it.</string>
+    <string name="relapse_emotion_guilty">Guilty</string>
+    <string name="relapse_emotion_empty">Empty</string>
+    <string name="relapse_emotion_angry">Angry</string>
+    <string name="relapse_emotion_anxious">Anxious</string>
+    <string name="relapse_emotion_hopeless">Hopeless</string>
+    <string name="relapse_emotion_okay">Okay</string>
+    <string name="recovery_trigger_title">What triggered it?</string>
+    <string name="recovery_trigger_subtitle">Recognizing the pattern is most of the fight.</string>
+    <string name="relapse_trigger_stress">Stress</string>
+    <string name="relapse_trigger_loneliness">Loneliness</string>
+    <string name="relapse_trigger_social_media">Social media</string>
+    <string name="relapse_trigger_boredom">Boredom</string>
+    <string name="relapse_trigger_night">Night</string>
+    <string name="relapse_trigger_couldnt_sleep">Couldn\'t sleep</string>
+    <string name="relapse_trigger_other">Other</string>
 
     <!-- Recovery flow: Learn (common relapse patterns) -->
     <string name="recovery_learn_title">Common patterns</string>
@@ -459,8 +470,8 @@
     <string name="pattern_loneliness_desc">When the trigger is disconnection, the tool is connection — even one honest message to someone you trust changes the moment.</string>
     <string name="pattern_social_media_title">Social media</string>
     <string name="pattern_social_media_desc">The spiral often starts a few scrolls before the urge itself. Notice which feeds tend to lead there.</string>
-    <string name="pattern_nighttime_title">Nighttime</string>
-    <string name="pattern_nighttime_desc">Late hours combine tiredness, privacy, and low willpower. A consistent wind-down routine removes much of the risk before it starts.</string>
+    <string name="pattern_nighttime_title">Night &amp; sleeplessness</string>
+    <string name="pattern_nighttime_desc">Late hours combine tiredness, privacy, and low willpower — and lying awake unable to sleep makes the pull even stronger. A consistent wind-down routine removes much of the risk before it starts.</string>
 
     <!-- Recovery flow: Plan (checklist) -->
     <string name="recovery_plan_title">Right now, try this</string>
@@ -478,7 +489,11 @@
     <!-- Recovery flow: Restart -->
     <string name="recovery_restart_title">Ready when you are</string>
     <string name="recovery_restart_subtitle">Day 1 starts the moment you close this. That\'s all it takes.</string>
+    <string name="recovery_restart_proof">You proved you can reach %1$d days.</string>
     <string name="recovery_restart_button">Begin new streak</string>
+    <string name="recovery_restart_shortcuts_label">Need support right now?</string>
+    <string name="recovery_restart_breathing_shortcut">Breathing exercise</string>
+    <string name="recovery_restart_toolkit_shortcut">Emergency toolkit</string>
 
     <!-- Recovery score (Journey tab) -->
     <string name="recovery_score_title">Recovery Score</string>
@@ -509,8 +524,14 @@
     <string name="settings_current_status_label">Current status</string>
     <string name="settings_status_free">Free</string>
     <string name="settings_status_premium">Premium</string>
+    <string name="settings_status_pending">Processing</string>
     <string name="settings_remove_ads_title">Remove Ads</string>
-    <string name="settings_coming_soon">Coming soon</string>
+    <string name="settings_remove_ads_description">A one-time purchase. Removes ads everywhere in the app, permanently — no subscription.</string>
+    <string name="settings_premium_active_description">Thanks for supporting Clarity — every ad is gone, for good.</string>
+    <string name="settings_pending_description">Your purchase is being confirmed by Google Play. This can take a moment.</string>
     <string name="settings_remove_ads_button">Remove Ads</string>
     <string name="settings_restore_purchases_button">Restore Purchases</string>
+    <string name="purchase_result_pending_message">Your purchase is processing — Premium will activate automatically once it\'s confirmed.</string>
+    <string name="purchase_result_unavailable_message">Purchases aren\'t available right now. Please try again later.</string>
+    <string name="purchase_result_nothing_to_restore_message">No previous purchase was found.</string>
 </resources>

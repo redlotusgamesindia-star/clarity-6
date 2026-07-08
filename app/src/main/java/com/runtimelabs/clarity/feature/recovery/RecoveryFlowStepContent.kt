@@ -26,7 +26,6 @@ import androidx.compose.material.icons.rounded.SelfImprovement
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,15 +40,12 @@ import com.runtimelabs.clarity.R
 import com.runtimelabs.clarity.core.designsystem.components.ClarityCard
 import com.runtimelabs.clarity.core.designsystem.theme.extended
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
-import com.runtimelabs.clarity.domain.model.MainTrigger
-import com.runtimelabs.clarity.domain.model.MoodLevel
-import com.runtimelabs.clarity.domain.model.RelapseLocation
-import com.runtimelabs.clarity.domain.model.UrgeTime
+import com.runtimelabs.clarity.domain.model.RelapseEmotion
+import com.runtimelabs.clarity.domain.model.RelapseSetbackType
+import com.runtimelabs.clarity.domain.model.RelapseTrigger
 import com.runtimelabs.clarity.domain.recovery.RecoveryChecklistItem
 import com.runtimelabs.clarity.domain.recovery.RecoveryChecklistItemCode
-import com.runtimelabs.clarity.feature.home.labelRes
 import com.runtimelabs.clarity.feature.onboarding.OptionCard
-import com.runtimelabs.clarity.feature.onboarding.labelRes
 
 // ---------------------------------------------------------------- accept --
 
@@ -125,18 +121,24 @@ private fun StatBadge(
     }
 }
 
-// ------------------------------------------------------------ reflection --
+// ------------------------------------------------------- single-question --
 
-data class ReflectionActions(
-    val onTriggerSelected: (MainTrigger) -> Unit,
-    val onTimeOfDaySelected: (UrgeTime) -> Unit,
-    val onMoodSelected: (MoodLevel) -> Unit,
-    val onLocationSelected: (RelapseLocation) -> Unit,
-    val onNotesChanged: (String) -> Unit,
-)
-
+/**
+ * The shared shape behind What Happened / Feelings / Trigger: a title, a
+ * subtitle, and a single-select list of [OptionCard]s. None of the three
+ * force a selection to continue — matching this whole flow's standing
+ * principle that reflection is offered, never required, even though each
+ * is now its own focused step rather than one long scrollable form.
+ */
 @Composable
-fun ReflectionContent(draft: RecoveryFlowDraft, actions: ReflectionActions) {
+private fun <T> SingleQuestionContent(
+    titleRes: Int,
+    subtitleRes: Int,
+    options: List<T>,
+    selected: T?,
+    labelRes: (T) -> Int,
+    onSelected: (T) -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -144,89 +146,60 @@ fun ReflectionContent(draft: RecoveryFlowDraft, actions: ReflectionActions) {
             .padding(horizontal = MaterialTheme.spacing.screenHorizontal),
     ) {
         Spacer(Modifier.height(MaterialTheme.spacing.md))
-        Text(
-            text = stringResource(R.string.recovery_reflection_title),
-            style = MaterialTheme.typography.headlineMedium,
-        )
+        Text(text = stringResource(titleRes), style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(MaterialTheme.spacing.xs))
         Text(
-            text = stringResource(R.string.recovery_reflection_subtitle),
+            text = stringResource(subtitleRes),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-
-        ReflectionSection(stringResource(R.string.recovery_reflection_trigger_label)) {
-            MainTrigger.entries.forEach { trigger ->
-                OptionCard(
-                    text = stringResource(trigger.labelRes()),
-                    selected = draft.trigger == trigger,
-                    onClick = { actions.onTriggerSelected(trigger) },
-                    modifier = Modifier.padding(bottom = MaterialTheme.spacing.sm),
-                )
-            }
+        Spacer(Modifier.height(MaterialTheme.spacing.lg))
+        options.forEach { option ->
+            OptionCard(
+                text = stringResource(labelRes(option)),
+                selected = selected == option,
+                onClick = { onSelected(option) },
+                modifier = Modifier.padding(bottom = MaterialTheme.spacing.sm),
+            )
         }
-
-        ReflectionSection(stringResource(R.string.recovery_reflection_time_label)) {
-            UrgeTime.entries.forEach { time ->
-                OptionCard(
-                    text = stringResource(time.labelRes()),
-                    selected = draft.timeOfDay == time,
-                    onClick = { actions.onTimeOfDaySelected(time) },
-                    modifier = Modifier.padding(bottom = MaterialTheme.spacing.sm),
-                )
-            }
-        }
-
-        ReflectionSection(stringResource(R.string.recovery_reflection_mood_label)) {
-            MoodLevel.entries.forEach { mood ->
-                OptionCard(
-                    text = stringResource(mood.labelRes()),
-                    selected = draft.mood == mood,
-                    onClick = { actions.onMoodSelected(mood) },
-                    modifier = Modifier.padding(bottom = MaterialTheme.spacing.sm),
-                )
-            }
-        }
-
-        ReflectionSection(stringResource(R.string.recovery_reflection_location_label)) {
-            RelapseLocation.entries.forEach { location ->
-                OptionCard(
-                    text = stringResource(location.labelRes()),
-                    selected = draft.location == location,
-                    onClick = { actions.onLocationSelected(location) },
-                    modifier = Modifier.padding(bottom = MaterialTheme.spacing.sm),
-                )
-            }
-        }
-
-        Spacer(Modifier.height(MaterialTheme.spacing.md))
-        Text(
-            text = stringResource(R.string.recovery_reflection_notes_label),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(Modifier.height(MaterialTheme.spacing.xs))
-        OutlinedTextField(
-            value = draft.notes,
-            onValueChange = actions.onNotesChanged,
-            placeholder = { Text(stringResource(R.string.recovery_reflection_notes_hint)) },
-            minLines = 2,
-            modifier = Modifier.fillMaxWidth(),
-        )
         Spacer(Modifier.height(MaterialTheme.spacing.xxl))
     }
 }
 
 @Composable
-private fun ReflectionSection(label: String, content: @Composable () -> Unit) {
-    Spacer(Modifier.height(MaterialTheme.spacing.lg))
-    Text(
-        text = label,
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+fun WhatHappenedContent(selected: RelapseSetbackType?, onSelected: (RelapseSetbackType) -> Unit) {
+    SingleQuestionContent(
+        titleRes = R.string.recovery_what_happened_title,
+        subtitleRes = R.string.recovery_what_happened_subtitle,
+        options = RelapseSetbackType.entries,
+        selected = selected,
+        labelRes = { it.labelRes() },
+        onSelected = onSelected,
     )
-    Spacer(Modifier.height(MaterialTheme.spacing.sm))
-    content()
+}
+
+@Composable
+fun FeelingsContent(selected: RelapseEmotion?, onSelected: (RelapseEmotion) -> Unit) {
+    SingleQuestionContent(
+        titleRes = R.string.recovery_feelings_title,
+        subtitleRes = R.string.recovery_feelings_subtitle,
+        options = RelapseEmotion.entries,
+        selected = selected,
+        labelRes = { it.labelRes() },
+        onSelected = onSelected,
+    )
+}
+
+@Composable
+fun TriggerContent(selected: RelapseTrigger?, onSelected: (RelapseTrigger) -> Unit) {
+    SingleQuestionContent(
+        titleRes = R.string.recovery_trigger_title,
+        subtitleRes = R.string.recovery_trigger_subtitle,
+        options = RelapseTrigger.entries,
+        selected = selected,
+        labelRes = { it.labelRes() },
+        onSelected = onSelected,
+    )
 }
 
 // ------------------------------------------------------------------ learn --
@@ -235,25 +208,21 @@ private data class RelapsePattern(
     val icon: ImageVector,
     val titleRes: Int,
     val descriptionRes: Int,
-    val matchesTrigger: MainTrigger?,
-    val matchesLateNight: Boolean = false,
+    val matchesTriggers: Set<RelapseTrigger>,
 )
 
 private val RELAPSE_PATTERNS = listOf(
-    RelapsePattern(Icons.Rounded.SelfImprovement, R.string.pattern_boredom_title, R.string.pattern_boredom_desc, MainTrigger.BOREDOM),
-    RelapsePattern(Icons.Rounded.Spa, R.string.pattern_stress_title, R.string.pattern_stress_desc, MainTrigger.STRESS),
-    RelapsePattern(Icons.Rounded.People, R.string.pattern_loneliness_title, R.string.pattern_loneliness_desc, MainTrigger.LONELINESS),
-    RelapsePattern(Icons.Rounded.PhoneAndroid, R.string.pattern_social_media_title, R.string.pattern_social_media_desc, MainTrigger.SOCIAL_MEDIA),
-    RelapsePattern(Icons.Rounded.NightsStay, R.string.pattern_nighttime_title, R.string.pattern_nighttime_desc, null, matchesLateNight = true),
+    RelapsePattern(Icons.Rounded.SelfImprovement, R.string.pattern_boredom_title, R.string.pattern_boredom_desc, setOf(RelapseTrigger.BOREDOM)),
+    RelapsePattern(Icons.Rounded.Spa, R.string.pattern_stress_title, R.string.pattern_stress_desc, setOf(RelapseTrigger.STRESS)),
+    RelapsePattern(Icons.Rounded.People, R.string.pattern_loneliness_title, R.string.pattern_loneliness_desc, setOf(RelapseTrigger.LONELINESS)),
+    RelapsePattern(Icons.Rounded.PhoneAndroid, R.string.pattern_social_media_title, R.string.pattern_social_media_desc, setOf(RelapseTrigger.SOCIAL_MEDIA)),
+    RelapsePattern(Icons.Rounded.NightsStay, R.string.pattern_nighttime_title, R.string.pattern_nighttime_desc, setOf(RelapseTrigger.NIGHT, RelapseTrigger.COULDNT_SLEEP)),
 )
 
 @Composable
-fun LearnContent(matchedTrigger: MainTrigger?, matchedLateNight: Boolean) {
-    val ordered = remember(matchedTrigger, matchedLateNight) {
-        RELAPSE_PATTERNS.sortedByDescending { pattern ->
-            (pattern.matchesTrigger != null && pattern.matchesTrigger == matchedTrigger) ||
-                (pattern.matchesLateNight && matchedLateNight)
-        }
+fun LearnContent(matchedTrigger: RelapseTrigger?) {
+    val ordered = remember(matchedTrigger) {
+        RELAPSE_PATTERNS.sortedByDescending { pattern -> matchedTrigger != null && matchedTrigger in pattern.matchesTriggers }
     }
     Column(
         modifier = Modifier
@@ -274,8 +243,7 @@ fun LearnContent(matchedTrigger: MainTrigger?, matchedLateNight: Boolean) {
         )
         Spacer(Modifier.height(MaterialTheme.spacing.lg))
         ordered.forEach { pattern ->
-            val isMatch = (pattern.matchesTrigger != null && pattern.matchesTrigger == matchedTrigger) ||
-                (pattern.matchesLateNight && matchedLateNight)
+            val isMatch = matchedTrigger != null && matchedTrigger in pattern.matchesTriggers
             PatternCard(pattern = pattern, highlighted = isMatch)
             Spacer(Modifier.height(MaterialTheme.spacing.sm))
         }

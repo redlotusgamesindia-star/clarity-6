@@ -111,6 +111,13 @@ dependencies {
     implementation(libs.play.services.ads)
     implementation(libs.user.messaging.platform)
 
+    // Google Play Billing v8 (one-time, non-consumable "remove_ads" product
+    // only — no subscriptions). billing-ktx supplies the suspend-function
+    // extensions used throughout PlayBillingConnector, keeping purchase
+    // code idiomatic Kotlin rather than nested listener callbacks.
+    implementation(libs.billing)
+    implementation(libs.billing.ktx)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -18,11 +18,9 @@ class RelapseReflectionRepositoryImpl @Inject constructor(
                 journeyEventId = reflection.journeyEventId,
                 epochDay = reflection.epochDay,
                 createdAtEpochMillis = reflection.createdAtEpochMillis,
+                setbackType = reflection.setbackType?.storageValue,
+                emotion = reflection.emotion?.storageValue,
                 trigger = reflection.trigger?.storageValue,
-                timeOfDay = reflection.timeOfDay?.storageValue,
-                mood = reflection.mood?.storageValue,
-                location = reflection.location?.storageValue,
-                notes = reflection.notes,
             ),
         )
     }

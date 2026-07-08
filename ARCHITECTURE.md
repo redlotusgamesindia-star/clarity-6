@@ -731,3 +731,139 @@ hand.** `main` and `test` are compiled as separate source sets by Gradle,
 which is exactly why `compileDebugKotlin` can go green while
 `compileDebugUnitTestKotlin` fails right after — a clean main build is not
 evidence the test tree still compiles.
+
+## 27. Google Play Billing v8 (remove_ads, one-time purchase)
+
+The domain contracts, `PlayBillingConnector`, `PurchaseResult`, and the
+`PremiumManager`/`ClarityApp` wiring already existed when this pass began —
+found by inspection, not built from memory of an earlier session, and
+verified rather than assumed correct. The one real gap: `SettingsScreen.kt`
+still referenced a `premiumState` property that no longer existed on
+`SettingsViewModel` and had a non-exhaustive `when` missing the `Pending`
+case — it would not have compiled. That screen is this section's actual
+new work; everything below it in this list already existed and was
+confirmed correct by reading it, not by re-deriving it from scratch.
+
+- **`PremiumState` gained a third case, `Pending`**, alongside `Free` and
+  `Premium` — distinct from `PurchaseResult.Pending`, which is the outcome
+  of *one attempt*, not durable ownership status. Cash and bank-transfer
+  payment methods (common in Japan, Brazil, Indonesia, and elsewhere) take
+  time to clear; a pending purchase must not unlock premium yet.
+  `PremiumState.isPremium` is deliberately true for `Premium` alone.
+- **`PendingPurchasesParams.enableOneTimeProducts()` is called explicitly.**
+  Billing v8 stopped implying this from the deprecated no-arg
+  `enablePendingPurchases()`; omitting it silently breaks pending-purchase
+  handling for exactly the payment methods above.
+- **Client-side signature verification, fail-closed.** No cloud backend
+  (by requirement) means no server-side purchase-token verification either
+  — the honest trade-off documented directly in `PlayBillingConnector`:
+  this stops casual tampering, not a sufficiently motivated attacker with
+  root on their own device. The placeholder public key is checked first;
+  every purchase is rejected as unverified until the real Play Console
+  licensing key replaces it, so forgetting to configure this cannot
+  silently grant free premium to everyone — it fails safe, not open.
+- **"Survives reinstall" has nothing to do with local storage.**
+  `PremiumManager.refreshFromBilling()`, called from `ClarityApp.onCreate()`,
+  queries Google's own purchase records at every startup. The purchase is
+  still valid on Google's servers even when nothing survived locally after
+  a reinstall — this is the entire mechanism, and it needed no changes.
+- **`PurchaseResult` and `PremiumState` are deliberately two different sealed
+  types.** Cancelling a purchase attempt doesn't change what you own; it's
+  an event the attempt produced, not a new ownership state — collapsing
+  them into one type would have made `PremiumState` need a `Cancelled` case
+  that persisted nonsensically.
+- **`AdsManager` was not touched, at all, in this entire pass** — confirmed
+  by inspection before writing anything, not assumed. `BannerAdViewModel`
+  already depended on `PremiumManager.isPremium`, itself sourced from
+  `PremiumState.isPremium` (true only for `Premium`, never `Pending`), so
+  "remove every banner instantly" and "a pending purchase must not hide
+  ads yet" were both already correct, structurally, before this pass began.
+- **The Settings UI fix**: `SettingsScreen` now actually reads
+  `SettingsViewModel.uiState` (not a nonexistent property), handles all
+  three `PremiumState` cases via a small pill-shaped `StatusBadge`, and
+  wires both buttons to real actions. The "smooth success animation"
+  requirement is carried entirely by `AnimatedContent`'s state-driven
+  crossfade on that badge — no separate celebration mechanism was built,
+  since the badge appearing already *is* the celebration, and it costs
+  nothing extra to wire. `AnimatedContent` was confirmed (directly against
+  its documented overloads, not assumed from `AnimatedVisibility`'s
+  behavior) to have no `RowScope`/`ColumnScope`-specific overload to
+  collide with, unlike `AnimatedVisibility` — so nesting it inside a `Row`
+  here carries none of the DslMarker risk documented in §25.
+- **Every non-success `PurchaseResult` gets exactly one piece of feedback,
+  once.** `Cancelled` gets nothing — cancelling is an ordinary choice, not
+  a failure worth interrupting anyone over. Every other outcome
+  (`Pending`, `BillingUnavailable`, `NothingToRestore`, `Error`) gets a
+  brief `Snackbar`, shown once via the existing one-shot
+  `purchaseResult`-then-`onPurchaseResultConsumed()` pattern the ViewModel
+  already implemented correctly.
+
+## 28. Recovery flow redesign: What Happened / Feelings / Trigger
+
+The single "Reflection" step (trigger + time-of-day + mood + location +
+free notes, all in one scrollable form, reusing onboarding's `MainTrigger`/
+`UrgeTime` and the daily check-in's `MoodLevel`) is replaced by three
+focused, sequential steps with their own purpose-built vocabulary. The
+flow is now Accept -> What Happened -> Feelings -> Trigger -> Learn ->
+Plan -> Restart — seven phases, still one VM-internal state machine, same
+reasons as §16/§22.
+
+- **Three new domain enums, not reused generic ones.** `RelapseSetbackType`
+  (Porn/Masturbation/Both/Urge only), `RelapseEmotion`
+  (Guilty/Empty/Angry/Anxious/Hopeless/Okay), and `RelapseTrigger`
+  (Stress/Loneliness/Social media/Boredom/Night/Couldn't sleep/Other) each
+  get their own type rather than overloading `MoodLevel` or `MainTrigger`+
+  `UrgeTime` to mean something they don't. `MoodLevel.STRUGGLING` standing
+  in for "Guilty" would have been a lossy, confusing hack — daily-check-in
+  mood and post-relapse emotion are genuinely different questions asking
+  for genuinely different vocabulary.
+- **`RelapseTrigger` deliberately flattens trigger and timing into one
+  list.** NIGHT and COULDNT_SLEEP are nameable triggers here in their own
+  right, not a time-of-day modifier on some other trigger — matching
+  exactly how the question was actually asked, rather than forcing it back
+  into the existing two-axis split.
+- **Still nothing is required to continue.** Each of the three new steps
+  is single-select with an always-enabled Continue, exactly like the
+  reflection step it replaces — the redesign changes what's asked and how
+  many screens it takes, not the standing principle that disclosure is
+  offered, never gated.
+- **`RelapseReflection`'s old `location` and free-text `notes` fields have
+  no home in the new design and are dropped, not preserved.** This is a
+  real simplification, not an oversight: the three specific questions
+  requested don't include either. `RelapseLocation` becomes fully orphaned
+  the moment its one caller stops using it and is deleted outright, along
+  with its now-unused strings — an unused enum with zero remaining callers
+  is dead code, not a placeholder worth keeping.
+- **DB v6 -> v7 is a drop-and-recreate, not a column migration.** There's
+  no meaningful way to carry old free-text notes or a location forward
+  into fields that don't correspond to them. This only affects the
+  optional reflection *color* on past relapses — the append-only
+  `journey_event` record of each relapse (§17, §22) is completely
+  untouched and remains the sole source of truth for streak math.
+- **`RecoveryChecklistGenerator` collapsed its two-parameter signature
+  `(trigger: MainTrigger?, timeOfDay: UrgeTime?)` into one:
+  `(trigger: RelapseTrigger?)`.** `RelapseTrigger.NIGHT` and
+  `.COULDNT_SLEEP` both route to the same wind-down checklist item —
+  two enum values, one personalization outcome, no duplicated logic.
+- **The Learn step's pattern-matching moved from a single nullable
+  `matchesTrigger` plus a separate `matchesLateNight` boolean to one
+  `matchesTriggers: Set<RelapseTrigger>` per card** — letting the
+  "Night & sleeplessness" card highlight for either NIGHT or COULDNT_SLEEP
+  without needing a second boolean flag bolted onto the data shape.
+- **The Restart screen is now the actual motivational moment the plan
+  described**, not just a plain restart button: "You proved you can reach
+  N days" (shown only when a previous run exists — never invented for a
+  first-ever relapse), then Start Again, then two shortcuts — Breathing
+  and the Emergency Toolkit — reusing the exact deep-link pattern already
+  proven on the Plan step (push on top, come back via the back button;
+  tapping a shortcut does not implicitly finish the flow). Both shortcut
+  icons reuse icons already confirmed compiling elsewhere in this exact
+  project (`SelfImprovement`, `Psychology`) rather than introduce
+  unverified new ones for a cosmetic choice.
+- **The Restart screen switched from `weight()`-centered content to a
+  scrollable Column.** It now carries meaningfully more content (the proof
+  line, two extra buttons) than the version that fit comfortably centered
+  on a fixed-height screen; `Modifier.weight()` inside `verticalScroll` is
+  a real Compose anti-pattern (a scrolling container offers unbounded
+  height, which weight has nothing sensible to divide), so this was
+  rebuilt with fixed spacers instead of quietly risking that combination.

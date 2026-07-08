@@ -22,8 +22,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Psychology
+import androidx.compose.material.icons.rounded.SelfImprovement
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,10 +48,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.runtimelabs.clarity.R
 import com.runtimelabs.clarity.core.designsystem.components.ClarityPrimaryButton
+import com.runtimelabs.clarity.core.designsystem.components.ClaritySecondaryButton
 import com.runtimelabs.clarity.core.designsystem.components.LoadingScreen
+import com.runtimelabs.clarity.core.designsystem.theme.extended
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import com.runtimelabs.clarity.core.util.rememberReduceMotionEnabled
-import com.runtimelabs.clarity.domain.model.UrgeTime
 
 /**
  * The five-step recovery flow. Structurally identical to OnboardingScreen on
@@ -62,6 +67,7 @@ fun RecoveryFlowScreen(
     onDone: () -> Unit,
     onOpenBreathing: () -> Unit,
     onOpenJournal: () -> Unit,
+    onOpenToolkit: () -> Unit,
     viewModel: RecoveryFlowViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(relapseJourneyEventId) {
@@ -95,20 +101,19 @@ fun RecoveryFlowScreen(
                                 previousRunDays = current.previousRunDays,
                                 bestStreakDays = current.bestStreakDays,
                             )
-                            RecoveryFlowPhase.REFLECTION -> ReflectionContent(
-                                draft = current.draft,
-                                actions = ReflectionActions(
-                                    onTriggerSelected = viewModel::onTriggerSelected,
-                                    onTimeOfDaySelected = viewModel::onTimeOfDaySelected,
-                                    onMoodSelected = viewModel::onMoodSelected,
-                                    onLocationSelected = viewModel::onLocationSelected,
-                                    onNotesChanged = viewModel::onNotesChanged,
-                                ),
+                            RecoveryFlowPhase.WHAT_HAPPENED -> WhatHappenedContent(
+                                selected = current.draft.setbackType,
+                                onSelected = viewModel::onSetbackTypeSelected,
                             )
-                            RecoveryFlowPhase.LEARN -> LearnContent(
-                                matchedTrigger = current.draft.trigger,
-                                matchedLateNight = current.draft.timeOfDay == UrgeTime.LATE_NIGHT,
+                            RecoveryFlowPhase.FEELINGS -> FeelingsContent(
+                                selected = current.draft.emotion,
+                                onSelected = viewModel::onEmotionSelected,
                             )
+                            RecoveryFlowPhase.TRIGGER -> TriggerContent(
+                                selected = current.draft.trigger,
+                                onSelected = viewModel::onTriggerSelected,
+                            )
+                            RecoveryFlowPhase.LEARN -> LearnContent(matchedTrigger = current.draft.trigger)
                             RecoveryFlowPhase.PLAN -> PlanContent(
                                 checklist = current.checklist,
                                 checkedCodes = current.checkedCodes,
@@ -116,7 +121,12 @@ fun RecoveryFlowScreen(
                                 onOpenBreathing = onOpenBreathing,
                                 onOpenJournal = onOpenJournal,
                             )
-                            RecoveryFlowPhase.RESTART -> RestartContent(onBeginNewStreak = viewModel::onBeginNewStreak)
+                            RecoveryFlowPhase.RESTART -> RestartContent(
+                                previousRunDays = current.previousRunDays,
+                                onBeginNewStreak = viewModel::onBeginNewStreak,
+                                onOpenBreathing = onOpenBreathing,
+                                onOpenToolkit = onOpenToolkit,
+                            )
                         }
                     }
                 }
@@ -126,14 +136,25 @@ fun RecoveryFlowScreen(
 }
 
 @Composable
-private fun RestartContent(onBeginNewStreak: () -> Unit) {
+private fun RestartContent(
+    previousRunDays: Int?,
+    onBeginNewStreak: () -> Unit,
+    onOpenBreathing: () -> Unit,
+    onOpenToolkit: () -> Unit,
+) {
+    // Scrollable, not weight-centered like before: this screen now carries
+    // more content (the "you proved" line, two shortcut buttons), and
+    // Modifier.weight() inside a verticalScroll Column is a real Compose
+    // anti-pattern — a scrolling container offers unbounded height, which
+    // weight() has nothing sensible to divide.
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = MaterialTheme.spacing.xl),
     ) {
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.height(MaterialTheme.spacing.xxl))
         Icon(
             imageVector = Icons.Rounded.Spa,
             contentDescription = null,
@@ -153,13 +174,49 @@ private fun RestartContent(onBeginNewStreak: () -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.weight(1f))
+        if (previousRunDays != null && previousRunDays > 0) {
+            Spacer(Modifier.height(MaterialTheme.spacing.lg))
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.extended.celebration.copy(alpha = 0.12f),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(R.string.recovery_restart_proof, previousRunDays),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.extended.celebration,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(MaterialTheme.spacing.md),
+                )
+            }
+        }
+        Spacer(Modifier.height(MaterialTheme.spacing.xl))
         ClarityPrimaryButton(
             text = stringResource(R.string.recovery_restart_button),
             onClick = onBeginNewStreak,
             leadingIcon = Icons.Rounded.Spa,
         )
-        Spacer(Modifier.height(MaterialTheme.spacing.lg))
+        Spacer(Modifier.height(MaterialTheme.spacing.md))
+        Text(
+            text = stringResource(R.string.recovery_restart_shortcuts_label),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(MaterialTheme.spacing.sm))
+        ClaritySecondaryButton(
+            text = stringResource(R.string.recovery_restart_breathing_shortcut),
+            onClick = onOpenBreathing,
+            leadingIcon = Icons.Rounded.SelfImprovement,
+        )
+        Spacer(Modifier.height(MaterialTheme.spacing.sm))
+        ClaritySecondaryButton(
+            text = stringResource(R.string.recovery_restart_toolkit_shortcut),
+            onClick = onOpenToolkit,
+            leadingIcon = Icons.Rounded.Psychology,
+        )
+        Spacer(Modifier.height(MaterialTheme.spacing.xl))
     }
 }
 

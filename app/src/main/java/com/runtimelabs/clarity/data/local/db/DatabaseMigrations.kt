@@ -133,4 +133,30 @@ internal val MIGRATION_5_6 = object : Migration(5, 6) {
     }
 }
 
-internal val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+internal val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // The recovery flow's reflection step was redesigned around a new,
+        // more specific vocabulary (setbackType/emotion/trigger replacing
+        // trigger/timeOfDay/mood/location/notes) — a clean rebuild of this
+        // one table rather than an in-place column migration, since the
+        // old free-text notes and location fields have no equivalent in
+        // the new shape and there is no way to meaningfully carry old rows
+        // forward. This table only ever added optional color to the
+        // already-durable journey_event record of a relapse (§22) — no
+        // relapse history is lost by this, only the optional reflection
+        // notes some past relapses may have had attached.
+        db.execSQL("DROP TABLE IF EXISTS `relapse_reflection`")
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `relapse_reflection` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`journeyEventId` INTEGER NOT NULL, " +
+                "`epochDay` INTEGER NOT NULL, " +
+                "`createdAtEpochMillis` INTEGER NOT NULL, " +
+                "`setbackType` TEXT, " +
+                "`emotion` TEXT, " +
+                "`trigger` TEXT)",
+        )
+    }
+}
+
+internal val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)

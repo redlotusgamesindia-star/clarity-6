@@ -130,11 +130,12 @@ fun ClarityNavHost(
                     // Pop all the way back to Home, not just one step — the
                     // flow's own back button already lets someone revisit
                     // earlier steps, but "done" should never leave the
-                    // five-step flow sitting on the back stack to return to.
+                    // seven-step flow sitting on the back stack to return to.
                     navController.popBackStack(HomeRoute, inclusive = false)
                 },
                 onOpenBreathing = { navController.navigate(BreathingRoute) },
                 onOpenJournal = { navController.navigate(JournalEditorRoute()) },
+                onOpenToolkit = { navController.navigate(SosRoute) },
             )
         }
         composable<SettingsRoute> {

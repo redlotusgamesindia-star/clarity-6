@@ -9,7 +9,9 @@ import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.runtimelabs.clarity.R
-import com.runtimelabs.clarity.domain.model.RelapseLocation
+import com.runtimelabs.clarity.domain.model.RelapseEmotion
+import com.runtimelabs.clarity.domain.model.RelapseSetbackType
+import com.runtimelabs.clarity.domain.model.RelapseTrigger
 import com.runtimelabs.clarity.domain.recovery.ComebackAchievement
 import com.runtimelabs.clarity.domain.recovery.RecoveryChecklistItemCode
 import com.runtimelabs.clarity.domain.recovery.RecoveryMotivationCode
@@ -21,11 +23,32 @@ import com.runtimelabs.clarity.domain.recovery.RecoveryMotivationCode
  */
 
 @StringRes
-fun RelapseLocation.labelRes(): Int = when (this) {
-    RelapseLocation.HOME -> R.string.relapse_location_home
-    RelapseLocation.WORK_OR_SCHOOL -> R.string.relapse_location_work
-    RelapseLocation.TRAVELING -> R.string.relapse_location_traveling
-    RelapseLocation.OTHER -> R.string.relapse_location_other
+fun RelapseSetbackType.labelRes(): Int = when (this) {
+    RelapseSetbackType.PORN -> R.string.setback_type_porn
+    RelapseSetbackType.MASTURBATION -> R.string.setback_type_masturbation
+    RelapseSetbackType.BOTH -> R.string.setback_type_both
+    RelapseSetbackType.URGE_ONLY -> R.string.setback_type_urge_only
+}
+
+@StringRes
+fun RelapseEmotion.labelRes(): Int = when (this) {
+    RelapseEmotion.GUILTY -> R.string.relapse_emotion_guilty
+    RelapseEmotion.EMPTY -> R.string.relapse_emotion_empty
+    RelapseEmotion.ANGRY -> R.string.relapse_emotion_angry
+    RelapseEmotion.ANXIOUS -> R.string.relapse_emotion_anxious
+    RelapseEmotion.HOPELESS -> R.string.relapse_emotion_hopeless
+    RelapseEmotion.OKAY -> R.string.relapse_emotion_okay
+}
+
+@StringRes
+fun RelapseTrigger.labelRes(): Int = when (this) {
+    RelapseTrigger.STRESS -> R.string.relapse_trigger_stress
+    RelapseTrigger.LONELINESS -> R.string.relapse_trigger_loneliness
+    RelapseTrigger.SOCIAL_MEDIA -> R.string.relapse_trigger_social_media
+    RelapseTrigger.BOREDOM -> R.string.relapse_trigger_boredom
+    RelapseTrigger.NIGHT -> R.string.relapse_trigger_night
+    RelapseTrigger.COULDNT_SLEEP -> R.string.relapse_trigger_couldnt_sleep
+    RelapseTrigger.OTHER -> R.string.relapse_trigger_other
 }
 
 @StringRes

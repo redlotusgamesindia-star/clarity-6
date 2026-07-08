@@ -1,6 +1,6 @@
 package com.runtimelabs.clarity.di
 
-import com.runtimelabs.clarity.data.premium.NoOpBillingConnector
+import com.runtimelabs.clarity.data.premium.PlayBillingConnector
 import com.runtimelabs.clarity.data.repository.CheckInRepositoryImpl
 import com.runtimelabs.clarity.data.repository.GratitudeRepositoryImpl
 import com.runtimelabs.clarity.data.repository.HabitRepositoryImpl
@@ -84,5 +84,5 @@ abstract class DataModule {
 
     @Binds
     @Singleton
-    abstract fun bindBillingConnector(impl: NoOpBillingConnector): BillingConnector
+    abstract fun bindBillingConnector(impl: PlayBillingConnector): BillingConnector
 }

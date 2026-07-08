@@ -21,6 +21,7 @@ espresso = "3.6.1"
 glance = "1.1.0"
 playServicesAds = "23.6.0"
 umpSdk = "4.0.0"
+billingClient = "8.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,6 +55,8 @@ espresso-core = { group = "androidx.test.espresso", name = "espresso-core", vers
 glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
 user-messaging-platform = { group = "com.google.android.ump", name = "user-messaging-platform", version.ref = "umpSdk" }
+billing = { group = "com.android.billingclient", name = "billing", version.ref = "billingClient" }
+billing-ktx = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "billingClient" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

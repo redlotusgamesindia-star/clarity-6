@@ -3,11 +3,10 @@ package com.runtimelabs.clarity.feature.recovery
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.runtimelabs.clarity.domain.model.JourneyEventType
-import com.runtimelabs.clarity.domain.model.MainTrigger
-import com.runtimelabs.clarity.domain.model.MoodLevel
-import com.runtimelabs.clarity.domain.model.RelapseLocation
+import com.runtimelabs.clarity.domain.model.RelapseEmotion
 import com.runtimelabs.clarity.domain.model.RelapseReflection
-import com.runtimelabs.clarity.domain.model.UrgeTime
+import com.runtimelabs.clarity.domain.model.RelapseSetbackType
+import com.runtimelabs.clarity.domain.model.RelapseTrigger
 import com.runtimelabs.clarity.domain.recovery.RecoveryChecklistGenerator
 import com.runtimelabs.clarity.domain.recovery.RecoveryChecklistItem
 import com.runtimelabs.clarity.domain.recovery.RecoveryChecklistItemCode
@@ -27,10 +26,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
- * Accept -> Reflection -> Learn -> Plan -> Restart. Same architectural
- * choice as onboarding and the exact same reasons: one experience, one
- * entry, one exit, so step navigation is VM-internal state rather than
- * NavController routes (ARCHITECTURE.md §16, extended §22).
+ * Accept -> What Happened -> Feelings -> Trigger -> Learn -> Plan -> Restart.
+ * Same architectural choice as onboarding and the exact same reasons: one
+ * experience, one entry, one exit, so step navigation is VM-internal state
+ * rather than NavController routes (ARCHITECTURE.md §16, extended §22, §28).
  *
  * The relapse JourneyEvent is already recorded by the time this VM is
  * created (HomeViewModel does that the moment the person confirms, before
@@ -39,14 +38,12 @@ import kotlinx.coroutines.launch
  * streak in a half-reset state. Only the OPTIONAL reflection and the
  * ephemeral checklist live here.
  */
-enum class RecoveryFlowPhase { ACCEPT, REFLECTION, LEARN, PLAN, RESTART }
+enum class RecoveryFlowPhase { ACCEPT, WHAT_HAPPENED, FEELINGS, TRIGGER, LEARN, PLAN, RESTART }
 
 data class RecoveryFlowDraft(
-    val trigger: MainTrigger? = null,
-    val timeOfDay: UrgeTime? = null,
-    val mood: MoodLevel? = null,
-    val location: RelapseLocation? = null,
-    val notes: String = "",
+    val setbackType: RelapseSetbackType? = null,
+    val emotion: RelapseEmotion? = null,
+    val trigger: RelapseTrigger? = null,
 )
 
 sealed interface RecoveryFlowUiState {
@@ -113,14 +110,16 @@ class RecoveryFlowViewModel @Inject constructor(
     fun onContinue() {
         updateReady { state ->
             when (state.phase) {
-                RecoveryFlowPhase.ACCEPT -> state.copy(phase = RecoveryFlowPhase.REFLECTION)
-                RecoveryFlowPhase.REFLECTION -> {
+                RecoveryFlowPhase.ACCEPT -> state.copy(phase = RecoveryFlowPhase.WHAT_HAPPENED)
+                RecoveryFlowPhase.WHAT_HAPPENED -> state.copy(phase = RecoveryFlowPhase.FEELINGS)
+                RecoveryFlowPhase.FEELINGS -> state.copy(phase = RecoveryFlowPhase.TRIGGER)
+                RecoveryFlowPhase.TRIGGER -> {
                     saveReflectionIfAnyFieldFilled(state.draft)
                     state.copy(phase = RecoveryFlowPhase.LEARN)
                 }
                 RecoveryFlowPhase.LEARN -> state.copy(
                     phase = RecoveryFlowPhase.PLAN,
-                    checklist = checklistGenerator.generate(state.draft.trigger, state.draft.timeOfDay),
+                    checklist = checklistGenerator.generate(state.draft.trigger),
                 )
                 RecoveryFlowPhase.PLAN -> state.copy(phase = RecoveryFlowPhase.RESTART)
                 RecoveryFlowPhase.RESTART -> state
@@ -137,11 +136,9 @@ class RecoveryFlowViewModel @Inject constructor(
         }
     }
 
-    fun onTriggerSelected(value: MainTrigger) = updateDraft { it.copy(trigger = value) }
-    fun onTimeOfDaySelected(value: UrgeTime) = updateDraft { it.copy(timeOfDay = value) }
-    fun onMoodSelected(value: MoodLevel) = updateDraft { it.copy(mood = value) }
-    fun onLocationSelected(value: RelapseLocation) = updateDraft { it.copy(location = value) }
-    fun onNotesChanged(value: String) = updateDraft { it.copy(notes = value) }
+    fun onSetbackTypeSelected(value: RelapseSetbackType) = updateDraft { it.copy(setbackType = value) }
+    fun onEmotionSelected(value: RelapseEmotion) = updateDraft { it.copy(emotion = value) }
+    fun onTriggerSelected(value: RelapseTrigger) = updateDraft { it.copy(trigger = value) }
 
     fun onChecklistItemToggled(code: RecoveryChecklistItemCode) {
         updateReady { state ->
@@ -155,14 +152,13 @@ class RecoveryFlowViewModel @Inject constructor(
         }
     }
 
-    /** The large "Begin new streak" button. Just closes the flow — the streak was already reset at confirm time. */
+    /** The large "Start Again" button. Just closes the flow — the streak was already reset at confirm time. */
     fun onBeginNewStreak() {
         updateReady { it.copy(finished = true) }
     }
 
     private fun saveReflectionIfAnyFieldFilled(draft: RecoveryFlowDraft) {
-        val hasAnything = draft.trigger != null || draft.timeOfDay != null ||
-            draft.mood != null || draft.location != null || draft.notes.isNotBlank()
+        val hasAnything = draft.setbackType != null || draft.emotion != null || draft.trigger != null
         if (!hasAnything) return // nothing offered — nothing to save, no empty row created
         viewModelScope.launch {
             relapseReflectionRepository.save(
@@ -171,11 +167,9 @@ class RecoveryFlowViewModel @Inject constructor(
                     journeyEventId = relapseJourneyEventId,
                     epochDay = LocalDate.now().toEpochDay(),
                     createdAtEpochMillis = System.currentTimeMillis(),
+                    setbackType = draft.setbackType,
+                    emotion = draft.emotion,
                     trigger = draft.trigger,
-                    timeOfDay = draft.timeOfDay,
-                    mood = draft.mood,
-                    location = draft.location,
-                    notes = draft.notes.trim(),
                 ),
             )
         }

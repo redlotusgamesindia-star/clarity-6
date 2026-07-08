@@ -1,8 +1,10 @@
 package com.runtimelabs.clarity.premium
 
+import android.app.Activity
 import com.runtimelabs.clarity.domain.premium.BillingConnector
 import com.runtimelabs.clarity.domain.premium.PremiumRepository
 import com.runtimelabs.clarity.domain.premium.PremiumState
+import com.runtimelabs.clarity.domain.premium.PurchaseResult
 import com.runtimelabs.clarity.domain.premium.isPremium
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,13 +24,10 @@ import kotlinx.coroutines.flow.map
  *
  * [premiumState] itself is a thin passthrough of [PremiumRepository] — the
  * cached, durable-across-restarts value everything reads reactively.
- * [BillingConnector] is genuinely injected and callable via
- * [refreshFromBilling], not just bound-and-unused: this is the one concrete
- * method a future purchase/restore flow would call to reconcile a live
- * entitlement check into the cached value, without needing to change
- * anything that already reads [premiumState]. Nothing calls it yet, since
- * [BillingConnector]'s only implementation is a no-op — but the seam is
- * real, not aspirational.
+ * [purchasePremium] and [restorePurchases] both persist a successful (or
+ * pending) outcome back through [PremiumRepository] the moment it's known,
+ * which is the entire mechanism behind "remove every banner instantly" —
+ * nothing downstream needs to be told to refresh; it already observes this.
  */
 @Singleton
 class PremiumManager @Inject constructor(
@@ -42,11 +41,40 @@ class PremiumManager @Inject constructor(
     /**
      * Queries [billingConnector] for the live entitlement and persists it
      * via [PremiumRepository], so every [premiumState] observer picks up
-     * the change automatically. The future purchase/restore flow's landing
-     * spot; unused until that exists.
+     * the change automatically. Called at app startup ([com.runtimelabs.clarity.ClarityApp])
+     * so a purchase made before a reinstall — still valid on Google's
+     * servers even though nothing survived locally — is rediscovered the
+     * moment billing successfully connects, with no user action required.
      */
     suspend fun refreshFromBilling() {
         val liveState = billingConnector.queryEntitlement()
         premiumRepository.setPremiumState(liveState)
+    }
+
+    /** Launches the purchase flow for the remove-ads product and persists a successful or pending outcome. */
+    suspend fun purchasePremium(activity: Activity): PurchaseResult {
+        val result = billingConnector.purchasePremium(activity)
+        persistIfOwnershipChanged(result)
+        return result
+    }
+
+    /** Re-checks Google's records for a past purchase — the mechanism behind "survives reinstall". */
+    suspend fun restorePurchases(): PurchaseResult {
+        val result = billingConnector.restorePurchases()
+        persistIfOwnershipChanged(result)
+        return result
+    }
+
+    /** Cancelled/error/unavailable outcomes never touch the persisted state — only a genuine change in ownership does. */
+    private suspend fun persistIfOwnershipChanged(result: PurchaseResult) {
+        when (result) {
+            PurchaseResult.Success -> premiumRepository.setPremiumState(PremiumState.Premium)
+            PurchaseResult.Pending -> premiumRepository.setPremiumState(PremiumState.Pending)
+            PurchaseResult.Cancelled,
+            PurchaseResult.BillingUnavailable,
+            PurchaseResult.NothingToRestore,
+            is PurchaseResult.Error,
+            -> Unit
+        }
     }
 }

@@ -47,7 +47,7 @@ import com.runtimelabs.clarity.data.local.db.entity.RecoveryProfileEntity
         GratitudeEntryEntity::class,
         RelapseReflectionEntity::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = true,
 )
 abstract class ClarityDatabase : RoomDatabase() {
