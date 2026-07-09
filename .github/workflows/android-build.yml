@@ -1,10 +1,12 @@
 # =============================================================================
 # Clarity — Android CI
 #
-# Tests the domain logic, then assembles debug + release APKs and uploads
-# them as workflow artifacts. Release signing is optional: with no secrets
-# configured the workflow still succeeds and uploads the UNSIGNED release
-# APK; add the four secrets below and it signs + verifies automatically.
+# Tests the domain logic, then assembles debug + release APKs AND a release
+# AAB (App Bundle — the format Play Console requires for new apps), and
+# uploads all of them as workflow artifacts. Release signing is optional:
+# with no secrets configured the workflow still succeeds and uploads the
+# UNSIGNED release APK/AAB; add the four secrets below and it signs +
+# verifies both automatically.
 #
 # Assumptions (all true for this repo today):
 #   - Project root == repository root (settings.gradle.kts at top level).
@@ -15,14 +17,20 @@
 #     If you later commit the wrapper JAR: switch every `gradle` command to
 #     `./gradlew` and un-comment the wrapper-validation step.
 #   - No signingConfig in app/build.gradle.kts, so `assembleRelease` emits
-#     app-release-unsigned.apk; we zipalign + apksigner it in CI instead of
-#     teaching the build script about keystores.
+#     app-release-unsigned.apk and `bundleRelease` emits app-release.aab
+#     (also unsigned); we sign both OUTSIDE Gradle in CI instead of teaching
+#     the build script about keystores. APKs are signed with zipalign +
+#     apksigner; the AAB is signed with jarsigner — apksigner cannot sign
+#     app bundles at all, and bundles don't need (or support) zipalign,
+#     which is an APK-specific optimization.
 #
 # Required secrets for signing (Settings -> Secrets and variables -> Actions):
 #   ANDROID_KEYSTORE_BASE64    base64 of the .keystore file (see below)
 #   ANDROID_KEYSTORE_PASSWORD  keystore password
 #   ANDROID_KEY_ALIAS          key alias inside the keystore
 #   ANDROID_KEY_PASSWORD       key password (often same as keystore password)
+# The same four secrets sign both the APK and the AAB — one keystore, one
+# upload key, both artifacts.
 #
 # Creating a release keystore + the base64 secret value:
 #   keytool -genkeypair -v -keystore clarity-release.keystore \
@@ -62,7 +70,7 @@ env:
 
 jobs:
   build:
-    name: Test & assemble APKs
+    name: Test & assemble APKs + AAB
     runs-on: ubuntu-latest
     timeout-minutes: 40
 
@@ -133,6 +141,16 @@ jobs:
       - name: List APK outputs
         run: find app/build/outputs/apk -name "*.apk" -exec ls -lh {} \;
 
+      - name: Assemble release AAB (unsigned)
+        # Same release build type as assembleRelease (minify + shrink +
+        # proguard already configured in app/build.gradle.kts) — bundleRelease
+        # just packages it as an .aab instead of an .apk. This is the format
+        # Play Console requires uploads to be in.
+        run: gradle bundleRelease --stacktrace
+
+      - name: List AAB outputs
+        run: find app/build/outputs/bundle -name "*.aab" -exec ls -lh {} \;
+
       # ------------------------------------------------------------- signing
       # Runs only when the keystore secret exists. Signs OUTSIDE Gradle so
       # the build script stays keystore-free; zipalign must precede apksigner.
@@ -167,6 +185,39 @@ jobs:
 
           rm -f "$KEYSTORE" "$APK_DIR/app-release-aligned.apk"
 
+      # Runs only when the keystore secret exists, same as APK signing above.
+      # jarsigner, not apksigner: apksigner cannot sign .aab files at all —
+      # this is Google's own documented signing path for app bundles
+      # (developer.android.com/build/building-cmdline). No zipalign step
+      # either; that's an APK-only optimization, not applicable to bundles.
+      - name: Sign release AAB
+        if: ${{ env.SIGNING_ENABLED == 'true' }}
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          AAB_DIR="app/build/outputs/bundle/release"
+          KEYSTORE="$RUNNER_TEMP/release.keystore"
+
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE"
+
+          jarsigner -verbose \
+            -sigalg SHA256withRSA \
+            -digestalg SHA-256 \
+            -keystore "$KEYSTORE" \
+            -storepass:env ANDROID_KEYSTORE_PASSWORD \
+            -keypass:env ANDROID_KEY_PASSWORD \
+            -signedjar "$AAB_DIR/clarity-release-signed.aab" \
+            "$AAB_DIR/app-release.aab" \
+            "$ANDROID_KEY_ALIAS"
+
+          jarsigner -verify "$AAB_DIR/clarity-release-signed.aab"
+
+          rm -f "$KEYSTORE"
+
       # ----------------------------------------------------------- artifacts
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
@@ -191,5 +242,23 @@ jobs:
         with:
           name: clarity-release-unsigned-${{ github.run_number }}
           path: app/build/outputs/apk/release/app-release-unsigned.apk
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload release AAB (signed)
+        if: ${{ env.SIGNING_ENABLED == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: clarity-release-signed-aab-${{ github.run_number }}
+          path: app/build/outputs/bundle/release/clarity-release-signed.aab
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload release AAB (unsigned — signing secrets not configured)
+        if: ${{ env.SIGNING_ENABLED != 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: clarity-release-unsigned-aab-${{ github.run_number }}
+          path: app/build/outputs/bundle/release/app-release.aab
           retention-days: 14
           if-no-files-found: error
