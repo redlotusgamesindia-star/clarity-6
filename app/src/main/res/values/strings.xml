@@ -370,7 +370,7 @@
         <item>Step outside, even just to your doorway, and notice the temperature.</item>
         <item>Text someone something you appreciate about them.</item>
         <item>Make a cup of tea or coffee, slowly, and pay attention to it.</item>
-        <item>Look up something you've been mildly curious about lately.</item>
+        <item>Look up something you\'ve been mildly curious about lately.</item>
         <item>Stretch for two minutes — nothing fancy, just move.</item>
         <item>Reorganize one small thing on your phone: photos, apps, notes.</item>
     </string-array>
@@ -561,23 +561,23 @@
 
     <string name="tool_cold_shower_title">Cold shower</string>
     <string name="tool_cold_shower_subtitle">A sharp, physical reset.</string>
-    <string name="tool_cold_shower_instructions">Turn the water cold for the last 30–60 seconds of your shower — or take a short one entirely cold. It genuinely interrupts an urge by giving your body something immediate to respond to. Come back here when you're done.</string>
+    <string name="tool_cold_shower_instructions">Turn the water cold for the last 30–60 seconds of your shower — or take a short one entirely cold. It genuinely interrupts an urge by giving your body something immediate to respond to. Come back here when you\'re done.</string>
 
     <string name="tool_walk_outside_title">Walk outside</string>
     <string name="tool_walk_outside_subtitle">Change your surroundings, on the move.</string>
-    <string name="tool_walk_outside_instructions">Leave the room you're in. Doesn't need to be far — around the block, down the hall, out the door. Distance from the moment is often enough.</string>
+    <string name="tool_walk_outside_instructions">Leave the room you\'re in. Doesn\'t need to be far — around the block, down the hall, out the door. Distance from the moment is often enough.</string>
 
     <string name="tool_push_ups_title">Push-up challenge</string>
     <string name="tool_push_ups_subtitle">Burn off the physical charge.</string>
-    <string name="tool_push_ups_instructions">Do as many push-ups as you can manage right now — modify however you need to (knees, wall, whatever works). The point isn't the number, it's giving the energy somewhere else to go.</string>
+    <string name="tool_push_ups_instructions">Do as many push-ups as you can manage right now — modify however you need to (knees, wall, whatever works). The point isn\'t the number, it\'s giving the energy somewhere else to go.</string>
 
     <string name="tool_drink_water_title">Drink water</string>
     <string name="tool_drink_water_subtitle">Small, immediate, always available.</string>
     <string name="tool_drink_water_instructions">Get a full glass of water and drink it slowly. Small physical resets like this genuinely help interrupt an urge — and it costs you nothing to try.</string>
 
     <string name="tool_call_friend_title">Call a friend</string>
-    <string name="tool_call_friend_subtitle">You don't have to explain why.</string>
-    <string name="tool_call_friend_instructions">Call or message someone you trust — you don't need to explain what's going on. "Can you talk for a bit?" is enough. Connection is one of the most effective interruptions there is.</string>
+    <string name="tool_call_friend_subtitle">You don\'t have to explain why.</string>
+    <string name="tool_call_friend_instructions">Call or message someone you trust — you don\'t need to explain what\'s going on. \"Can you talk for a bit?\" is enough. Connection is one of the most effective interruptions there is.</string>
 
     <string name="tool_write_journal_title">Write it down</string>
     <string name="tool_write_journal_subtitle">Get it out of your head.</string>
