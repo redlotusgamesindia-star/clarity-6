@@ -10,8 +10,9 @@
 local.properties
 app/build
 
-# Defense in depth alongside local.properties: even if a keystore ever gets
-# placed inside the repo by mistake instead of outside it as documented in
-# app/build.gradle.kts, it still can't be committed.
+# Defense in depth: this repo's release keystore lives outside the repo
+# entirely (CI reads it from a GitHub Secret; see
+# .github/workflows/android-build.yml). These patterns just make sure one
+# can never be committed by accident even so.
 *.jks
 *.keystore
