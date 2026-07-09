@@ -1,7 +1,9 @@
 package com.runtimelabs.clarity.feature.home
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.runtimelabs.clarity.domain.badge.Badge
 import com.runtimelabs.clarity.domain.model.DailyCheckIn
 import com.runtimelabs.clarity.domain.model.JourneyEvent
 import com.runtimelabs.clarity.domain.model.JourneyEventType
@@ -9,6 +11,7 @@ import com.runtimelabs.clarity.domain.model.MoodLevel
 import com.runtimelabs.clarity.domain.model.StreakSnapshot
 import com.runtimelabs.clarity.domain.recovery.RecoveryMotivationCode
 import com.runtimelabs.clarity.domain.recovery.RecoveryMotivationMessages
+import com.runtimelabs.clarity.domain.repository.BadgeRepository
 import com.runtimelabs.clarity.domain.repository.CheckInRepository
 import com.runtimelabs.clarity.domain.repository.JourneyRepository
 import com.runtimelabs.clarity.domain.repository.RecoveryProfileRepository
@@ -29,6 +32,8 @@ import kotlinx.coroutines.launch
 sealed interface HomeUiState {
     data object Loading : HomeUiState
 
+    /** @Immutable: the `List<DailyCheckIn>`/`List<Badge>` fields are otherwise conservatively-unstable — see JournalUiState's fuller rationale. */
+    @Immutable
     data class Ready(
         val streak: StreakSnapshot,
         val milestoneDays: Int,
@@ -44,6 +49,15 @@ sealed interface HomeUiState {
         val pendingRecoveryFlowEventId: Long?,
         /** Shown only while [StreakSnapshot.isRebuilding] — the Motivation Engine's line for today. */
         val motivationMessage: RecoveryMotivationCode?,
+        /**
+         * Badges genuinely earned just now — by a check-in, a relapse (and
+         * the new recovery run it starts), or simply by opening the app
+         * for the first time since qualifying for one retroactively. The
+         * screen shows the unlock celebration for these, then consumes
+         * this via [onAchievementCelebrationDismissed]. Empty in the
+         * overwhelmingly common case where nothing new was unlocked.
+         */
+        val newlyUnlockedBadges: List<Badge>,
     ) : HomeUiState
 }
 
@@ -53,6 +67,14 @@ data class CheckInSheetState(
     val isSaving: Boolean = false,
 )
 
+/** The small UI-only signals folded together to stay under combine()'s 5-flow ceiling — see below. */
+private data class HomeTransientState(
+    val showRelapseConfirm: Boolean,
+    val pendingRecoveryFlowEventId: Long?,
+    val checkInSheet: CheckInSheetState?,
+    val newlyUnlockedBadges: List<Badge>,
+)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     profileRepository: RecoveryProfileRepository,
@@ -60,6 +82,7 @@ class HomeViewModel @Inject constructor(
     private val checkInRepository: CheckInRepository,
     private val streakCalculator: StreakCalculator,
     private val widgetSyncRepository: WidgetSyncRepository,
+    private val badgeRepository: BadgeRepository,
 ) : ViewModel() {
 
     // Captured at init. A session held open across midnight shows the old
@@ -70,17 +93,22 @@ class HomeViewModel @Inject constructor(
     private val sheetState = MutableStateFlow<CheckInSheetState?>(null)
     private val showRelapseConfirm = MutableStateFlow(false)
     private val pendingRecoveryFlowEventId = MutableStateFlow<Long?>(null)
+    private val newlyUnlockedBadges = MutableStateFlow<List<Badge>>(emptyList())
 
     // combine() tops out at 5 named flow arguments (kotlinx.coroutines has no
     // 6-flow overload — confirmed against the maintainers' own tracker, not
-    // assumed). Folding the three small UI-only flows into one Triple here
-    // keeps the outer combine below at exactly 5, same trick JourneyViewModel
-    // already uses for its streak inputs.
-    private val dialogAndSheetState = combine(
+    // assumed). Folding the four small UI-only flows into one data class
+    // here keeps the outer combine below at exactly 5, same trick
+    // JourneyViewModel already uses for its streak inputs (§24). This grew
+    // from a Triple to a named data class when the badge signal joined it —
+    // a fourth positional field on a Triple has no fourth slot to grow
+    // into, and a named type reads better than nesting Pairs.
+    private val transientState = combine(
         showRelapseConfirm,
         pendingRecoveryFlowEventId,
         sheetState,
-        ::Triple,
+        newlyUnlockedBadges,
+        ::HomeTransientState,
     )
 
     val uiState: StateFlow<HomeUiState> = combine(
@@ -88,8 +116,8 @@ class HomeViewModel @Inject constructor(
         profileRepository.plan,
         journeyRepository.observeEventDays(JourneyEventType.RELAPSE),
         checkInRepository.observeSince(todayEpochDay - 6),
-        dialogAndSheetState,
-    ) { profile, plan, relapseDays, weekCheckIns, (showConfirm, pendingEventId, sheet) ->
+        transientState,
+    ) { profile, plan, relapseDays, weekCheckIns, transient ->
         val startEpochDay = profile?.createdAtEpochMillis
             ?.let { Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate().toEpochDay() }
             ?: todayEpochDay // defensive: no profile should be impossible post-onboarding
@@ -104,20 +132,34 @@ class HomeViewModel @Inject constructor(
             todayEpochDay = todayEpochDay,
             todayCheckIn = weekCheckIns.firstOrNull { it.epochDay == todayEpochDay },
             weekCheckIns = weekCheckIns,
-            checkInSheet = sheet,
-            showRelapseConfirm = showConfirm,
-            pendingRecoveryFlowEventId = pendingEventId,
+            checkInSheet = transient.checkInSheet,
+            showRelapseConfirm = transient.showRelapseConfirm,
+            pendingRecoveryFlowEventId = transient.pendingRecoveryFlowEventId,
             motivationMessage = if (streak.isRebuilding) {
                 RecoveryMotivationMessages.forDay(streak.currentDays)
             } else {
                 null
             },
+            newlyUnlockedBadges = transient.newlyUnlockedBadges,
         ) as HomeUiState
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = HomeUiState.Loading,
     )
+
+    init {
+        // Cold-start backfill: re-check every badge against current state
+        // once per Home visit. Deliberately not silent — see
+        // AchievementUnlockOverlay's doc comment for why celebrating a
+        // badge that turns out to already be earned (e.g. right after this
+        // feature ships to someone with an existing 40-day streak) is
+        // treated as a genuine, honest one-time moment rather than
+        // suppressed the way ARCHITECTURE.md §21 suppresses REPEATING
+        // celebrations elsewhere — this one only ever fires once per badge,
+        // for the life of the install.
+        runEvaluation()
+    }
 
     fun onOpenCheckIn() {
         val ready = uiState.value as? HomeUiState.Ready ?: return
@@ -155,6 +197,7 @@ class HomeViewModel @Inject constructor(
                 ),
             )
             sheetState.value = null
+            runEvaluation() // catches Morning Check-in and any streak badge the new day crossed
         }
     }
 
@@ -186,12 +229,34 @@ class HomeViewModel @Inject constructor(
             )
             widgetSyncRepository.refresh()
             pendingRecoveryFlowEventId.value = eventId
+            // A relapse is the start of a new recovery run in this app's own
+            // vocabulary (§22) — First/Five Recoveries can genuinely unlock
+            // right here, the same moment totalRelapses actually changes.
+            runEvaluation()
         }
     }
 
     /** Called once the screen has navigated to the Recovery Flow, so it doesn't fire again on recomposition. */
     fun onRecoveryFlowNavigated() {
         pendingRecoveryFlowEventId.value = null
+    }
+
+    /** Consumes the current celebration (or the current badge within a multi-badge sequence — see the overlay). */
+    fun onAchievementCelebrationDismissed() {
+        newlyUnlockedBadges.value = emptyList()
+    }
+
+    private fun runEvaluation() {
+        viewModelScope.launch {
+            val newlyUnlocked = badgeRepository.evaluateAndUnlock()
+            if (newlyUnlocked.isNotEmpty()) {
+                // Additive: a badge unlocked by a later call (e.g. the
+                // relapse-confirm evaluation firing before the check-in
+                // evaluation from this same visit has been dismissed)
+                // extends the queue rather than clobbering it.
+                newlyUnlockedBadges.value = newlyUnlockedBadges.value + newlyUnlocked
+            }
+        }
     }
 
     private companion object {

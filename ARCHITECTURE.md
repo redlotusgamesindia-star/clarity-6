@@ -867,3 +867,288 @@ reasons as §16/§22.
   a real Compose anti-pattern (a scrolling container offers unbounded
   height, which weight has nothing sensible to divide), so this was
   rebuilt with fixed spacers instead of quietly risking that combination.
+
+## 29. Emergency Toolkit expansion (5 tools -> 14) + usage tracking
+
+The toolkit grew from Breathing + Grounding + Muscle Relaxation + Quick
+Reframe to fourteen tools across five labeled sections (the screen was a
+single flat list before; a 14-item list needs scanning structure a 5-item
+one didn't). This section covers what's genuinely new; everything about
+the ads/premium/billing/recovery-flow work in §20-28 is unaffected.
+
+- **The original three tools were kept, not replaced.** They weren't part
+  of the new 11-item spec, but they're real, evidence-based techniques
+  with real content behind them — deleting working therapeutic tools on an
+  ambiguous reading of "include these" was the wrong default. Flagged to
+  the developer explicitly rather than decided silently either way.
+- **Every tool's exit action reads "I made it through this urge," literally,
+  as the terminal button label** — not a separate transitional screen. This
+  was a deliberate simplification: building a distinct "completion state"
+  UI for five structurally-different tool types (a live breathing timer, an
+  instruction-and-confirm reminder, a count-up walk timer, a self-paced
+  step list, a read-only motivation wall) would have meant five bespoke
+  implementations of essentially the same idea. Making the label itself
+  carry the affirmation is simpler, more consistent, and — since it applies
+  on *any* meaningful exit, not just reaching a target duration — matches
+  this app's standing non-perfectionist stance: partial engagement with a
+  coping tool still earns the same validation as finishing it.
+- **Breathing gained an optional target duration** (`BreathingSessionState.targetDurationSeconds`,
+  0 = open-ended, the same sentinel convention as every other optional
+  route parameter in this app). The cycle-based pattern math underneath
+  (§ Phase C) didn't need to change at all — a target is purely an
+  additional stopping *signal*, checked by `hasReachedTarget`, layered on
+  top of the same tick loop.
+- **`ToolkitTool` is one closed enum shared by navigation, usage tracking,
+  and stats** — "most used tool" can't drift out of sync with what the
+  toolkit screen actually offers, because there's exactly one vocabulary
+  for "which tool" anywhere in the app.
+- **Duration honesty, not padding.** Tools this app can observe start-to-
+  finish (breathing, the walk timer, reminder tools, guided steps, the
+  motivation wall) report a real elapsed time. The journal shortcut hands
+  off to a general-purpose editor built for many other purposes, with no
+  visibility into how long someone spends there once they leave — it
+  records a plain "used," duration 0, and `ToolkitUsageStatsCalculator`
+  excludes zero-duration records from the average rather than count them
+  as zero and quietly drag the number down. This was caught and reasoned
+  through explicitly rather than defaulting to whichever was easier to
+  code.
+- **A real bug caught by mechanical verification, not review:** the stats
+  calculator's tie-break comparator for "most used tool" was initially
+  backwards — `maxWithOrNull` on `(count, ordinal)` picks the *highest*
+  ordinal on a tie, not the lowest, which is the opposite of "ties go to
+  whichever tool is declared first." Caught by tracing the exact comparator
+  in Python before trusting the test, not by re-reading the Kotlin harder —
+  the fix uses `minWithOrNull` on `(-count, ordinal)` instead, verified the
+  same way before being applied. Every other assertion in that test file
+  was then re-checked against the same independent model, not just the one
+  that happened to be wrong.
+- **Journey's `combine()` gained a second nested fold** (streak AND toolkit
+  usage stats, computed inside one inner `combine`, feeding a `Pair` into
+  the outer 5-argument call) — the exact pattern documented in §24 for
+  the same 5-flow ceiling, applied again rather than rediscovered.
+- **The Journey stats card is hidden entirely until the toolkit has been
+  used at least once** — same "nothing to show yet, so show nothing"
+  restraint already applied to Comeback Achievements (§22), not a card
+  showing "0 times used" as if that were itself a meaningful data point.
+
+## 30. Lifetime achievement badges (post-toolkit-expansion)
+
+Fourteen badges — nine streak milestones (1/3/7/14/21/30/50/100/365 days),
+two recovery milestones (first and fifth comeback), and three daily-practice
+badges (an early check-in, five journal entries, a three-day toolkit-usage
+streak) — plus unlock animations, confetti, a badge collection screen, and
+quotes that unlock alongside their badge.
+
+- **A genuinely new shape of state for this app: persisted, not derived.**
+  Every other "achievement" concept here — the streak itself (§17),
+  Comeback Achievements (§22) — is deliberately computed live with zero
+  storage, because AD-1's event-sourcing discipline makes that both correct
+  and simpler. Lifetime badges break that pattern on purpose: a badge must
+  stay earned even after a later relapse changes the very numbers that
+  earned it, which recomputation can't express. `domain/badge/Badge.kt`
+  says this explicitly: this is the "dedicated unlock-tracking table"
+  `ComebackAchievement`'s own doc comment named as the trade-off it wasn't
+  attempting to solve. `badge_unlock` (DB v8 -> v9) is that table — one row
+  per earned badge, never updated or deleted, same append-only spirit as
+  `journey_event` even though it isn't one.
+- **Streak badges are evaluated against `StreakSnapshot.longestDays`, not
+  `currentDays`.** `longestDays` already means "best run ever, including
+  the current one if it leads" — using it is what makes a badge earned at
+  day 30 stay earned after a relapse drops the current streak back to 0,
+  with no special-casing anywhere. It's also what makes retroactive
+  backfill for existing installs correct for free: someone who already has
+  a 40-day history the moment this feature ships qualifies immediately,
+  not "starting from zero."
+- **`BadgeEvaluator` is pure and unit-tested**, same contract as
+  `StreakCalculator` and `ToolkitUsageStatsCalculator`: plain `BadgeStats`
+  in, a list of newly-qualifying badges out, no clock, no I/O. All
+  timezone-aware conversion (profile creation time -> epoch day, a
+  check-in's timestamp -> local hour) happens in `BadgeRepositoryImpl`
+  before the evaluator ever sees it — the same "today is a parameter"
+  discipline `StreakCalculator`'s callers already follow.
+- **`BadgeRepositoryImpl` is an orchestrator, not a thin CRUD wrapper** —
+  same shape as `WidgetSyncRepositoryImpl`: one `evaluateAndUnlock()`
+  method reads across five other repositories plus two calculators, called
+  from several sites (Home's cold start, a check-in save, a relapse
+  confirm; the Journal editor's save) rather than that composition being
+  rebuilt at each call site.
+- **Recoveries are framed the way §22 already frames them**: a relapse is
+  the moment a new recovery run begins, not just a setback, so
+  First/Five Recoveries key off `totalRelapses` and unlock at the same
+  moment the Rebuild System's own numbers change — no separate tracking.
+- **Learning Streak had no real feature to key off.** The `Learn` tab is
+  still a `PlaceholderScreen` (§2's own inventory says so). Rather than
+  invent unearned content-engagement tracking or block the whole badge on
+  a tab that doesn't exist yet, it keys off consecutive days of Emergency
+  Toolkit usage instead — the closest existing signal for "coming back to
+  practice a coping skill" the app actually has instrumented today
+  (`ToolkitUsageRepository`, already built for §29's usage stats). Named
+  here as a deliberate substitution, not a hidden one; worth revisiting if
+  `Learn` ever ships real content of its own.
+- **A pre-existing gap, found while wiring this, fixed rather than
+  worked around**: `ToolkitUsageRepositoryImpl` has taken a
+  `ToolkitUsageDao` constructor dependency since §29, but `DatabaseModule`
+  never actually provided one — a real DI-graph hole that this pass's own
+  toolkit-usage reads would have hit immediately. Fixed alongside adding
+  `BadgeUnlockDao`'s own provider, flagged explicitly per §26's own lesson
+  about grepping before assuming an existing wire is connected.
+- **Unlock celebrations are the one deliberate exception to this app's
+  "not gamified" stance** (§21's streak-ring restraint, §22's static
+  Comeback Achievement rows). The reasoning is written directly on
+  `ConfettiOverlay`'s doc comment: those other surfaces are viewed dozens
+  of times a day, so a repeating celebration would cheapen fast. A badge
+  unlock fires at most once ever, per badge, for the life of the install —
+  a genuine one-time moment, which is exactly the shape of thing this
+  app's restraint was protecting in the first place, not contradicting.
+  Confetti is hand-rolled with `Canvas` (no new dependency), and the whole
+  overlay degrades to a plain static reveal under `rememberReduceMotionEnabled()`
+  — already named as covering "milestone celebrations" in that function's
+  own doc comment, written before this feature existed to use it.
+- **Cold-start re-evaluation deliberately still celebrates**, even for a
+  badge that turns out to already be earned (e.g. immediately after this
+  feature ships to someone with an existing streak). This was a real
+  choice, not an oversight: `evaluateAndUnlock()` only ever returns a
+  badge the FIRST time its row is actually inserted (conflict-ignored
+  insert, checked by row id), so "celebrate on cold start" and "celebrate
+  at most once per badge, ever" are the same guarantee, not in tension.
+- **The badge collection screen shows locked badges dimmed, not hidden.**
+  Unlike Comeback Achievements and the toolkit stats card (both "nothing
+  to show yet, so show nothing"), a badge collection's locked slots are
+  the point — they're what makes 3 of 14 read as progress instead of a
+  ceiling. `Badge.descriptionRes()` deliberately doubles as both the
+  earned-badge description and the locked-badge requirement text: the
+  criterion is one sentence either way, so this avoids a second,
+  easy-to-drift string per badge that would just restate the same fact.
+- **The "motivational quotes unlock" requirement became one bespoke quote
+  per badge**, revealed on that badge's own unlock celebration and kept
+  visible afterward in its detail sheet — deliberately distinct from
+  `R.array.daily_quotes` (§17's always-on rotating Home quote). Ambient
+  and earned are different promises; collapsing them into one pool would
+  have made the always-visible quote occasionally feel like a spoiler for
+  a badge not yet unlocked.
+- **Journey's `combine()` gained a third fold** (streak, toolkit stats, AND
+  the unlocked-badge list, inside the same inner `combine` §29 already
+  introduced) — the 5-flow ceiling pattern applied again, not rediscovered.
+  Home's own transient-state fold grew from a `Triple` to a small named
+  data class (`HomeTransientState`) for the same reason: a fourth
+  positional field has nowhere to go on a `Triple`, and a named type reads
+  better than nesting `Pair`s once state stops being three small
+  unrelated flags.
+- **Thresholds chosen, not specified, and recorded as such**: Journal
+  Writer's 5 entries mirrors Five Recoveries' "five" as a believable
+  habit-formed milestone; Learning Streak's 3 days mirrors the app's own
+  first non-trivial day badge (3 Days) so "a streak" means the same
+  length everywhere it's used. Both are named explicitly in
+  `BadgeEvaluator`'s own doc comment rather than left as unexplained magic
+  numbers.
+
+## 31. App-wide polish pass, and a real Learn tab
+
+An audit pass across the whole app rather than one feature — findings
+below are only the ones that were verified against the actual code, not a
+generic checklist run through blind. Several categories (typography scale,
+dark-mode color discipline, list-item keying) were audited and found
+already correct; they're not relisted here as "fixed."
+
+- **`Learn` stops being a placeholder.** It was a
+  `PlaceholderScreen` with literally nothing behind it — the single most
+  visible incomplete surface in the app. It's now a real library:
+  `domain/learn/LearnArticle.kt` (a closed enum, same discipline as every
+  other content vocabulary here) backing twelve short, original,
+  non-clinical articles across three categories — Understanding Urges,
+  Building New Habits, Staying the Course — bundled and static, same "no
+  network, ever" privacy posture as the rest of the app. `PlaceholderScreen`
+  itself is deleted, not just unused: its own doc comment said "delete each
+  usage as the corresponding feature ships; nothing else references this,"
+  and once Learn shipped, nothing did.
+- **Dispatcher correctness, four places.** `ClarityApp`'s application
+  scope and all three fire-and-forget `BroadcastReceiver`s
+  (`BootCompletedReceiver`, `HabitReminderReceiver`, `WidgetRefreshReceiver`)
+  were launching Room reads/writes and `AlarmManager` scheduling — all
+  blocking I/O — on `Dispatchers.Default`, which is sized and intended for
+  CPU-bound work. Switched to `Dispatchers.IO` everywhere. Low real-world
+  impact at this app's scale, but the wrong tool for the job is still the
+  wrong tool, and it's a one-line fix repeated four times, not a redesign.
+- **Compose recomposition: `@Immutable` on every UiState that holds a
+  collection.** The compiler's stability inference treats a plain
+  `List<T>` (or `Set<T>`) field as unstable by default — it can't prove
+  nothing else holds a mutable reference to it — which quietly disables
+  strong-skipping recomposition for any composable reading that state.
+  Seven UI-state types across Home, Journey, Journal, Achievements,
+  Why, and the Recovery Flow carry list/set fields and are always replaced
+  wholesale (never mutated in place), which is exactly the guarantee
+  `@Immutable` exists to let a developer assert when the compiler can't
+  infer it. Added it there, plus on two supporting model types
+  (`HabitWithStatus`, `BadgeUiModel`) that themselves hold a list. Left
+  alone the several UiState types that only ever held primitives/enums —
+  already stable by inference, so the annotation would have been a no-op.
+- **Screen transitions.** The whole app had zero configured
+  `enterTransition`/`exitTransition` — `ClarityNavHost`'s `NavHost` used
+  every default. Added a direction-aware slide + fade for pushed detail
+  screens (using `AnimatedContentTransitionScope`'s Start/End semantics,
+  not Left/Right, so it's correct under RTL — the manifest already
+  declares `supportsRtl="true"`) and a plain crossfade for tab-to-tab
+  switches specifically, matching the conventional bottom-nav feel and
+  keeping a very-high-frequency action visually quiet — the same restraint
+  §21/§22 already apply to the streak ring and Comeback Achievements.
+  Degrades to a quick crossfade under `rememberReduceMotionEnabled()`.
+- **Dark-mode status bar contrast, a real bug, not a cosmetic gap.**
+  `enableEdgeToEdge()` was called once, with no arguments, in `onCreate` —
+  before this app's own Light/Dark/System override (`ThemeMode`) is even
+  loaded. Its default `SystemBarStyle` reads the SYSTEM's dark/light state,
+  not the app's resolved theme, so anyone with the phone in system Light
+  mode but "Dark" chosen inside the app (or the reverse) got status/nav
+  bar icons styled for the wrong theme — genuinely low-contrast, not just
+  mismatched. Fixed with a `SideEffect` inside `setContent` that re-issues
+  `enableEdgeToEdge()` with an explicit light/dark `SystemBarStyle` once
+  `shouldUseDarkTheme(state.themeMode)` is actually known. The original
+  no-arg call stays too, purely to avoid a flash of the wrong default
+  while the splash screen still covers the window.
+- **Touch targets: two links smaller than Android's 48dp minimum.**
+  `RelapseEntryLink` and `PrivacyOptionsLink` on Home were both a small
+  `Text` with `.clickable` attached directly to the text's own bounds — for
+  `labelSmall`/`labelMedium` type, that's well under 48dp tall with zero
+  padding. Both now wrap in a `Box` with `heightIn(min = 48.dp)`; the label
+  itself stays exactly as small and quiet as before, only the tappable
+  area grew. Audited for the same shape elsewhere (a `Text` with a
+  directly-attached `.clickable` modifier) — these were the only two.
+- **Spacing: two repeated-but-unnamed micro-values, named.** `2.dp`
+  between a title and the subtitle under it, and `12.dp` between a
+  leading icon and text beside it, each turned up independently across
+  nine and five files respectively — the same rhythm, never named as a
+  token the way the rest of the spacing scale is. Added `Spacing.hairline`
+  (2.dp) and `Spacing.iconGap` (12.dp) and replaced every exact-match
+  occurrence. Left the nearby-but-different literals (14.dp, 6.dp, 4.dp)
+  alone rather than force them into a token that doesn't quite fit — those
+  read as genuinely separate choices, not accidental drift.
+- **Release build, prepared rather than assumed.** `app/build.gradle.kts`
+  had no signing config at all — a debug-signed APK can't be uploaded to
+  Play Console. Added a `signingConfigs.release` block that reads store/key
+  credentials from `local.properties` (already git-ignored) with the exact
+  `keytool` command and the four property names documented inline; the
+  release build type simply has no signing config attached if those
+  properties are absent, so an unmodified checkout still builds. Bumped
+  `versionName` from the pre-release `0.1.0` to `1.0.0` for a first Play
+  submission (`versionCode` stays at 1). Added `*.jks`/`*.keystore` to
+  `.gitignore` as defense in depth alongside `local.properties`, and
+  `org.gradle.parallel=true` for faster release builds.
+- **Found, not fixed, and said so rather than guessing: `ErrorScreen`.**
+  A fully-built, on-brand error-state component exists in the design
+  system and is never actually referenced anywhere — every `UiState` in
+  this app only has `Loading`/`Ready` variants, so a Room read that threw
+  would currently just never resolve out of Loading rather than showing
+  this. Wiring real error states into every ViewModel's Flow chain is a
+  correctness project in its own right, not a polish-pass line item, and
+  guessing at try/catch placement across fifteen ViewModels without a
+  compiler to check the result against was judged the wrong trade for
+  this pass. Left as a clearly-named follow-up rather than either deleted
+  (it's good, reusable code) or silently left unmentioned.
+- **What this pass deliberately did NOT touch**: no dependency changes
+  (`kotlinx-collections-immutable` would be the more complete fix for the
+  `@Immutable` work above, but it's a real new dependency + a `List` ->
+  `ImmutableList` signature change across every touched file, not a
+  same-behavior annotation); no changes to already-shipped, already-tested
+  motion curves outside what's newly added; no re-litigating design
+  decisions §17–§30 already made and explained. "Polish" read as
+  "verify, then fix what's actually wrong," not "rewrite what already
+  works."

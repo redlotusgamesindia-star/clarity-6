@@ -42,6 +42,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.runtimelabs.clarity.R
+import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import com.runtimelabs.clarity.feature.onboarding.OnboardingScreen
 import com.runtimelabs.clarity.navigation.ClarityNavHost
 import com.runtimelabs.clarity.navigation.SosRoute
@@ -195,7 +196,7 @@ private fun RowScope.ClarityNavItem(
             tint = contentColor,
             modifier = Modifier.size(24.dp),
         )
-        Spacer(Modifier.height(2.dp))
+        Spacer(Modifier.height(MaterialTheme.spacing.hairline))
         Text(
             text = stringResource(destination.labelRes),
             style = MaterialTheme.typography.labelMedium,

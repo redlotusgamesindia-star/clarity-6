@@ -29,6 +29,7 @@ import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material.icons.rounded.Cached
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.EmojiEvents
@@ -74,12 +75,17 @@ import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import com.runtimelabs.clarity.domain.habit.DayStat
 import com.runtimelabs.clarity.domain.insight.Insight
 import com.runtimelabs.clarity.domain.insight.InsightCode
+import com.runtimelabs.clarity.domain.badge.Badge
+import com.runtimelabs.clarity.feature.achievement.icon as badgeIcon
+import com.runtimelabs.clarity.feature.achievement.titleRes as badgeTitleRes
 import com.runtimelabs.clarity.feature.recovery.descriptionRes
 import com.runtimelabs.clarity.feature.recovery.icon
 import com.runtimelabs.clarity.feature.recovery.titleRes
 import com.runtimelabs.clarity.domain.model.Habit
 import com.runtimelabs.clarity.domain.recovery.ComebackAchievement
 import com.runtimelabs.clarity.domain.recovery.RecoveryScore
+import com.runtimelabs.clarity.domain.toolkit.ToolkitUsageStats
+import com.runtimelabs.clarity.feature.toolkit.titleRes
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -181,7 +187,7 @@ fun HabitTodayRow(
             )
             status.habit.reminderMinutesOfDay?.let { minutes ->
                 val timeLabel = remember(minutes) { formatMinutesOfDay(minutes) }
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(MaterialTheme.spacing.hairline))
                 Text(
                     text = timeLabel,
                     style = MaterialTheme.typography.labelSmall,
@@ -189,7 +195,7 @@ fun HabitTodayRow(
                 )
             }
         }
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(MaterialTheme.spacing.iconGap))
         WeekDots(dots = status.weekDots)
     }
 }
@@ -272,7 +278,7 @@ fun HabitOtherDayRow(
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             Text(text = habit.name, style = MaterialTheme.typography.bodyLarge)
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(MaterialTheme.spacing.hairline))
             Text(
                 text = daysLabel,
                 style = MaterialTheme.typography.labelSmall,
@@ -400,7 +406,7 @@ fun InsightRow(insight: Insight, modifier: Modifier = Modifier) {
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(20.dp),
         )
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(MaterialTheme.spacing.iconGap))
         Text(
             text = insightText(insight),
             style = MaterialTheme.typography.bodyMedium,
@@ -542,3 +548,127 @@ private fun AchievementRow(achievement: ComebackAchievement) {
         }
     }
 }
+
+// ------------------------------------------------------------ toolkit use --
+
+/**
+ * "Times toolkit used / most used tool / average urge duration" — the three
+ * stats requested for the Emergency Toolkit. Hidden entirely until the
+ * toolkit has been used at least once, matching the same "nothing to show
+ * yet, so show nothing" restraint as [ComebackAchievementsSection].
+ */
+@Composable
+fun ToolkitUsageCard(stats: ToolkitUsageStats, modifier: Modifier = Modifier) {
+    if (stats.timesUsed == 0) return
+
+    ClarityCard(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.toolkit_usage_card_title),
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Spacer(Modifier.height(MaterialTheme.spacing.md))
+        Row(modifier = Modifier.fillMaxWidth()) {
+            ToolkitUsageStat(
+                value = stats.timesUsed.toString(),
+                labelRes = R.string.toolkit_usage_times_used,
+                modifier = Modifier.weight(1f),
+            )
+            ToolkitUsageStat(
+                value = stats.mostUsedTool?.let { stringResource(it.titleRes()) }
+                    ?: stringResource(R.string.toolkit_usage_none),
+                labelRes = R.string.toolkit_usage_most_used,
+                modifier = Modifier.weight(1f),
+            )
+            ToolkitUsageStat(
+                value = formatDuration(stats.averageDurationSeconds),
+                labelRes = R.string.toolkit_usage_average_duration,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ToolkitUsageStat(value: String, labelRes: Int, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Text(
+            text = stringResource(labelRes),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+private fun formatDuration(seconds: Int): String = if (seconds < 60) {
+    "${seconds}s"
+} else {
+    "${seconds / 60}m ${seconds % 60}s"
+}
+
+// -------------------------------------------------------- badge collection --
+
+/**
+ * A quiet entry point into the full [com.runtimelabs.clarity.feature.achievement.AchievementsScreen]
+ * — always visible (unlike [ComebackAchievementsSection] and
+ * [ToolkitUsageCard], which hide until there's something to show), because
+ * "0 of 14 unlocked" is itself useful information: it tells a brand-new
+ * person the collection exists and is worth coming back to. Shows up to the
+ * 5 most recently earned badges as small icons, or a plain "not unlocked
+ * yet" line before the first one.
+ */
+@Composable
+fun BadgeCollectionPreview(
+    unlockedCount: Int,
+    recentBadges: List<Badge>,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ClarityCard(onClick = onClick, modifier = modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.achievements_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(Modifier.height(MaterialTheme.spacing.xs))
+                Text(
+                    text = stringResource(R.string.achievements_progress, unlockedCount, Badge.entries.size),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (recentBadges.isNotEmpty()) {
+                Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {
+                    recentBadges.forEach { badge ->
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(MaterialTheme.extended.celebration.copy(alpha = 0.18f), CircleShape)
+                                .border(1.5.dp, MaterialTheme.colorScheme.surface, CircleShape),
+                        ) {
+                            Icon(
+                                imageVector = badge.badgeIcon(),
+                                contentDescription = stringResource(badge.badgeTitleRes()),
+                                tint = MaterialTheme.extended.celebration,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.width(MaterialTheme.spacing.xs))
+            }
+            Icon(
+                imageVector = Icons.Rounded.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+

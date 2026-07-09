@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.SelfImprovement
 import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material3.Icon
@@ -32,7 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,18 +40,22 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.runtimelabs.clarity.R
 import com.runtimelabs.clarity.core.designsystem.components.ClarityPrimaryButton
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import com.runtimelabs.clarity.core.util.rememberReduceMotionEnabled
+import com.runtimelabs.clarity.domain.toolkit.ToolkitTool
 
 const val EXERCISE_GROUNDING = "grounding_54321"
 const val EXERCISE_MUSCLE = "muscle_release"
+const val EXERCISE_DISTRACTION = "distraction_ideas"
 
 private data class GuidedExercise(
     val titleRes: Int,
     val stepsArrayRes: Int,
     val icon: ImageVector,
+    val tool: ToolkitTool,
 )
 
 private fun exerciseFor(code: String): GuidedExercise = when (code) {
@@ -59,23 +63,34 @@ private fun exerciseFor(code: String): GuidedExercise = when (code) {
         titleRes = R.string.toolkit_muscle_title,
         stepsArrayRes = R.array.muscle_steps,
         icon = Icons.Rounded.SelfImprovement,
+        tool = ToolkitTool.MUSCLE_RELAXATION,
+    )
+    EXERCISE_DISTRACTION -> GuidedExercise(
+        titleRes = R.string.tool_distraction_ideas_title,
+        stepsArrayRes = R.array.distraction_ideas,
+        icon = Icons.Rounded.Lightbulb,
+        tool = ToolkitTool.DISTRACTION_IDEAS,
     )
     else -> GuidedExercise(
         titleRes = R.string.toolkit_grounding_title,
         stepsArrayRes = R.array.grounding_steps,
         icon = Icons.Rounded.Visibility,
+        tool = ToolkitTool.GROUNDING,
     )
 }
 
 /**
  * One instruction at a time, advanced by the user — no per-step timers.
  * Someone anxious shouldn't be raced by a countdown, and self-pacing is
- * what keeps this usable under TalkBack and reduce-motion alike.
+ * what keeps this usable under TalkBack and reduce-motion alike. Now also
+ * backs Distraction Ideas, sharing the exact same self-paced mechanism —
+ * a list of things to try is really the same shape as a list of steps.
  */
 @Composable
 fun GuidedStepsScreen(
     exerciseCode: String,
     onDone: () -> Unit,
+    viewModel: GuidedStepsViewModel = hiltViewModel(),
 ) {
     val exercise = remember(exerciseCode) { exerciseFor(exerciseCode) }
     val steps = stringArrayResource(exercise.stepsArrayRes)
@@ -165,10 +180,15 @@ fun GuidedStepsScreen(
             ) {
                 ClarityPrimaryButton(
                     text = stringResource(
-                        if (index == steps.lastIndex) R.string.guided_done else R.string.guided_next,
+                        if (index == steps.lastIndex) R.string.toolkit_made_it_through else R.string.guided_next,
                     ),
                     onClick = {
-                        if (index < steps.lastIndex) index++ else onDone()
+                        if (index < steps.lastIndex) {
+                            index++
+                        } else {
+                            viewModel.onFinished(exercise.tool)
+                            onDone()
+                        }
                     },
                 )
             }

@@ -20,6 +20,21 @@ data class Spacing(
     val xxl: Dp = 48.dp,
     /** Default horizontal inset for screen content. */
     val screenHorizontal: Dp = 20.dp,
+    /**
+     * The gap between a title and its subtitle directly beneath it — used
+     * dozens of times across the app (Home, Journey, Achievements, badge
+     * detail sheets) but never named until this polish pass, when the same
+     * literal `2.dp` turned up independently in nine different files.
+     * Named here so it reads as one deliberate rhythm choice, not nine
+     * coincidentally-matching magic numbers.
+     */
+    val hairline: Dp = 2.dp,
+    /**
+     * The tight horizontal gap between a leading element (usually an icon,
+     * sometimes a toggle or a label column) and what sits beside it in a
+     * row — same "found repeated, then named" reasoning as [hairline].
+     */
+    val iconGap: Dp = 12.dp,
 )
 
 val LocalSpacing = staticCompositionLocalOf { Spacing() }

@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,8 +20,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.AcUnit
+import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.DirectionsWalk
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FitnessCenter
+import androidx.compose.material.icons.rounded.Lightbulb
+import androidx.compose.material.icons.rounded.LocalDrink
 import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.SelfImprovement
 import androidx.compose.material.icons.rounded.Visibility
@@ -52,25 +60,35 @@ import com.runtimelabs.clarity.core.util.rememberReduceMotionEnabled
 
 /**
  * The SOS destination — the dawn-amber button finally has its purpose.
- * Breathing is the hero (one tap, auto-starts); everything else is a card
- * away. Pushed on top of whatever tab the user was in, so leaving here
- * returns them exactly where they were.
+ * Breathing is the hero (one tap, auto-starts); everything else is grouped
+ * into scannable sections rather than one long flat list, since this grew
+ * from 5 tools to 14. Pushed on top of whatever tab the user was in, so
+ * leaving here returns them exactly where they were.
  *
- * The hero card and four tool cards settle in with a gentle staggered
- * entrance (same "beat" idea as onboarding's welcome screen) — this is
- * arguably the single most important screen to feel calm and considered,
- * since it's the one someone opens mid-crisis.
+ * Grounding, Muscle Relaxation, and Quick Reframe are the original three
+ * tools from before this screen's expansion — kept rather than replaced,
+ * since they're real, evidence-based techniques with content behind them,
+ * not placeholders (ARCHITECTURE.md §29).
  */
 @Composable
 fun ToolkitScreen(
     onBack: () -> Unit,
     onBreathe: () -> Unit,
+    onBreatheTimed: (Int) -> Unit,
+    onColdShower: () -> Unit,
+    onWalkOutside: () -> Unit,
+    onPushUps: () -> Unit,
+    onDrinkWater: () -> Unit,
     onGrounding: () -> Unit,
     onMuscle: () -> Unit,
     onReframe: () -> Unit,
+    onCallFriend: () -> Unit,
+    onWriteJournal: () -> Unit,
     onWhy: () -> Unit,
+    onDistractionIdeas: () -> Unit,
 ) {
     val reduceMotion = rememberReduceMotionEnabled()
+
     Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
@@ -107,72 +125,71 @@ fun ToolkitScreen(
                 )
 
                 Spacer(Modifier.height(MaterialTheme.spacing.xl))
+                SectionLabel(R.string.toolkit_section_breathe)
+                Spacer(Modifier.height(MaterialTheme.spacing.sm))
                 EntranceItem(index = 0, reduceMotion = reduceMotion) {
-                    Surface(
-                        shape = MaterialTheme.shapes.large,
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)),
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Column(modifier = Modifier.padding(MaterialTheme.spacing.lg)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                BreathingIndicator(size = 40.dp)
-                                Spacer(Modifier.width(MaterialTheme.spacing.md))
-                                Column {
-                                    Text(
-                                        text = stringResource(R.string.toolkit_breathe_title),
-                                        style = MaterialTheme.typography.titleLarge,
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.toolkit_breathe_subtitle),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-                            Spacer(Modifier.height(MaterialTheme.spacing.md))
-                            ClarityPrimaryButton(
-                                text = stringResource(R.string.toolkit_breathe_action),
-                                onClick = onBreathe,
-                            )
-                        }
-                    }
+                    BreathingHeroCard(onBreathe = onBreathe)
+                }
+                Spacer(Modifier.height(MaterialTheme.spacing.sm))
+                EntranceItem(index = 1, reduceMotion = reduceMotion) {
+                    TimedBreathingRow(onBreatheTimed = onBreatheTimed)
                 }
 
                 Spacer(Modifier.height(MaterialTheme.spacing.lg))
-                EntranceItem(index = 1, reduceMotion = reduceMotion) {
-                    ToolCard(
-                        icon = Icons.Rounded.Visibility,
-                        titleRes = R.string.toolkit_grounding_title,
-                        subtitleRes = R.string.toolkit_grounding_subtitle,
-                        onClick = onGrounding,
-                    )
-                }
+                SectionLabel(R.string.toolkit_section_reset_body)
                 Spacer(Modifier.height(MaterialTheme.spacing.sm))
-                EntranceItem(index = 2, reduceMotion = reduceMotion) {
-                    ToolCard(
-                        icon = Icons.Rounded.SelfImprovement,
-                        titleRes = R.string.toolkit_muscle_title,
-                        subtitleRes = R.string.toolkit_muscle_subtitle,
-                        onClick = onMuscle,
-                    )
+                listOf(
+                    Triple(Icons.Rounded.AcUnit, R.string.tool_cold_shower_title, R.string.tool_cold_shower_subtitle) to onColdShower,
+                    Triple(Icons.Rounded.DirectionsWalk, R.string.tool_walk_outside_title, R.string.tool_walk_outside_subtitle) to onWalkOutside,
+                    Triple(Icons.Rounded.FitnessCenter, R.string.tool_push_ups_title, R.string.tool_push_ups_subtitle) to onPushUps,
+                    Triple(Icons.Rounded.LocalDrink, R.string.tool_drink_water_title, R.string.tool_drink_water_subtitle) to onDrinkWater,
+                ).forEachIndexed { i, (content, onClick) ->
+                    val (icon, titleRes, subtitleRes) = content
+                    EntranceItem(index = 2 + i, reduceMotion = reduceMotion) {
+                        ToolCard(icon = icon, titleRes = titleRes, subtitleRes = subtitleRes, onClick = onClick)
+                    }
+                    Spacer(Modifier.height(MaterialTheme.spacing.sm))
                 }
+
+                Spacer(Modifier.height(MaterialTheme.spacing.md))
+                SectionLabel(R.string.toolkit_section_ground_reframe)
                 Spacer(Modifier.height(MaterialTheme.spacing.sm))
-                EntranceItem(index = 3, reduceMotion = reduceMotion) {
-                    ToolCard(
-                        icon = Icons.Rounded.Psychology,
-                        titleRes = R.string.toolkit_reframe_title,
-                        subtitleRes = R.string.toolkit_reframe_subtitle,
-                        onClick = onReframe,
-                    )
+                listOf(
+                    Triple(Icons.Rounded.Visibility, R.string.toolkit_grounding_title, R.string.toolkit_grounding_subtitle) to onGrounding,
+                    Triple(Icons.Rounded.SelfImprovement, R.string.toolkit_muscle_title, R.string.toolkit_muscle_subtitle) to onMuscle,
+                    Triple(Icons.Rounded.Psychology, R.string.toolkit_reframe_title, R.string.toolkit_reframe_subtitle) to onReframe,
+                ).forEachIndexed { i, (content, onClick) ->
+                    val (icon, titleRes, subtitleRes) = content
+                    EntranceItem(index = 6 + i, reduceMotion = reduceMotion) {
+                        ToolCard(icon = icon, titleRes = titleRes, subtitleRes = subtitleRes, onClick = onClick)
+                    }
+                    Spacer(Modifier.height(MaterialTheme.spacing.sm))
                 }
+
+                Spacer(Modifier.height(MaterialTheme.spacing.md))
+                SectionLabel(R.string.toolkit_section_reach_reflect)
                 Spacer(Modifier.height(MaterialTheme.spacing.sm))
-                EntranceItem(index = 4, reduceMotion = reduceMotion) {
+                listOf(
+                    Triple(Icons.Rounded.Call, R.string.tool_call_friend_title, R.string.tool_call_friend_subtitle) to onCallFriend,
+                    Triple(Icons.Rounded.Edit, R.string.tool_write_journal_title, R.string.tool_write_journal_subtitle) to onWriteJournal,
+                    Triple(Icons.Rounded.Favorite, R.string.tool_motivation_wall_title, R.string.tool_motivation_wall_subtitle) to onWhy,
+                ).forEachIndexed { i, (content, onClick) ->
+                    val (icon, titleRes, subtitleRes) = content
+                    EntranceItem(index = 9 + i, reduceMotion = reduceMotion) {
+                        ToolCard(icon = icon, titleRes = titleRes, subtitleRes = subtitleRes, onClick = onClick)
+                    }
+                    Spacer(Modifier.height(MaterialTheme.spacing.sm))
+                }
+
+                Spacer(Modifier.height(MaterialTheme.spacing.md))
+                SectionLabel(R.string.toolkit_section_distract)
+                Spacer(Modifier.height(MaterialTheme.spacing.sm))
+                EntranceItem(index = 12, reduceMotion = reduceMotion) {
                     ToolCard(
-                        icon = Icons.Rounded.Favorite,
-                        titleRes = R.string.toolkit_why_title,
-                        subtitleRes = R.string.toolkit_why_subtitle,
-                        onClick = onWhy,
+                        icon = Icons.Rounded.Lightbulb,
+                        titleRes = R.string.tool_distraction_ideas_title,
+                        subtitleRes = R.string.tool_distraction_ideas_subtitle,
+                        onClick = onDistractionIdeas,
                     )
                 }
 
@@ -190,7 +207,84 @@ fun ToolkitScreen(
     }
 }
 
-/** One beat in the staggered entrance; index 0 leads, each later index follows by a fixed offset. */
+@Composable
+private fun SectionLabel(textRes: Int) {
+    Text(
+        text = stringResource(textRes),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+}
+
+@Composable
+private fun BreathingHeroCard(onBreathe: () -> Unit) {
+    Surface(
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.padding(MaterialTheme.spacing.lg)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                BreathingIndicator(size = 40.dp)
+                Spacer(Modifier.width(MaterialTheme.spacing.md))
+                Column {
+                    Text(
+                        text = stringResource(R.string.toolkit_breathe_title),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    Text(
+                        text = stringResource(R.string.toolkit_breathe_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            Spacer(Modifier.height(MaterialTheme.spacing.md))
+            ClarityPrimaryButton(
+                text = stringResource(R.string.toolkit_breathe_action),
+                onClick = onBreathe,
+            )
+        }
+    }
+}
+
+@Composable
+private fun TimedBreathingRow(onBreatheTimed: (Int) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm), modifier = Modifier.fillMaxWidth()) {
+        TimedBreathingChip(R.string.tool_breathing_30s_title, 30, Modifier.weight(1f), onBreatheTimed)
+        TimedBreathingChip(R.string.tool_breathing_60s_title, 60, Modifier.weight(1f), onBreatheTimed)
+        TimedBreathingChip(R.string.tool_breathing_2min_title, 120, Modifier.weight(1f), onBreatheTimed)
+    }
+}
+
+@Composable
+private fun TimedBreathingChip(
+    labelRes: Int,
+    seconds: Int,
+    modifier: Modifier,
+    onBreatheTimed: (Int) -> Unit,
+) {
+    Surface(
+        onClick = { onBreatheTimed(seconds) },
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
+        modifier = modifier,
+    ) {
+        Text(
+            text = stringResource(labelRes),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = MaterialTheme.spacing.sm, horizontal = MaterialTheme.spacing.xs),
+        )
+    }
+}
+
+/** One beat in the staggered entrance; index 0 leads, each later index follows by a fixed offset, capped so a long list doesn't feel sluggish by its final item. */
 @Composable
 private fun EntranceItem(
     index: Int,
@@ -199,11 +293,12 @@ private fun EntranceItem(
 ) {
     var started by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { started = true }
+    val cappedIndex = index.coerceAtMost(MAX_STAGGER_INDEX)
     val beat by animateFloatAsState(
         targetValue = if (started || reduceMotion) 1f else 0f,
         animationSpec = tween(
             durationMillis = MotionTokens.EMPHASIZED,
-            delayMillis = if (reduceMotion) 0 else index * STAGGER_DELAY_MS,
+            delayMillis = if (reduceMotion) 0 else cappedIndex * STAGGER_DELAY_MS,
         ),
         label = "toolkitEntranceBeat$index",
     )
@@ -217,7 +312,8 @@ private fun EntranceItem(
     }
 }
 
-private const val STAGGER_DELAY_MS = 70
+private const val STAGGER_DELAY_MS = 60
+private const val MAX_STAGGER_INDEX = 6
 
 @Composable
 private fun ToolCard(
@@ -247,7 +343,7 @@ private fun ToolCard(
                     text = stringResource(titleRes),
                     style = MaterialTheme.typography.titleMedium,
                 )
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(MaterialTheme.spacing.hairline))
                 Text(
                     text = stringResource(subtitleRes),
                     style = MaterialTheme.typography.bodySmall,

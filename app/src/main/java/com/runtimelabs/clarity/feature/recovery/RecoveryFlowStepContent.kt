@@ -280,7 +280,7 @@ private fun PatternCard(pattern: RelapsePattern, highlighted: Boolean) {
             Spacer(Modifier.width(MaterialTheme.spacing.md))
             Column {
                 Text(text = stringResource(pattern.titleRes), style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(MaterialTheme.spacing.hairline))
                 Text(
                     text = stringResource(pattern.descriptionRes),
                     style = MaterialTheme.typography.bodyMedium,

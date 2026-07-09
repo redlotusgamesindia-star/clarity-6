@@ -1,5 +1,6 @@
 package com.runtimelabs.clarity.feature.journal
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.runtimelabs.clarity.domain.repository.GratitudeRepository
@@ -14,6 +15,19 @@ import kotlinx.coroutines.flow.stateIn
 
 sealed interface JournalUiState {
     data object Loading : JournalUiState
+
+    /**
+     * @Immutable — not just a `data class` convention here: this pass
+     * marks every UiState type across the app the same way, since the
+     * Compose compiler's stability inference treats a plain `List<T>`
+     * field as unstable by default (it can't prove nothing else holds a
+     * mutable reference to it), which silently disables recomposition
+     * skipping for every screen reading this state. The list is in
+     * practice always replaced wholesale, never mutated in place — the
+     * same guarantee `@Immutable` exists to let a developer assert
+     * directly when the compiler can't infer it on its own.
+     */
+    @Immutable
     data class Ready(val entries: List<JournalHubEntry>) : JournalUiState
 }
 

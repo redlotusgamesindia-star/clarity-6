@@ -169,7 +169,7 @@ private fun PremiumSection(
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(MaterialTheme.spacing.hairline))
                 Text(
                     text = stringResource(
                         when (state.premiumState) {

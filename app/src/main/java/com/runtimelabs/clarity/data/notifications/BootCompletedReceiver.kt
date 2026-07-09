@@ -25,7 +25,12 @@ class BootCompletedReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
         val pendingResult = goAsync()
-        CoroutineScope(Dispatchers.Default).launch {
+        // IO, not Default: this does Room reads/writes and AlarmManager
+        // scheduling, not CPU-bound work — Default's small, CPU-sized pool
+        // is the wrong tool for blocking I/O and risks starving it under
+        // load. Same fix applied uniformly across every fire-and-forget
+        // receiver/Application scope in this app.
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 habitRepository.rescheduleAllReminders()
                 widgetSyncRepository.refresh() // also re-arms the widget's daily alarm

@@ -68,4 +68,28 @@ class BreathingSessionTest {
         val s = advanceBy(BreathingSessionState(BreathingPatterns.CALM), 30)
         assertEquals(3, s.completedCycles)
     }
+
+    @Test
+    fun `open-ended session never reaches a target`() {
+        val s = advanceBy(BreathingSessionState(BreathingPatterns.CALM, targetDurationSeconds = 0), 300)
+        assertEquals(false, s.hasReachedTarget)
+    }
+
+    @Test
+    fun `a timed session has not reached target before elapsed time catches up`() {
+        val s = advanceBy(BreathingSessionState(BreathingPatterns.CALM, targetDurationSeconds = 30), 29)
+        assertEquals(false, s.hasReachedTarget)
+    }
+
+    @Test
+    fun `a timed session reaches target exactly on the boundary second`() {
+        val s = advanceBy(BreathingSessionState(BreathingPatterns.CALM, targetDurationSeconds = 30), 30)
+        assertEquals(true, s.hasReachedTarget)
+    }
+
+    @Test
+    fun `a timed session stays reached past the boundary`() {
+        val s = advanceBy(BreathingSessionState(BreathingPatterns.CALM, targetDurationSeconds = 30), 45)
+        assertEquals(true, s.hasReachedTarget)
+    }
 }

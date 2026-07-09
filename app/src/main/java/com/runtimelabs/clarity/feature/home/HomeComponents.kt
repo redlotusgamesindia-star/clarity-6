@@ -197,7 +197,7 @@ fun CheckInCard(
                         text = stringResource(R.string.checkin_card_title_todo),
                         style = MaterialTheme.typography.titleMedium,
                     )
-                    Spacer(Modifier.height(2.dp))
+                    Spacer(Modifier.height(MaterialTheme.spacing.hairline))
                     Text(
                         text = stringResource(R.string.checkin_card_subtitle_todo),
                         style = MaterialTheme.typography.bodySmall,
@@ -208,7 +208,7 @@ fun CheckInCard(
                         text = stringResource(R.string.checkin_card_title_done),
                         style = MaterialTheme.typography.titleMedium,
                     )
-                    Spacer(Modifier.height(2.dp))
+                    Spacer(Modifier.height(MaterialTheme.spacing.hairline))
                     Text(
                         text = stringResource(todayCheckIn.mood.labelRes()) +
                             " · " + stringResource(R.string.checkin_card_edit),
@@ -217,7 +217,7 @@ fun CheckInCard(
                     )
                 }
             }
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(MaterialTheme.spacing.iconGap))
             Icon(
                 imageVector = todayCheckIn?.mood?.icon() ?: Icons.Rounded.ChevronRight,
                 contentDescription = null, // card text carries the semantics

@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.unit.dp
+import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -81,7 +82,7 @@ fun OptionCard(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 if (supportingText != null) {
-                    Spacer(Modifier.height(2.dp))
+                    Spacer(Modifier.height(MaterialTheme.spacing.hairline))
                     Text(
                         text = supportingText,
                         style = MaterialTheme.typography.bodySmall,
@@ -89,7 +90,7 @@ fun OptionCard(
                     )
                 }
             }
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(MaterialTheme.spacing.iconGap))
             if (multiSelect) {
                 // Persistent affordance: multi-select must look checkable
                 // even when unchecked.

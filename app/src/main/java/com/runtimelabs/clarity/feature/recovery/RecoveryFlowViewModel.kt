@@ -1,5 +1,6 @@
 package com.runtimelabs.clarity.feature.recovery
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.runtimelabs.clarity.domain.model.JourneyEventType
@@ -49,6 +50,8 @@ data class RecoveryFlowDraft(
 sealed interface RecoveryFlowUiState {
     data object Loading : RecoveryFlowUiState
 
+    /** @Immutable: the `List`/`Set` fields are otherwise conservatively-unstable — see JournalUiState's fuller rationale. */
+    @Immutable
     data class Ready(
         val phase: RecoveryFlowPhase,
         val draft: RecoveryFlowDraft,

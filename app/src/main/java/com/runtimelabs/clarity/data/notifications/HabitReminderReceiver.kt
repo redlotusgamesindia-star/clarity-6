@@ -28,7 +28,9 @@ class HabitReminderReceiver : BroadcastReceiver() {
         if (habitId < 0) return
 
         val pendingResult = goAsync()
-        CoroutineScope(Dispatchers.Default).launch {
+        // IO, not Default — see BootCompletedReceiver's identical fix; this
+        // is a Room read plus AlarmManager scheduling, both blocking I/O.
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 val habit = habitRepository.getHabit(habitId)
                 if (habit?.reminderMinutesOfDay != null) {

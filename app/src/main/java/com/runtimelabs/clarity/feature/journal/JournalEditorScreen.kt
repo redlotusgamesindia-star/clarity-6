@@ -35,6 +35,8 @@ import com.runtimelabs.clarity.R
 import com.runtimelabs.clarity.core.designsystem.components.BreathingIndicator
 import com.runtimelabs.clarity.core.designsystem.components.ClarityPrimaryButton
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
+import com.runtimelabs.clarity.core.util.rememberReduceMotionEnabled
+import com.runtimelabs.clarity.feature.achievement.AchievementUnlockOverlay
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -51,6 +53,7 @@ fun JournalEditorScreen(
     viewModel: JournalEditorViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val reduceMotion = rememberReduceMotionEnabled()
 
     LaunchedEffect(state.finished) {
         if (state.finished) onDone()
@@ -133,6 +136,12 @@ fun JournalEditorScreen(
             },
         )
     }
+
+    AchievementUnlockOverlay(
+        newlyUnlocked = state.newlyUnlockedBadges,
+        reduceMotion = reduceMotion,
+        onDismiss = viewModel::onAchievementCelebrationDismissed,
+    )
 }
 
 @Composable

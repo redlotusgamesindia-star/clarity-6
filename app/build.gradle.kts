@@ -7,6 +7,32 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+// Release signing, read from local.properties (already git-ignored — see
+// .gitignore) rather than committed to source control. Doing this at the
+// top of the file, before the `android {}` block, so it's the first thing
+// anyone opening this file for a Play Store release sees.
+//
+// To produce a signed release build:
+//   1. Generate a keystore once, keep it OUTSIDE this repo:
+//        keytool -genkey -v -keystore clarity-release.jks -keyalg RSA \
+//          -keysize 2048 -validity 10000 -alias clarity
+//   2. Add these four lines to local.properties (create it if it doesn't
+//      exist — it's already in .gitignore, never commit it):
+//        RELEASE_STORE_FILE=/absolute/path/to/clarity-release.jks
+//        RELEASE_STORE_PASSWORD=...
+//        RELEASE_KEY_ALIAS=clarity
+//        RELEASE_KEY_PASSWORD=...
+//   3. Run `./gradlew bundleRelease` for the .aab Play Console expects.
+// Without those properties present, the release build type simply has no
+// signing config attached (same as an unmodified `./gradlew` checkout) —
+// it still builds, it just can't be installed or uploaded, which is the
+// correct default for a repo with no secrets in it.
+val localProperties = java.util.Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val hasReleaseSigningConfig = localProperties.getProperty("RELEASE_STORE_FILE") != null
+
 android {
     namespace = "com.runtimelabs.clarity"
     compileSdk = 35
@@ -16,9 +42,20 @@ android {
         minSdk = 29
         targetSdk = 35
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        if (hasReleaseSigningConfig) {
+            create("release") {
+                storeFile = file(localProperties.getProperty("RELEASE_STORE_FILE"))
+                storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD")
+                keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS")
+                keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
@@ -29,6 +66,14 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            if (hasReleaseSigningConfig) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+            // AGP already defaults this to false for the release build type;
+            // stated explicitly so it's never accidentally inherited or
+            // overridden by a future build-type tweak for a build type that
+            // ships to real users.
+            isDebuggable = false
         }
     }
 

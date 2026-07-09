@@ -51,7 +51,12 @@ fun WhyScreen(
                     .height(56.dp)
                     .padding(horizontal = MaterialTheme.spacing.sm),
             ) {
-                IconButton(onClick = onDone) {
+                IconButton(
+                    onClick = {
+                        viewModel.onExit()
+                        onDone()
+                    },
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                         contentDescription = stringResource(R.string.action_back),
@@ -105,7 +110,7 @@ fun WhyScreen(
                                 tint = MaterialTheme.colorScheme.tertiary, // the dawn accent
                                 modifier = Modifier.size(22.dp),
                             )
-                            Spacer(Modifier.width(12.dp))
+                            Spacer(Modifier.width(MaterialTheme.spacing.iconGap))
                             Text(
                                 text = stringResource(reason.labelRes()),
                                 style = MaterialTheme.typography.bodyLarge,
@@ -124,7 +129,7 @@ fun WhyScreen(
                             text = stringResource(current.goal.labelRes()),
                             style = MaterialTheme.typography.titleMedium,
                         )
-                        Spacer(Modifier.height(2.dp))
+                        Spacer(Modifier.height(MaterialTheme.spacing.hairline))
                         Text(
                             text = stringResource(current.goal.supportingRes()),
                             style = MaterialTheme.typography.bodySmall,

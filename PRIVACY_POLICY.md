@@ -86,6 +86,8 @@ Questions about this policy or how Clarity handles data:
 
 **Unbroken Self**
 📧 unbrokenselfsupport@gmail.com
+🔗 _[replace with your GitHub repository or project URL]_
+
 ---
 
 *This policy describes Clarity's actual data handling as implemented in the app's source code as of the date above. It is provided as an accurate technical account, not legal advice — if you are publishing this app commercially, especially given its subject matter, we'd recommend having a lawyer familiar with app privacy law (GDPR, CCPA/CPRA, and Google Play's Developer Program Policies) review this before publishing.*

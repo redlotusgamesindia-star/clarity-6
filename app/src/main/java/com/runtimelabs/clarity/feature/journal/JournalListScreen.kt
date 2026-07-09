@@ -204,7 +204,7 @@ private fun JournalHubRow(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(MaterialTheme.spacing.hairline))
                 Text(
                     text = entry.preview,
                     style = MaterialTheme.typography.bodyMedium,

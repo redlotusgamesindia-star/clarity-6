@@ -187,7 +187,7 @@ fun HabitEditorScreen(
                                     text = stringResource(R.string.habit_reminder_label),
                                     style = MaterialTheme.typography.titleSmall,
                                 )
-                                Spacer(Modifier.height(2.dp))
+                                Spacer(Modifier.height(MaterialTheme.spacing.hairline))
                                 val timeLabel = if (state.reminderEnabled) {
                                     formatMinutesOfDay(state.reminderMinutes)
                                 } else {

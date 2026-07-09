@@ -60,8 +60,13 @@ data class BreathingSessionState(
     val secondsRemainingInPhase: Int = pattern.phases.first().seconds,
     val completedCycles: Int = 0,
     val elapsedSeconds: Int = 0,
+    /** 0 means open-ended (no target) — same sentinel convention as [com.runtimelabs.clarity.navigation.BreathingRoute]. */
+    val targetDurationSeconds: Int = 0,
 ) {
     val currentPhase: BreathPhase get() = pattern.phases[phaseIndex]
+
+    /** True once elapsed time reaches a set target. Always false for an open-ended session. */
+    val hasReachedTarget: Boolean get() = targetDurationSeconds > 0 && elapsedSeconds >= targetDurationSeconds
 }
 
 fun advanceOneSecond(state: BreathingSessionState): BreathingSessionState {

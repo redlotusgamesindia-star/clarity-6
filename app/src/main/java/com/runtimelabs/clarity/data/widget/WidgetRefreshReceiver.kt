@@ -23,7 +23,9 @@ class WidgetRefreshReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != WidgetRefreshScheduler.ACTION_WIDGET_REFRESH) return
         val pendingResult = goAsync()
-        CoroutineScope(Dispatchers.Default).launch {
+        // IO, not Default — same fix as the other two receivers; refresh()
+        // is Room + DataStore + AlarmManager, all blocking I/O.
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 widgetSyncRepository.refresh()
             } finally {

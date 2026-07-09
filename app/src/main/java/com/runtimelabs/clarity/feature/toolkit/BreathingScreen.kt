@@ -51,9 +51,13 @@ import com.runtimelabs.clarity.core.util.rememberReduceMotionEnabled
  */
 @Composable
 fun BreathingScreen(
+    targetDurationSeconds: Int,
     onDone: () -> Unit,
     viewModel: BreathingViewModel = hiltViewModel(),
 ) {
+    LaunchedEffect(targetDurationSeconds) {
+        viewModel.setTargetDuration(targetDurationSeconds)
+    }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val reduceMotion = rememberReduceMotionEnabled()
 
@@ -126,7 +130,15 @@ fun BreathingScreen(
                 }
                 Spacer(Modifier.height(MaterialTheme.spacing.lg))
                 Text(
-                    text = stringResource(R.string.breathing_cycles, session.completedCycles),
+                    text = if (session.targetDurationSeconds > 0) {
+                        stringResource(
+                            R.string.breathing_target_progress,
+                            session.elapsedSeconds.coerceAtMost(session.targetDurationSeconds),
+                            session.targetDurationSeconds,
+                        )
+                    } else {
+                        stringResource(R.string.breathing_cycles, session.completedCycles)
+                    },
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -144,7 +156,7 @@ fun BreathingScreen(
                     .padding(bottom = MaterialTheme.spacing.lg),
             ) {
                 ClaritySecondaryButton(
-                    text = stringResource(R.string.breathing_end),
+                    text = stringResource(R.string.toolkit_made_it_through),
                     onClick = viewModel::onEndSession,
                 )
             }

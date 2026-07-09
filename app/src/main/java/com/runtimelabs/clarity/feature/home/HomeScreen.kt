@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.runtimelabs.clarity.R
@@ -41,6 +44,7 @@ import com.runtimelabs.clarity.core.designsystem.components.LoadingScreen
 import com.runtimelabs.clarity.core.designsystem.theme.spacing
 import com.runtimelabs.clarity.core.util.rememberReduceMotionEnabled
 import com.runtimelabs.clarity.domain.ads.AdScreen
+import com.runtimelabs.clarity.feature.achievement.AchievementUnlockOverlay
 import com.runtimelabs.clarity.feature.recovery.RelapseConfirmDialog
 import com.runtimelabs.clarity.feature.recovery.textRes
 import java.time.LocalDate
@@ -58,6 +62,7 @@ import java.util.Locale
 fun HomeScreen(
     onNavigateToRecoveryFlow: (Long) -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToAchievements: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -80,6 +85,7 @@ fun HomeScreen(
                 onOpenCheckIn = viewModel::onOpenCheckIn,
                 onRelapseButtonTapped = viewModel::onRelapseButtonTapped,
                 onNavigateToSettings = onNavigateToSettings,
+                onNavigateToAchievements = onNavigateToAchievements,
             )
             val sheet = current.checkInSheet
             if (sheet != null) {
@@ -101,6 +107,11 @@ fun HomeScreen(
                     onDismiss = viewModel::onRelapseDialogDismissed,
                 )
             }
+            AchievementUnlockOverlay(
+                newlyUnlocked = current.newlyUnlockedBadges,
+                reduceMotion = reduceMotion,
+                onDismiss = viewModel::onAchievementCelebrationDismissed,
+            )
         }
     }
 }
@@ -112,6 +123,7 @@ private fun HomeContent(
     onOpenCheckIn: () -> Unit,
     onRelapseButtonTapped: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToAchievements: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -123,6 +135,13 @@ private fun HomeContent(
         Row(verticalAlignment = Alignment.Top) {
             Box(modifier = Modifier.weight(1f)) {
                 GreetingHeader(todayEpochDay = state.todayEpochDay)
+            }
+            IconButton(onClick = onNavigateToAchievements) {
+                Icon(
+                    imageVector = Icons.Rounded.EmojiEvents,
+                    contentDescription = stringResource(R.string.achievements_title),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
             IconButton(onClick = onNavigateToSettings) {
                 Icon(
@@ -176,13 +195,21 @@ private fun HomeContent(
  */
 @Composable
 private fun RelapseEntryLink(onClick: () -> Unit) {
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            // 48dp minimum touch target (Android accessibility guidance) —
+            // the label itself stays visually small and quiet on purpose
+            // (see the doc comment above), the tappable area doesn't have to.
+            .heightIn(min = 48.dp)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
         Text(
             text = stringResource(R.string.relapse_entry_link),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textDecoration = TextDecoration.Underline,
-            modifier = Modifier.clickable(onClick = onClick),
         )
     }
 }
@@ -199,17 +226,22 @@ private fun PrivacyOptionsLink(viewModel: PrivacyOptionsViewModel = hiltViewMode
     if (!isRequired) return
 
     val context = LocalContext.current
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clickable {
+                (context as? Activity)?.let { activity ->
+                    viewModel.showPrivacyOptionsForm(activity) { }
+                }
+            },
+        contentAlignment = Alignment.Center,
+    ) {
         Text(
             text = stringResource(R.string.privacy_options_link),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textDecoration = TextDecoration.Underline,
-            modifier = Modifier.clickable {
-                (context as? Activity)?.let { activity ->
-                    viewModel.showPrivacyOptionsForm(activity) { }
-                }
-            },
         )
     }
 }

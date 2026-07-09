@@ -9,3 +9,9 @@
 .cxx
 local.properties
 app/build
+
+# Defense in depth alongside local.properties: even if a keystore ever gets
+# placed inside the repo by mistake instead of outside it as documented in
+# app/build.gradle.kts, it still can't be committed.
+*.jks
+*.keystore

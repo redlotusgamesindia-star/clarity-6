@@ -38,7 +38,7 @@ class ClarityApp : Application() {
     @Inject
     lateinit var premiumManager: PremiumManager
 
-    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()

@@ -36,6 +36,7 @@ import com.runtimelabs.clarity.domain.ads.AdScreen
 fun JourneyScreen(
     onNewHabit: () -> Unit,
     onEditHabit: (Long) -> Unit,
+    onOpenAchievements: () -> Unit,
     viewModel: JourneyViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -49,6 +50,7 @@ fun JourneyScreen(
             onNewHabit = onNewHabit,
             onEditHabit = onEditHabit,
             onToggleToday = viewModel::onToggleToday,
+            onOpenAchievements = onOpenAchievements,
         )
     }
 }
@@ -60,6 +62,7 @@ private fun JourneyContent(
     onNewHabit: () -> Unit,
     onEditHabit: (Long) -> Unit,
     onToggleToday: (Long, Boolean) -> Unit,
+    onOpenAchievements: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -84,6 +87,17 @@ private fun JourneyContent(
                 Spacer(Modifier.height(MaterialTheme.spacing.md))
                 ComebackAchievementsSection(achievements = state.comebackAchievements)
             }
+            if (state.toolkitStats.timesUsed > 0) {
+                Spacer(Modifier.height(MaterialTheme.spacing.md))
+                ToolkitUsageCard(stats = state.toolkitStats)
+            }
+
+            Spacer(Modifier.height(MaterialTheme.spacing.md))
+            BadgeCollectionPreview(
+                unlockedCount = state.unlockedBadges.size,
+                recentBadges = state.unlockedBadges.takeLast(5).map { it.badge },
+                onClick = onOpenAchievements,
+            )
 
             if (!state.hasHabits) {
                 Spacer(Modifier.height(MaterialTheme.spacing.xl))
