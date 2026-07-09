@@ -235,7 +235,12 @@ class PlayBillingConnector @Inject constructor(
             .build()
         val result = billingClient.queryProductDetails(params)
         if (result.billingResult.responseCode != BillingResponseCode.OK) return null
-        return result.productDetailsList.firstOrNull()
+        // Safe call: this Billing Library version's Kotlin-visible signature
+        // for productDetailsList is List<ProductDetails>? (nullable), not
+        // the non-null List some docs/samples show for other versions —
+        // trusting the compiler's own reported type here over a generic
+        // sample rather than assuming non-null.
+        return result.productDetailsList?.firstOrNull()
     }
 
     private fun Purchase.toPremiumState(): PremiumState = when (purchaseState) {
@@ -244,7 +249,15 @@ class PlayBillingConnector @Inject constructor(
         else -> PremiumState.Free
     }
 
-    private fun BillingResponseCode.toPurchaseResult(): PurchaseResult = when (this) {
+    // Receiver is Int, not BillingResponseCode: BillingClient.BillingResponseCode is a
+    // @Retention(SOURCE) @IntDef-style annotation used purely to mark Int
+    // constants for lint, not an actual assignable type — every real
+    // response code value throughout this API (BillingResult.responseCode
+    // included) is plain Int. BillingResponseCode.USER_CANCELED etc. below
+    // are still exactly right as-is: those reference the namespaced Int
+    // constants, which is the only thing BillingResponseCode is actually
+    // for.
+    private fun Int.toPurchaseResult(): PurchaseResult = when (this) {
         BillingResponseCode.USER_CANCELED -> PurchaseResult.Cancelled
         BillingResponseCode.ITEM_ALREADY_OWNED -> PurchaseResult.Success
         BillingResponseCode.SERVICE_DISCONNECTED,
