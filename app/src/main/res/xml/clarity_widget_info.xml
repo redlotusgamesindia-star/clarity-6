@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Two responsive sizes (see ClarityWidget.kt's SizeMode.Responsive):
+    small ~110x110dp (a compact square), large up to 250x150dp (adds the
+    milestone progress bar). updatePeriodMillis is 0 on purpose — refresh is
+    fully self-managed via WidgetRefreshScheduler's daily alarm plus app-start
+    / boot / onboarding-completion triggers, consistent with why habit
+    reminders use AlarmManager over WorkManager (ARCHITECTURE.md §18, §20).
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="110dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="1"
+    android:maxResizeWidth="250dp"
+    android:maxResizeHeight="150dp"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:description="@string/widget_description"
+    android:previewImage="@mipmap/ic_launcher" />

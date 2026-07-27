@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Base ring -->
+    <path
+        android:pathData="M54,32 A22,22 0 1,1 53.99,32"
+        android:strokeColor="#2E4A49"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- Progress arc (top to bottom, clockwise), teal -->
+    <path
+        android:pathData="M54,32 A22,22 0 0,1 76,54 A22,22 0 0,1 54,76"
+        android:strokeColor="#7FD1CF"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- Leading dot, dawn amber -->
+    <path
+        android:pathData="M54,76 m-5,0 a5,5 0 1,1 10,0 a5,5 0 1,1 -10,0"
+        android:fillColor="#F0B98E" />
+</vector>

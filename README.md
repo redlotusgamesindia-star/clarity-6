@@ -1,0 +1,74 @@
+# Clarity — Foundation Build (Phase 1)
+
+Private, offline-first recovery companion. Android 10+ (minSdk 29), Kotlin,
+Jetpack Compose, Material 3, Hilt, Room (SQLCipher), DataStore, Navigation
+Compose.
+
+## Open & run
+
+1. **Android Studio Ladybug (2024.2) or newer**, JDK 17.
+2. Open the project root. If Studio asks about a missing Gradle wrapper JAR,
+   let it regenerate it (or run `gradle wrapper` once with any local Gradle
+   8.x) — the binary JAR is intentionally not committed.
+3. Sync → Run. First launch shows the onboarding placeholder; Continue flips
+   the persisted flag and drops you into the four-tab shell with the SOS
+   button.
+
+## What's real vs placeholder
+
+Real: architecture, DI graph, encrypted DB wiring (now schema v2 with a
+hand-written migration), settings persistence, theme/typography/dark mode,
+design-system components, navigation shell, splash, and the **full
+onboarding**: animated welcome, 11 questions, deterministic personalized
+plan generation (unit-tested — run `./gradlew testDebugUnitTest`), and
+profile+plan persistence in the encrypted database, and the **Phase A
+core**: Home dashboard (event-sourced streak ring, daily check-in with mood
++ urge tracking, week strip, deterministic daily reflection) and the full
+journal (list, editor, delete), and the **Phase B habit system**: habit
+creation with weekday scheduling and curated icons, self-healing inexact
+reminder notifications (POST_NOTIFICATIONS runtime flow; still NO INTERNET),
+a Canvas weekly progress chart, and deterministic weekly insights, plus the
+**Phase C mental health toolkit**: the SOS button now opens a real toolkit
+(auto-starting guided breathing with 3 patterns, 5-4-3-2-1 grounding,
+muscle release, and "remember your why"), a CBT thought record and a
+gratitude exercise as first-class Journal entry kinds in a unified hub —
+schema v5. Phase D adds a **home-screen widget** (Glance, two responsive
+sizes, self-healing daily refresh, zero new Room schema — a separate
+unencrypted DataStore cache backs it, see ARCHITECTURE.md §20) and an
+animation polish pass (shared `MotionTokens`, animated habit/mood/chart
+transitions, a staggered SOS entrance, and the first real use of the
+long-defined `celebration` color on the streak ring). Phase E adds the
+**relapse & recovery system**: a low-key relapse entry point on Home, a
+five-step supportive recovery flow (accept, optional reflection, common-
+pattern education, a personalized checklist, restart), the Rebuild System's
+"Recovery Day N / previous streak / best streak" framing, a daily Motivation
+Engine, a Recovery Score blending lifetime consistency with momentum, and
+five comeback achievements — schema v6, no new permissions. Tests: plan
+generator, streak calculator (now with previous/best-run and lifetime
+aggregate coverage), habit stats, insights, reminder timing, breathing
+state machine, widget snapshot math, recovery checklist, recovery score,
+motivation messages, comeback achievements (`./gradlew testDebugUnitTest`).
+
+A banner ad (AdMob, via a centralized `AdsManager` + UMP consent) was added
+after Phase E on Home, Journey, and the Journal list only — see
+ARCHITECTURE.md §23 for the privacy trade-off this represents and why it
+was a deliberate, discussed exception rather than an oversight. Test ads
+show automatically in debug builds; release builds use the real ad unit.
+A follow-up monetization pass added a proper **Premium architecture**
+(`PremiumState`, `PremiumRepository`, `PremiumPreferences`, a
+`BillingConnector` seam with a genuine no-op implementation, and a
+global `PremiumManager` — see ARCHITECTURE.md §24) that supersedes the
+placeholder premium flag from the ads pass, plus a minimal **Settings**
+screen (reached from a gear icon on Home, not a new bottom tab) hosting
+the Premium section. `ClarityBannerAd` now only reveals once an ad
+genuinely loads, animates in, and auto-hides on failure. Placeholder
+(loudly labeled in-app): Learn only.
+
+## Notes
+
+- **Fonts** (Fraunces/Inter) load via the Google Fonts provider — no app
+  permissions involved. Offline/no-Play-services devices fall back to system
+  serif/sans. Bundle TTFs in `res/font` before store submission (see
+  `Type.kt` production note).
+- **Zero permissions** by design; the manifest is the privacy policy.
+- Architecture rationale: see `ARCHITECTURE.md`.

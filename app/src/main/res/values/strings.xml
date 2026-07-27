@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Clarity</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_journey">Journey</string>
+    <string name="nav_learn">Learn</string>
+    <string name="nav_journal">Journal</string>
+    <string name="sos_button">Open urge toolkit</string>
+
+    <!-- Shared state screens -->
+    <string name="error_title">Something didn\'t load</string>
+    <string name="error_message">Your data is safe on this device. Try again in a moment.</string>
+    <string name="action_retry">Try again</string>
+    <string name="action_back">Back</string>
+    <string name="loading">Loading</string>
+
+    <!-- Onboarding: welcome -->
+    <string name="onboarding_title">Take back control</string>
+    <string name="onboarding_subtitle">A private, science-informed path to quit porn — built around you.</string>
+    <string name="onboarding_welcome_privacy">No account. No cloud. Everything stays on this device.</string>
+    <string name="onboarding_begin">Begin</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_start_recovery">Start my recovery</string>
+    <string name="onboarding_progress">Onboarding progress</string>
+
+    <!-- Onboarding: questions -->
+    <string name="q_age_title">How old are you?</string>
+    <string name="q_age_subtitle">Clarity is designed for adults.</string>
+    <string name="q_gender_title">How do you identify?</string>
+    <string name="q_gender_subtitle">Optional — choose \'Prefer not to say\' to skip.</string>
+    <string name="q_years_title">How long has porn felt like a problem?</string>
+    <string name="q_years_subtitle">There\'s no judgment here — this shapes your plan.</string>
+    <string name="q_frequency_title">On average, how often do you watch?</string>
+    <string name="q_frequency_subtitle">An honest answer sets the right starting intensity.</string>
+    <string name="q_trigger_title">What most often leads you to it?</string>
+    <string name="q_trigger_subtitle">Pick the strongest one — you can track others later.</string>
+    <string name="q_urge_time_title">When are urges strongest?</string>
+    <string name="q_sleep_title">What\'s your sleep like?</string>
+    <string name="q_sleep_subtitle">Late nights and urges are closely linked.</string>
+    <string name="q_prev_streak_title">What\'s the longest you\'ve gone without it?</string>
+    <string name="q_prev_streak_subtitle">Past attempts are data, not failures.</string>
+    <string name="q_goal_title">What are you here to do?</string>
+    <string name="q_reasons_title">Why does this matter to you?</string>
+    <string name="q_reasons_subtitle">Choose all that apply — this becomes your \'why\'.</string>
+    <string name="q_motivation_title">How ready are you, honestly?</string>
+    <string name="q_motivation_subtitle">There\'s no wrong answer — your plan meets you where you are.</string>
+    <string name="q_motivation_low">Testing the waters</string>
+    <string name="q_motivation_high">All in</string>
+
+    <!-- Onboarding: options -->
+    <string name="age_18_24">18–24</string>
+    <string name="age_25_34">25–34</string>
+    <string name="age_35_44">35–44</string>
+    <string name="age_45_54">45–54</string>
+    <string name="age_55_plus">55+</string>
+
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_non_binary">Non-binary</string>
+    <string name="gender_prefer_not">Prefer not to say</string>
+
+    <string name="years_lt_1">Less than a year</string>
+    <string name="years_1_3">1–3 years</string>
+    <string name="years_3_5">3–5 years</string>
+    <string name="years_5_10">5–10 years</string>
+    <string name="years_gt_10">More than 10 years</string>
+
+    <string name="freq_multiple_daily">Multiple times a day</string>
+    <string name="freq_daily">About once a day</string>
+    <string name="freq_several_week">A few times a week</string>
+    <string name="freq_weekly">About once a week</string>
+    <string name="freq_few_month">A few times a month</string>
+
+    <string name="trigger_stress">Stress or anxiety</string>
+    <string name="trigger_boredom">Boredom</string>
+    <string name="trigger_loneliness">Loneliness</string>
+    <string name="trigger_fatigue">Fatigue or insomnia</string>
+    <string name="trigger_social_media">Social media spirals</string>
+    <string name="trigger_emotions">Difficult emotions</string>
+
+    <string name="urge_morning">Morning</string>
+    <string name="urge_afternoon">Afternoon</string>
+    <string name="urge_evening">Evening</string>
+    <string name="urge_late_night">Late at night</string>
+    <string name="urge_unpredictable">It\'s unpredictable</string>
+
+    <string name="sleep_early">Before 10pm, consistent</string>
+    <string name="sleep_regular">Around 10pm–midnight</string>
+    <string name="sleep_night_owl">Usually after midnight</string>
+    <string name="sleep_irregular">All over the place</string>
+
+    <string name="streak_never">Never really tried</string>
+    <string name="streak_1_7">A few days</string>
+    <string name="streak_8_30">1–4 weeks</string>
+    <string name="streak_31_90">1–3 months</string>
+    <string name="streak_90_plus">More than 3 months</string>
+
+    <string name="goal_quit">Quit completely</string>
+    <string name="goal_quit_support">Zero porn, for good</string>
+    <string name="goal_reboot">Complete a 90-day reboot</string>
+    <string name="goal_reboot_support">A full reset, then reassess</string>
+    <string name="goal_reduce">Cut back gradually</string>
+    <string name="goal_reduce_support">Step down at your own pace</string>
+
+    <string name="reason_mental_clarity">Mental clarity &amp; focus</string>
+    <string name="reason_relationships">My relationship(s)</string>
+    <string name="reason_self_respect">Self-respect</string>
+    <string name="reason_energy">Energy &amp; productivity</string>
+    <string name="reason_faith">My faith or values</string>
+    <string name="reason_sexual_health">Sexual health</string>
+    <string name="reason_time">Reclaiming my time</string>
+
+    <!-- Onboarding: plan generation -->
+    <string name="gen_msg_1">Reading your answers…</string>
+    <string name="gen_msg_2">Choosing your focus areas…</string>
+    <string name="gen_msg_3">Building week one…</string>
+
+    <!-- Onboarding: plan reveal -->
+    <string name="plan_title">Your recovery plan</string>
+    <string name="plan_subtitle">Built from your answers. It adapts as you go.</string>
+    <string name="plan_first_milestone">First milestone: %1$d days</string>
+    <string name="plan_focus_label">Your focus areas</string>
+    <string name="plan_footnote">You can revisit and adjust this anytime from Settings.</string>
+
+    <string name="cat_foundation">Foundation</string>
+    <string name="cat_trigger_defense">Trigger defense</string>
+    <string name="cat_environment">Environment &amp; routines</string>
+    <string name="cat_sleep">Sleep</string>
+    <string name="cat_mindset">Mindset</string>
+
+    <!-- Plan items (code -> copy; DB stores codes only) -->
+    <string name="plan_daily_checkin_title">Daily check-in</string>
+    <string name="plan_daily_checkin_desc">Two minutes each day to log mood, urges, and wins. Consistency beats intensity.</string>
+    <string name="plan_learn_urge_toolkit_title">Learn the urge toolkit</string>
+    <string name="plan_learn_urge_toolkit_desc">Practice the breathing and delay tools once while calm, so they\'re familiar when it counts.</string>
+    <string name="plan_define_your_why_title">Write down your why</string>
+    <string name="plan_define_your_why_desc">Turn the reasons you chose into one sentence you\'ll see when it matters most.</string>
+    <string name="plan_first_milestone_focus_title">Focus on your first milestone</string>
+    <string name="plan_first_milestone_focus_desc">One clear target to start. Reaching it rewires what feels possible.</string>
+    <string name="plan_abstinence_identity_title">Build the identity, not just the streak</string>
+    <string name="plan_abstinence_identity_desc">You\'re not \'trying to stop\' — you\'re becoming someone who doesn\'t watch. Small daily proof compounds.</string>
+    <string name="plan_reboot_90_frame_title">Frame the 90-day reboot</string>
+    <string name="plan_reboot_90_frame_desc">Ninety days gives your brain\'s reward system a genuine reset. Week by week, not all at once.</string>
+    <string name="plan_reduction_ladder_title">Set your reduction ladder</string>
+    <string name="plan_reduction_ladder_desc">Define clear step-downs — fewer days, tighter limits — so progress is measurable, not vague.</string>
+    <string name="plan_high_risk_moment_map_title">Map your high-risk moments</string>
+    <string name="plan_high_risk_moment_map_desc">Daily habits hide in routines. Spot the exact times and places, then plan around them.</string>
+    <string name="plan_device_friction_setup_title">Add friction to your devices</string>
+    <string name="plan_device_friction_setup_desc">Blockers, app limits, grayscale after dark — make the easy path the healthy one.</string>
+    <string name="plan_stress_reset_breathing_title">Use breathing as your stress reset</string>
+    <string name="plan_stress_reset_breathing_desc">When stress spikes, ninety seconds of slow breathing beats willpower. It\'s built into your SOS button.</string>
+    <string name="plan_boredom_replacement_list_title">Build a boredom replacement list</string>
+    <string name="plan_boredom_replacement_list_desc">Five go-to activities you can start in under a minute. Boredom needs an answer ready.</string>
+    <string name="plan_connection_plan_title">Make a connection plan</string>
+    <string name="plan_connection_plan_desc">Loneliness is the trigger, so connection is the tool: one real interaction a day, even a message.</string>
+    <string name="plan_fatigue_energy_audit_title">Run an energy audit</string>
+    <string name="plan_fatigue_energy_audit_desc">Track when you\'re most drained this week. Fatigue urges are usually a sleep problem in disguise.</string>
+    <string name="plan_social_media_hygiene_title">Clean up your feeds</string>
+    <string name="plan_social_media_hygiene_desc">Unfollow and mute the accounts that start the spiral. The urge often begins three scrolls earlier.</string>
+    <string name="plan_emotion_journaling_title">Name the feeling first</string>
+    <string name="plan_emotion_journaling_desc">Before acting on an urge, write one line about what you\'re actually feeling. Naming it breaks the loop.</string>
+    <string name="plan_if_then_plans_title">Write if-then plans</string>
+    <string name="plan_if_then_plans_desc">\'If an urge hits, then I open the toolkit.\' Deciding in advance removes the hardest step.</string>
+    <string name="plan_late_night_device_curfew_title">Set a device curfew</string>
+    <string name="plan_late_night_device_curfew_desc">Phone out of the bedroom, or locked down after a set hour. Late-night urges lose their easiest doorway.</string>
+    <string name="plan_morning_launch_routine_title">Design a morning launch</string>
+    <string name="plan_morning_launch_routine_desc">Feet on the floor, phone stays down for the first 20 minutes. Momentum before temptation.</string>
+    <string name="plan_evening_transition_ritual_title">Create an evening transition</string>
+    <string name="plan_evening_transition_ritual_desc">A repeatable wind-down — shower, walk, music — that carries you through the risky hours.</string>
+    <string name="plan_afternoon_reset_walk_title">Take the afternoon reset</string>
+    <string name="plan_afternoon_reset_walk_desc">A short walk or stretch at your danger hour. Change your state before the urge chooses for you.</string>
+    <string name="plan_wind_down_routine_title">Build a wind-down routine</string>
+    <string name="plan_wind_down_routine_desc">Thirty screen-light minutes before bed. Calmer nights mean fewer late-night battles.</string>
+    <string name="plan_sleep_anchor_time_title">Anchor your sleep time</string>
+    <string name="plan_sleep_anchor_time_desc">Pick one consistent lights-out time. A stable schedule quietly removes dozens of risky hours a week.</string>
+    <string name="plan_start_tiny_commitment_title">Start tiny on purpose</string>
+    <string name="plan_start_tiny_commitment_desc">Motivation grows from evidence. Commit to the check-in and one tool — nothing more yet.</string>
+    <string name="plan_channel_momentum_title">Channel this momentum</string>
+    <string name="plan_channel_momentum_desc">You\'re starting strong — bank it. Set up your environment and routines this week while it\'s easy.</string>
+    <string name="plan_streak_pattern_review_title">Review what ended past streaks</string>
+    <string name="plan_streak_pattern_review_desc">You\'ve gone long stretches before. Write down what happened at the end — that\'s where your plan needs armor.</string>
+
+    <!-- Home: greeting + streak -->
+    <string name="home_greeting_morning">Good morning</string>
+    <string name="home_greeting_afternoon">Good afternoon</string>
+    <string name="home_greeting_evening">Good evening</string>
+    <plurals name="streak_days_label">
+        <item quantity="one">day clean</item>
+        <item quantity="other">days clean</item>
+    </plurals>
+    <string name="home_longest_streak">Longest: %1$d days</string>
+    <string name="home_milestone_reached">Milestone reached — keep going</string>
+
+    <!-- Home: daily check-in -->
+    <string name="checkin_card_title_todo">How are you feeling today?</string>
+    <string name="checkin_card_subtitle_todo">Takes ten seconds.</string>
+    <string name="checkin_card_title_done">Checked in for today</string>
+    <string name="checkin_card_edit">Tap to edit</string>
+    <string name="checkin_sheet_title">Daily check-in</string>
+    <string name="checkin_mood_label">Mood</string>
+    <string name="checkin_urge_label">Urge intensity</string>
+    <string name="checkin_urge_low">None</string>
+    <string name="checkin_urge_high">Intense</string>
+    <string name="checkin_save">Save check-in</string>
+    <string name="mood_struggling">Struggling</string>
+    <string name="mood_low">Low</string>
+    <string name="mood_okay">Okay</string>
+    <string name="mood_good">Good</string>
+    <string name="mood_great">Great</string>
+    <string name="home_week_label">This week</string>
+
+    <!-- Home: daily quote -->
+    <string name="home_quote_label">Today\'s reflection</string>
+
+    <!-- Journal -->
+    <string name="journal_empty_title">Your journal is empty</string>
+    <string name="journal_empty_description">Writing for two minutes can take an urge\'s power away.</string>
+    <string name="journal_new_entry">New entry</string>
+    <string name="journal_editor_hint">What\'s on your mind?</string>
+    <string name="journal_editor_new_title">New entry</string>
+    <string name="journal_save">Save</string>
+    <string name="journal_delete_title">Delete this entry?</string>
+    <string name="journal_delete_message">This can\'t be undone.</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="cd_delete_entry">Delete entry</string>
+
+    <!-- Daily reflections: all original copy (no licensing), one per day via epochDay modulo -->
+    <string-array name="daily_quotes">
+        <item>Every urge you outlast teaches your brain a new ending.</item>
+        <item>You are not starting over. You are starting stronger.</item>
+        <item>The craving is loud because it is losing.</item>
+        <item>Progress is quiet. Keep making it.</item>
+        <item>One honest day is worth more than a perfect week imagined.</item>
+        <item>Discomfort is the feeling of rewiring.</item>
+        <item>Urges peak, then pass. You only have to outlast the peak.</item>
+        <item>Small promises kept build unshakable trust — with yourself.</item>
+        <item>You can\'t control the wave, but you\'re learning to surf.</item>
+        <item>Today\'s boredom is tomorrow\'s peace, in disguise.</item>
+        <item>Healing isn\'t linear. It\'s still healing.</item>
+        <item>Every clean morning is proof, not luck.</item>
+        <item>You are allowed to find this hard and do it anyway.</item>
+        <item>Your attention is the most valuable thing you own. Reclaim it.</item>
+        <item>The streak is a side effect. The real win is who you\'re becoming.</item>
+        <item>The number grows on its own. Your job is just today.</item>
+        <item>Freedom feels like this: choosing, not being chosen for.</item>
+        <item>A slip is a data point, not a verdict.</item>
+        <item>Rest is part of recovery, not a break from it.</item>
+        <item>What you water grows. Stop watering the weeds.</item>
+        <item>Cravings are old echoes. You\'re writing new sound.</item>
+        <item>Real strength is asking for the tools before you need them.</item>
+        <item>Tonight\'s sleep is tomorrow\'s willpower.</item>
+        <item>Your hardest days so far all ended. This one will too.</item>
+        <item>Quiet consistency beats loud intensity.</item>
+        <item>You noticed the urge. That awareness is already a win.</item>
+        <item>Two minutes of writing can defuse an hour of wanting.</item>
+        <item>Be the person your first milestone believes you are.</item>
+    </string-array>
+
+    <!-- Journey: habit system -->
+    <string name="journey_today">Today</string>
+    <string name="journey_rest_today">Nothing scheduled today — rest is part of the plan.</string>
+    <string name="journey_other_days">Other days</string>
+    <string name="journey_this_week">This week</string>
+    <string name="journey_week_summary">%1$d of %2$d completed</string>
+    <string name="journey_insights_label">Weekly insights</string>
+    <string name="journey_empty_title">Build your routine</string>
+    <string name="journey_empty_description">Small daily habits are what carry a recovery. Start with one.</string>
+    <string name="habit_new">New habit</string>
+    <string name="cd_habit_done">Mark done</string>
+    <string name="cd_habit_undone">Mark not done</string>
+
+    <!-- Habit editor -->
+    <string name="habit_editor_new_title">New habit</string>
+    <string name="habit_editor_edit_title">Edit habit</string>
+    <string name="habit_name_label">Name</string>
+    <string name="habit_name_hint">e.g. Evening walk</string>
+    <string name="habit_icon_label">Icon</string>
+    <string name="habit_days_label">Days</string>
+    <string name="habit_reminder_label">Daily reminder</string>
+    <string name="habit_reminder_off">Off</string>
+    <string name="habit_save">Save habit</string>
+    <string name="habit_delete_title">Delete this habit?</string>
+    <string name="habit_delete_message">Its history will be deleted too. This can\'t be undone.</string>
+    <string name="cd_delete_habit">Delete habit</string>
+    <string name="habit_notifications_hint">Allow notifications in system settings to receive this reminder.</string>
+    <string name="action_ok">OK</string>
+
+    <!-- Habit icon labels (picker accessibility) -->
+    <string name="icon_spa">Calm</string>
+    <string name="icon_walk">Walk</string>
+    <string name="icon_book">Read</string>
+    <string name="icon_water">Hydrate</string>
+    <string name="icon_gym">Exercise</string>
+    <string name="icon_meditate">Meditate</string>
+    <string name="icon_sleep">Sleep</string>
+    <string name="icon_phone_off">Phone-free</string>
+    <string name="icon_journal">Write</string>
+    <string name="icon_sun">Morning</string>
+
+    <!-- Reminder notifications (respectful, private copy) -->
+    <string name="reminder_channel_name">Habit reminders</string>
+    <string name="reminder_channel_description">Gentle reminders for the habits you schedule.</string>
+    <string name="reminder_notification_body">A small step keeps the momentum.</string>
+
+    <!-- Weekly insights (code -> copy; logic emits codes only) -->
+    <string name="insight_perfect_week">A perfect week — every scheduled habit done. That\'s momentum.</string>
+    <string name="insight_best_habit">\'%1$s\' is your anchor — %2$d%% this week.</string>
+    <string name="insight_focus_habit">\'%1$s\' could use some love. Try attaching it to a routine you already have.</string>
+    <string name="insight_consistency_up">Habit completion is up %1$d points on last week.</string>
+    <string name="insight_consistency_down">A lighter week than last — that\'s okay. Restart with just one habit.</string>
+    <string name="insight_mood_up">Your average mood is trending up this week.</string>
+    <string name="insight_urges_easing">Urges are running quieter than last week.</string>
+    <string name="insight_checkin_streak">%1$d-day check-in streak — the picture is getting clearer.</string>
+    <string name="insight_milestone_near">%1$d days to your milestone. Stay close to your plan.</string>
+    <string name="insight_getting_started">Log a few days of habits and check-ins and your weekly insights will appear here.</string>
+
+    <!-- Toolkit (SOS destination) -->
+    <string name="toolkit_title">You\'re safe. Let\'s ride this out.</string>
+    <string name="toolkit_subtitle">Urges and anxiety peak, then pass. Pick a tool.</string>
+    <string name="toolkit_breathe_title">Guided breathing</string>
+    <string name="toolkit_breathe_subtitle">Slow the body first — the mind follows.</string>
+    <string name="toolkit_breathe_action">Start breathing</string>
+    <string name="toolkit_grounding_title">5-4-3-2-1 grounding</string>
+    <string name="toolkit_grounding_subtitle">Come back to the room through your senses.</string>
+    <string name="toolkit_muscle_title">Muscle release</string>
+    <string name="toolkit_muscle_subtitle">Unclench, head to toe.</string>
+    <string name="toolkit_reframe_title">Quick reframe</string>
+    <string name="toolkit_reframe_subtitle">Catch the thought. Answer it kindly.</string>
+    <string name="toolkit_why_title">Remember your why</string>
+    <string name="toolkit_why_subtitle">The reasons you chose, in your own words.</string>
+    <string name="toolkit_disclaimer">These are self-help tools, not a substitute for professional support.</string>
+
+    <!-- Guided breathing -->
+    <string name="breathing_title">Breathe</string>
+    <string name="breath_in">Breathe in</string>
+    <string name="breath_hold">Hold</string>
+    <string name="breath_out">Breathe out</string>
+    <string name="breathing_cycles">%1$d cycles</string>
+    <string name="breathing_target_progress">%1$ds / %2$ds</string>
+    <string name="pattern_calm">Calm</string>
+    <string name="pattern_box">Box</string>
+    <string name="pattern_relax">4-7-8</string>
+
+    <!-- Guided step exercises -->
+    <string name="guided_step_progress">%1$d of %2$d</string>
+    <string name="guided_next">Next</string>
+    <string-array name="grounding_steps">
+        <item>Look around. Name five things you can see — anything at all.</item>
+        <item>Notice four things you can feel. Your feet on the floor. Fabric. Air.</item>
+        <item>Listen. Find three sounds, near or far.</item>
+        <item>Two things you can smell — or two smells you like.</item>
+        <item>One thing you can taste. Take a slow breath.</item>
+        <item>You\'re here. The wave is already passing.</item>
+    </string-array>
+    <string-array name="muscle_steps">
+        <item>Sit or stand comfortably. Take one slow breath.</item>
+        <item>Make fists. Squeeze for five seconds — then let go completely.</item>
+        <item>Shrug your shoulders up to your ears. Hold… and drop them.</item>
+        <item>Scrunch your face gently. Hold… and soften everything.</item>
+        <item>Tense your stomach. Hold… release, and breathe out long.</item>
+        <item>Press your feet into the floor. Hold… and let your legs go heavy.</item>
+        <item>Scan head to toe. Wherever you find tension, breathe into it and let it drop.</item>
+    </string-array>
+    <string-array name="distraction_ideas">
+        <item>Put on one song you actually love and just listen — nothing else.</item>
+        <item>Tidy one small surface: a desk, a shelf, a drawer.</item>
+        <item>Step outside, even just to your doorway, and notice the temperature.</item>
+        <item>Text someone something you appreciate about them.</item>
+        <item>Make a cup of tea or coffee, slowly, and pay attention to it.</item>
+        <item>Look up something you\'ve been mildly curious about lately.</item>
+        <item>Stretch for two minutes — nothing fancy, just move.</item>
+        <item>Reorganize one small thing on your phone: photos, apps, notes.</item>
+    </string-array>
+
+    <!-- Remember your why -->
+    <string name="why_header">You chose this because:</string>
+    <string name="why_goal_label">Your goal</string>
+    <string name="why_empty">Complete onboarding to see your reasons here.</string>
+
+    <!-- Journal hub -->
+    <string name="journal_kind_free">Free write</string>
+    <string name="journal_kind_thought">Thought record</string>
+    <string name="journal_kind_gratitude">Gratitude</string>
+    <string name="journal_new_sheet_title">New entry</string>
+    <string name="journal_new_free_desc">Blank page, your pace.</string>
+    <string name="journal_new_thought_desc">Catch a thought and reframe it.</string>
+    <string name="journal_new_gratitude_desc">Three good things from today.</string>
+
+    <!-- Thought record editor -->
+    <string name="thought_situation_label">What happened?</string>
+    <string name="thought_situation_hint">The situation, briefly.</string>
+    <string name="thought_thought_label">What went through your mind?</string>
+    <string name="thought_thought_hint">The automatic thought, word for word.</string>
+    <string name="thought_feeling_label">How did it feel?</string>
+    <string name="thought_feeling_hint">e.g. ashamed, anxious, restless</string>
+    <string name="thought_intensity_label">How strong? (%1$d/10)</string>
+    <string name="thought_reframe_label">A kinder, truer way to see it</string>
+    <string name="thought_reframe_hint">What would you tell a friend in the same spot?</string>
+    <string name="thought_save">Save record</string>
+    <string name="thought_delete_title">Delete this record?</string>
+
+    <!-- Gratitude editor -->
+    <string name="gratitude_prompt">Three good things about today</string>
+    <string name="gratitude_hint_1">One thing, however small…</string>
+    <string name="gratitude_hint_2">Another, if it comes…</string>
+    <string name="gratitude_hint_3">And one more…</string>
+    <string name="gratitude_save">Save gratitude</string>
+    <string name="gratitude_delete_title">Delete this entry?</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_description">See your streak at a glance.</string>
+    <string name="widget_days_clean_label">days clean</string>
+    <string name="widget_milestone_caption">%1$d of %2$d days</string>
+
+    <!-- Relapse: entry point + confirmation -->
+    <string name="relapse_entry_link">Had a setback?</string>
+    <string name="relapse_confirm_title">Log this setback?</string>
+    <string name="relapse_confirm_message">This resets your current streak, but nothing is erased — your history and best streak are always saved. You\'ll be guided through what comes next.</string>
+    <string name="relapse_confirm_action">Yes, log it</string>
+
+    <!-- Home: rebuild framing + motivation engine -->
+    <string name="home_recovery_day_label">Recovery Day</string>
+    <string name="home_previous_streak">Previous streak: %1$d days</string>
+    <string name="home_best_streak">Best streak: %1$d days</string>
+    <string name="motivation_day_1">Your comeback starts today.</string>
+    <string name="motivation_day_2">You\'re already doing better than yesterday.</string>
+    <string name="motivation_day_3">Momentum is returning.</string>
+    <string name="motivation_day_4">Four days in. This is becoming real.</string>
+    <string name="motivation_day_5">Halfway to a full week back.</string>
+    <string name="motivation_day_6">One more day to a full week.</string>
+    <string name="motivation_day_7">A week ago you chose to restart.</string>
+    <string name="motivation_week_2">Two weeks of showing up for yourself.</string>
+    <string name="motivation_week_3">Three weeks — new habits are taking root.</string>
+    <string name="motivation_month_1">A full month since you chose to begin again.</string>
+    <string name="motivation_ongoing">Every day back is proof, not luck.</string>
+
+    <!-- Recovery flow: Accept -->
+    <string name="recovery_accept_title">One relapse doesn\'t erase your progress.</string>
+    <string name="recovery_accept_subtitle">Your history is still yours. Let\'s figure out what comes next.</string>
+    <string name="recovery_previous_streak_label">Previous streak</string>
+    <string name="recovery_best_streak_label">Best streak</string>
+
+    <!-- Recovery flow: Reflection (all fields optional) -->
+    <string name="recovery_what_happened_title">What happened?</string>
+    <string name="recovery_what_happened_subtitle">This stays between you and this app.</string>
+    <string name="setback_type_porn">Porn</string>
+    <string name="setback_type_masturbation">Masturbation</string>
+    <string name="setback_type_both">Both</string>
+    <string name="setback_type_urge_only">Urge only</string>
+    <string name="recovery_feelings_title">How do you feel?</string>
+    <string name="recovery_feelings_subtitle">Naming it is part of moving through it.</string>
+    <string name="relapse_emotion_guilty">Guilty</string>
+    <string name="relapse_emotion_empty">Empty</string>
+    <string name="relapse_emotion_angry">Angry</string>
+    <string name="relapse_emotion_anxious">Anxious</string>
+    <string name="relapse_emotion_hopeless">Hopeless</string>
+    <string name="relapse_emotion_okay">Okay</string>
+    <string name="recovery_trigger_title">What triggered it?</string>
+    <string name="recovery_trigger_subtitle">Recognizing the pattern is most of the fight.</string>
+    <string name="relapse_trigger_stress">Stress</string>
+    <string name="relapse_trigger_loneliness">Loneliness</string>
+    <string name="relapse_trigger_social_media">Social media</string>
+    <string name="relapse_trigger_boredom">Boredom</string>
+    <string name="relapse_trigger_night">Night</string>
+    <string name="relapse_trigger_couldnt_sleep">Couldn\'t sleep</string>
+    <string name="relapse_trigger_other">Other</string>
+
+    <!-- Recovery flow: Learn (common relapse patterns) -->
+    <string name="recovery_learn_title">Common patterns</string>
+    <string name="recovery_learn_subtitle">Most relapses trace back to one of these. Recognizing the pattern is most of the fight.</string>
+    <string name="pattern_boredom_title">Boredom</string>
+    <string name="pattern_boredom_desc">Unstructured time is one of the most common triggers. A pre-decided replacement activity removes the decision fatigue in the moment.</string>
+    <string name="pattern_stress_title">Stress</string>
+    <string name="pattern_stress_desc">Stress narrows focus toward fast relief. A short breathing reset lowers the physical intensity before it turns into an urge.</string>
+    <string name="pattern_loneliness_title">Loneliness</string>
+    <string name="pattern_loneliness_desc">When the trigger is disconnection, the tool is connection — even one honest message to someone you trust changes the moment.</string>
+    <string name="pattern_social_media_title">Social media</string>
+    <string name="pattern_social_media_desc">The spiral often starts a few scrolls before the urge itself. Notice which feeds tend to lead there.</string>
+    <string name="pattern_nighttime_title">Night &amp; sleeplessness</string>
+    <string name="pattern_nighttime_desc">Late hours combine tiredness, privacy, and low willpower — and lying awake unable to sleep makes the pull even stronger. A consistent wind-down routine removes much of the risk before it starts.</string>
+
+    <!-- Recovery flow: Plan (checklist) -->
+    <string name="recovery_plan_title">Right now, try this</string>
+    <string name="recovery_plan_subtitle">A short list to help reset — check off what you do.</string>
+    <string name="checklist_drink_water">Drink a glass of water</string>
+    <string name="checklist_take_walk">Take a 10-minute walk</string>
+    <string name="checklist_shower">Take a shower</string>
+    <string name="checklist_journal">Write it down</string>
+    <string name="checklist_breathing">Do a breathing exercise</string>
+    <string name="checklist_reach_out">Message someone you trust</string>
+    <string name="checklist_plan_next_hour">Decide what you\'re doing for the next hour</string>
+    <string name="checklist_wind_down">Put your phone away and lie down</string>
+    <string name="checklist_open_tool">Open</string>
+
+    <!-- Recovery flow: Restart -->
+    <string name="recovery_restart_title">Ready when you are</string>
+    <string name="recovery_restart_subtitle">Day 1 starts the moment you close this. That\'s all it takes.</string>
+    <string name="recovery_restart_proof">You proved you can reach %1$d days.</string>
+    <string name="recovery_restart_button">Begin new streak</string>
+    <string name="recovery_restart_shortcuts_label">Need support right now?</string>
+    <string name="recovery_restart_breathing_shortcut">Breathing exercise</string>
+    <string name="recovery_restart_toolkit_shortcut">Emergency toolkit</string>
+
+    <!-- Recovery score (Journey tab) -->
+    <string name="recovery_score_title">Recovery Score</string>
+    <string name="recovery_score_percent">%1$d%%</string>
+    <string name="recovery_score_total_clean_days">Total clean days</string>
+    <string name="recovery_score_relapses">Relapses</string>
+    <string name="recovery_score_best_streak">Best streak</string>
+    <string name="recovery_score_current_streak">Current streak</string>
+
+    <!-- Comeback achievements -->
+    <string name="achievement_started_again">Started Again</string>
+    <string name="achievement_started_again_desc">You chose to come back. That\'s the hardest part.</string>
+    <string name="achievement_didnt_quit">Didn\'t Quit After Relapse</string>
+    <string name="achievement_didnt_quit_desc">Three days in and still going.</string>
+    <string name="achievement_first_week_back">First Week Back</string>
+    <string name="achievement_first_week_back_desc">A full week since you restarted.</string>
+    <string name="achievement_stronger_than_before">Stronger Than Before</string>
+    <string name="achievement_stronger_than_before_desc">This comeback has real momentum.</string>
+    <string name="achievement_beat_record">Beat Previous Record</string>
+    <string name="achievement_beat_record_desc">You\'ve now gone longer than ever before.</string>
+
+    <!-- Ads: banner + UMP privacy options -->
+    <string name="privacy_options_link">Privacy &amp; ad choices</string>
+
+    <!-- Settings + Premium section -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_premium_section_title">Premium</string>
+    <string name="settings_current_status_label">Current status</string>
+    <string name="settings_status_free">Free</string>
+    <string name="settings_status_premium">Premium</string>
+    <string name="settings_status_pending">Processing</string>
+    <string name="settings_remove_ads_title">Remove Ads</string>
+    <string name="settings_remove_ads_description">A one-time purchase. Removes ads everywhere in the app, permanently — no subscription.</string>
+    <string name="settings_premium_active_description">Thanks for supporting Clarity — every ad is gone, for good.</string>
+    <string name="settings_pending_description">Your purchase is being confirmed by Google Play. This can take a moment.</string>
+    <string name="settings_remove_ads_button">Remove Ads</string>
+    <string name="settings_restore_purchases_button">Restore Purchases</string>
+    <string name="purchase_result_pending_message">Your purchase is processing — Premium will activate automatically once it\'s confirmed.</string>
+    <string name="purchase_result_unavailable_message">Purchases aren\'t available right now. Please try again later.</string>
+    <string name="purchase_result_nothing_to_restore_message">No previous purchase was found.</string>
+
+    <!-- Emergency Toolkit expansion -->
+    <string name="toolkit_made_it_through">I made it through this urge.</string>
+    <string name="toolkit_section_breathe">Breathe</string>
+    <string name="toolkit_section_reset_body">Reset your body</string>
+    <string name="toolkit_section_ground_reframe">Ground &amp; reframe</string>
+    <string name="toolkit_section_reach_reflect">Reach out &amp; reflect</string>
+    <string name="toolkit_section_distract">Distract</string>
+
+    <string name="tool_breathing_30s_title">30-second breathing</string>
+    <string name="tool_breathing_30s_subtitle">A quick reset when you have almost no time.</string>
+    <string name="tool_breathing_60s_title">60-second breathing</string>
+    <string name="tool_breathing_60s_subtitle">A full minute to let the spike pass.</string>
+    <string name="tool_breathing_2min_title">2-minute breathing</string>
+    <string name="tool_breathing_2min_subtitle">The longer reset, when you can spare it.</string>
+
+    <string name="tool_cold_shower_title">Cold shower</string>
+    <string name="tool_cold_shower_subtitle">A sharp, physical reset.</string>
+    <string name="tool_cold_shower_instructions">Turn the water cold for the last 30–60 seconds of your shower — or take a short one entirely cold. It genuinely interrupts an urge by giving your body something immediate to respond to. Come back here when you\'re done.</string>
+
+    <string name="tool_walk_outside_title">Walk outside</string>
+    <string name="tool_walk_outside_subtitle">Change your surroundings, on the move.</string>
+    <string name="tool_walk_outside_instructions">Leave the room you\'re in. Doesn\'t need to be far — around the block, down the hall, out the door. Distance from the moment is often enough.</string>
+
+    <string name="tool_push_ups_title">Push-up challenge</string>
+    <string name="tool_push_ups_subtitle">Burn off the physical charge.</string>
+    <string name="tool_push_ups_instructions">Do as many push-ups as you can manage right now — modify however you need to (knees, wall, whatever works). The point isn\'t the number, it\'s giving the energy somewhere else to go.</string>
+
+    <string name="tool_drink_water_title">Drink water</string>
+    <string name="tool_drink_water_subtitle">Small, immediate, always available.</string>
+    <string name="tool_drink_water_instructions">Get a full glass of water and drink it slowly. Small physical resets like this genuinely help interrupt an urge — and it costs you nothing to try.</string>
+
+    <string name="tool_call_friend_title">Call a friend</string>
+    <string name="tool_call_friend_subtitle">You don\'t have to explain why.</string>
+    <string name="tool_call_friend_instructions">Call or message someone you trust — you don\'t need to explain what\'s going on. \"Can you talk for a bit?\" is enough. Connection is one of the most effective interruptions there is.</string>
+
+    <string name="tool_write_journal_title">Write it down</string>
+    <string name="tool_write_journal_subtitle">Get it out of your head.</string>
+
+    <string name="tool_motivation_wall_title">Motivation wall</string>
+    <string name="tool_motivation_wall_subtitle">Your own reasons, in your own words.</string>
+
+    <string name="tool_distraction_ideas_title">Distraction ideas</string>
+    <string name="tool_distraction_ideas_subtitle">A few things to try instead.</string>
+
+    <!-- Toolkit usage stats (Journey) -->
+    <string name="toolkit_usage_card_title">Emergency Toolkit</string>
+    <string name="toolkit_usage_times_used">Times used</string>
+    <string name="toolkit_usage_most_used">Most used</string>
+    <string name="toolkit_usage_average_duration">Avg. duration</string>
+    <string name="toolkit_usage_none">—</string>
+
+    <!-- Achievements: screen chrome -->
+    <string name="achievements_title">Achievements</string>
+    <string name="achievements_progress">%1$d of %2$d unlocked</string>
+    <string name="achievement_locked">Locked</string>
+    <string name="achievement_locked_hint">Not unlocked yet.</string>
+    <string name="achievement_earned_on">Earned %1$s</string>
+    <string name="achievement_unlock_label">Achievement unlocked</string>
+    <string name="achievement_unlock_progress">%1$d of %2$d</string>
+    <string name="achievement_unlock_continue">Continue</string>
+    <string name="achievement_unlock_next">Next</string>
+    <string name="badge_category_streak">Streaks</string>
+    <string name="badge_category_recovery">Recovery</string>
+    <string name="badge_category_daily_practice">Daily practice</string>
+
+    <!-- Achievements: badge titles, descriptions (doubles as the locked-state requirement), and unlock quotes -->
+    <string name="badge_day_1_title">First Day</string>
+    <string name="badge_day_1_desc">Complete your first day clean.</string>
+    <string name="badge_day_1_quote">The first day is the loudest. You showed up anyway.</string>
+
+    <string name="badge_day_3_title">3 Days</string>
+    <string name="badge_day_3_desc">Reach a 3-day streak.</string>
+    <string name="badge_day_3_quote">Three days in, and the pattern is already breaking.</string>
+
+    <string name="badge_day_7_title">7 Days</string>
+    <string name="badge_day_7_desc">Reach a 7-day streak — a full week.</string>
+    <string name="badge_day_7_quote">A week is proof, not luck.</string>
+
+    <string name="badge_day_14_title">14 Days</string>
+    <string name="badge_day_14_desc">Reach a 14-day streak — two weeks strong.</string>
+    <string name="badge_day_14_quote">Two weeks of choosing yourself, every single day.</string>
+
+    <string name="badge_day_21_title">21 Days</string>
+    <string name="badge_day_21_desc">Reach a 21-day streak — three weeks in.</string>
+    <string name="badge_day_21_quote">Three weeks in, and a habit is quietly forming underneath.</string>
+
+    <string name="badge_day_30_title">30 Days</string>
+    <string name="badge_day_30_desc">Reach a 30-day streak — a full month.</string>
+    <string name="badge_day_30_quote">A month. Whoever you were on day one, you\'re not that person anymore.</string>
+
+    <string name="badge_day_50_title">50 Days</string>
+    <string name="badge_day_50_desc">Reach a 50-day streak.</string>
+    <string name="badge_day_50_quote">Fifty days of practice most people never even start.</string>
+
+    <string name="badge_day_100_title">100 Days</string>
+    <string name="badge_day_100_desc">Reach a 100-day streak.</string>
+    <string name="badge_day_100_quote">Triple digits. This is who you are now.</string>
+
+    <string name="badge_day_365_title">365 Days</string>
+    <string name="badge_day_365_desc">Reach a 365-day streak — a full year.</string>
+    <string name="badge_day_365_quote">A year. You didn\'t just survive it — you built something.</string>
+
+    <string name="badge_first_recovery_title">First Recovery</string>
+    <string name="badge_first_recovery_desc">Start a new recovery run after a setback.</string>
+    <string name="badge_first_recovery_quote">You didn\'t disappear. You came back — that\'s the whole thing.</string>
+
+    <string name="badge_five_recoveries_title">Five Recoveries</string>
+    <string name="badge_five_recoveries_desc">Start a new recovery run five times.</string>
+    <string name="badge_five_recoveries_quote">Five times back on your feet. That\'s resilience with a track record.</string>
+
+    <string name="badge_morning_check_in_title">Morning Check-in</string>
+    <string name="badge_morning_check_in_desc">Complete a daily check-in before noon.</string>
+    <string name="badge_morning_check_in_quote">Starting the day honest with yourself sets the tone for everything after.</string>
+
+    <string name="badge_journal_writer_title">Journal Writer</string>
+    <string name="badge_journal_writer_desc">Write 5 journal entries.</string>
+    <string name="badge_journal_writer_quote">Five entries in — you\'re learning what your own mind sounds like.</string>
+
+    <string name="badge_learning_streak_title">Learning Streak</string>
+    <string name="badge_learning_streak_desc">Use the Emergency Toolkit on 3 days in a row.</string>
+    <string name="badge_learning_streak_quote">Three days of reaching for a tool instead of an urge — that\'s a new instinct forming.</string>
+
+    <!-- Learn: screen chrome -->
+    <string name="learn_screen_subtitle">Short, practical reads. No account, no tracking — just here when you want them.</string>
+    <string name="learn_read_minutes">%1$d min read</string>
+    <string name="learn_category_understanding_urges">Understanding Urges</string>
+    <string name="learn_category_building_habits">Building New Habits</string>
+    <string name="learn_category_staying_course">Staying the Course</string>
+
+    <!-- Learn: Understanding Urges -->
+    <string name="learn_urge_what_is_title">What an urge actually is</string>
+    <string name="learn_urge_what_is_summary">It\'s a wave, not a command — and waves always pass.</string>
+    <string name="learn_urge_what_is_body">An urge feels like an order you have to obey right now. It isn\'t. It\'s a wave of sensation and thought that rises, peaks, and falls — usually within 15 to 20 minutes, whether you act on it or not.\n\nThe mistake most people make is treating the urge as an emergency that has to be resolved immediately. That belief is what gives it its power. The urge itself is just a signal passing through your body.\n\nYou don\'t have to fight it or make it disappear. You just have to outlast it. Every time you do, the next wave gets a little easier to recognize for what it is.</string>
+
+    <string name="learn_urge_surfing_title">Urge surfing, step by step</string>
+    <string name="learn_urge_surfing_summary">A simple way to ride out a craving instead of fighting it.</string>
+    <string name="learn_urge_surfing_body">Urge surfing is a technique borrowed from mindfulness-based relapse prevention. Instead of pushing an urge away or giving in to it, you observe it — the way a surfer rides a wave instead of trying to stop the ocean.\n\nWhen an urge hits, try this: name what you\'re feeling, out loud or in your head (\"this is an urge\"). Notice where it shows up in your body — a tight chest, restless hands, racing thoughts. Breathe slowly and stay with the sensation for a minute without acting on it or trying to force it away.\n\nThe urge will crest and start to fade. It almost always does. Each time you surf one out instead of reacting to it, you\'re proving to yourself that the wave is survivable — and that proof is worth more than any amount of willpower.</string>
+
+    <string name="learn_willpower_title">Why willpower alone falls short</string>
+    <string name="learn_willpower_summary">Relying on grit in the moment sets you up to blame yourself later.</string>
+    <string name="learn_willpower_body">White-knuckling through urges works sometimes — until it doesn\'t. Willpower is a limited resource that gets used up by stress, poor sleep, and ordinary decision-making, so the moment you need it most is often the moment you have the least of it left.\n\nThat\'s not a character flaw. It\'s how self-control works for everyone. Treating every urge as a fresh willpower test, with no other plan, quietly stacks the odds against you no matter how motivated you are.\n\nA better approach is to reduce how often you need willpower in the first place: fewer triggers within reach, a plan already decided before the urge shows up, and tools you can reach for on autopilot. Discipline still matters — it\'s just not meant to carry the whole load by itself.</string>
+
+    <string name="learn_halt_title">H.A.L.T.: the four usual suspects</string>
+    <string name="learn_halt_summary">Hungry, Angry, Lonely, Tired — most urges trace back to one of these.</string>
+    <string name="learn_halt_body">H.A.L.T. is a quick checklist used across a lot of recovery work: Hungry, Angry, Lonely, Tired. It isn\'t scientific law, but for most people, urges cluster around these four states far more than random chance would suggest.\n\nWhen an urge hits, running through the list takes ten seconds and often explains a lot: skipped a meal, stewing over something from earlier, haven\'t talked to anyone all day, running on five hours of sleep. Naming the real state underneath the urge makes it easier to address the actual problem instead of reaching for the same old response to everything.\n\nSometimes the fix is as unglamorous as eating something and going to bed early. That\'s not a consolation prize — for a lot of urges, it\'s the entire solution.</string>
+
+    <!-- Learn: Building New Habits -->
+    <string name="learn_habits_change_title">How habits actually change</string>
+    <string name="learn_habits_change_summary">Cue, routine, reward — and why deleting one piece isn\'t enough.</string>
+    <string name="learn_habits_change_body">Every habit runs on a loop: a cue triggers it, a routine plays out, and a reward reinforces it so the loop repeats. This one runs on the same loop any habit does — which is actually good news, because it means it follows rules that are well understood and changeable.\n\nMost people try to break a habit by fighting the routine step in the moment, which is the hardest place to intervene. It\'s far easier to change the cues that start the loop, and to give yourself a different routine that still delivers some form of the reward — relief, distraction, comfort — the old one did.\n\nThis is why the tools in this app aren\'t about gritting your teeth through the routine step. They\'re about interrupting the loop earlier and redirecting it somewhere else entirely.</string>
+
+    <string name="learn_replacing_title">Replacing, not just removing</string>
+    <string name="learn_replacing_summary">A habit rarely leaves an empty space behind — fill it on purpose.</string>
+    <string name="learn_replacing_body">Simply trying to stop a habit, with nothing planned to take its place, tends to leave a gap that the old habit is very good at refilling. The urge doesn\'t know it\'s supposed to disappear; it just knows there used to be something to do here.\n\nThink about what the habit was actually giving you — stress relief, a break from boredom, a way to fall asleep, a moment of control — and find something that gives you a piece of that without the cost. It doesn\'t need to be a perfect substitute on day one.\n\nOver time, the new routine becomes the automatic one, and the old cue stops pulling as hard. That\'s the whole idea behind a tool like the Emergency Toolkit: not a punishment, but somewhere else for the loop to go.</string>
+
+    <string name="learn_environment_title">Designing your environment</string>
+    <string name="learn_environment_summary">The easiest willpower is the kind you never have to use.</string>
+    <string name="learn_environment_body">Environment shapes behavior more than most people give it credit for. If a trigger is one tap away at 11pm, you\'re negotiating with an urge at your weakest moment. If it takes real friction to get there — a device left in another room, a blocker in place, a plan for what else to do at that hour — you\'ve already won half the fight before it starts.\n\nThis isn\'t about willpower at all. It\'s about making the harmful choice slightly harder to reach and the better choice slightly easier, so future-you isn\'t relying on in-the-moment strength that may not be there.\n\nLook at your own patterns: what time, what place, what device, what\'s usually happening right before. Small, boring, structural changes in those spots tend to outperform sheer determination by a wide margin.</string>
+
+    <string name="learn_sleep_exercise_title">Sleep and movement as infrastructure</string>
+    <string name="learn_sleep_exercise_summary">The most unglamorous tools are often the most effective ones.</string>
+    <string name="learn_sleep_exercise_body">Sleep deprivation and a sedentary day both raise stress levels and strain the same self-regulation you rely on when an urge hits. It\'s one of the most consistent, least exciting findings in the self-control research: rested, physically active people report fewer and weaker urges — not because they\'re more disciplined, but because their baseline stress is simply lower.\n\nYou don\'t need a training plan or a perfect sleep schedule to benefit from this. A short walk, a few push-ups, or getting to bed thirty minutes earlier all measurably shift the odds in your favor for the next day.\n\nThink of sleep and movement as infrastructure sitting underneath every other tool in this app, not as separate goals of their own. When that infrastructure is solid, everything else gets easier by default.</string>
+
+    <!-- Learn: Staying the Course -->
+    <string name="learn_relapse_meaning_title">What a relapse actually means</string>
+    <string name="learn_relapse_meaning_summary">Data, not a verdict on who you are.</string>
+    <string name="learn_relapse_meaning_body">A relapse can feel like proof that nothing has worked and nothing will. It isn\'t. It\'s one data point in a much longer pattern, and treating it as a final verdict is exactly what makes the next one more likely — shame is a worse motivator than it feels like it should be.\n\nWhat matters far more than the relapse itself is what happens in the hour after it. Beating yourself up rarely changes behavior; it just adds pain on top of pain. Looking honestly at what led to it — what state you were in, what got skipped, what was within easy reach — actually changes something.\n\nEvery streak that\'s ever been rebuilt started the exact same way: from zero, right after a setback, by someone who kept going anyway. That\'s not a consolation story. It\'s the only way this has ever worked for anyone.</string>
+
+    <string name="learn_self_compassion_title">Self-compassion isn\'t self-indulgence</string>
+    <string name="learn_self_compassion_summary">Being harsh with yourself doesn\'t make you more disciplined.</string>
+    <string name="learn_self_compassion_body">It\'s easy to assume that going easy on yourself after a setback is the same as letting yourself off the hook — that real accountability requires some amount of self-punishment. The research points the other way: people who treat themselves with basic kindness after a setback tend to recover faster and relapse less than people who respond with harsh self-criticism.\n\nSelf-compassion isn\'t pretending the setback didn\'t matter. It\'s talking to yourself the way you\'d talk to a friend going through the same thing — honestly, but without contempt. Contempt doesn\'t build discipline. It just makes the whole subject something you want to avoid thinking about, which is the opposite of what recovery needs.\n\nYou can hold yourself to a real standard and still be kind to yourself when you miss it. Those aren\'t in conflict — they\'re what makes trying again next time possible at all.</string>
+
+    <string name="learn_isolation_title">Why isolation makes urges louder</string>
+    <string name="learn_isolation_summary">Secrecy and loneliness feed the exact loop you\'re trying to change.</string>
+    <string name="learn_isolation_body">Habits people feel ashamed of tend to thrive in isolation. Secrecy removes the social friction that would normally interrupt a pattern — no one to notice, no one to check in with, nothing pulling attention outward. Loneliness is also one of the four H.A.L.T. states that reliably precedes an urge.\n\nThis is part of why reaching out, even briefly, is one of the more effective tools available — not because a conversation magically erases an urge, but because it interrupts the loop and reminds you there\'s a whole life happening outside of it.\n\nIt doesn\'t have to be a deep conversation about what you\'re going through. A text to a friend, a call home, five minutes talking about something completely unrelated — all of it counts, and all of it works against the isolation the habit depends on.</string>
+
+    <string name="learn_tape_forward_title">Playing the tape forward</string>
+    <string name="learn_tape_forward_summary">A ten-second habit that changes what an urge is offering you.</string>
+    <string name="learn_tape_forward_body">In the moment, an urge only shows you the next thirty seconds — relief, escape, a hit of something familiar. It never shows you the fifteen minutes after that: the same emptiness, plus regret this time, plus whatever streak or momentum you\'d built now reset.\n\n\"Playing the tape forward\" means deliberately imagining that whole sequence before acting, not just the appealing first frame. Ask yourself, honestly: how will I feel about this exact choice in twenty minutes? Most of the time, the honest answer is the same one it was yesterday.\n\nThis takes ten seconds and no special willpower — just a pause long enough to see the whole picture instead of the edited highlight reel the urge is offering. It\'s one of the simplest tools here, and one of the most reliable.</string>
+</resources>

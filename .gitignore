@@ -1,0 +1,18 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+app/build
+
+# Defense in depth: this repo's release keystore lives outside the repo
+# entirely (CI reads it from a GitHub Secret; see
+# .github/workflows/android-build.yml). These patterns just make sure one
+# can never be committed by accident even so.
+*.jks
+*.keystore
