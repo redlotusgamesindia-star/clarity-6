@@ -1,6 +1,6 @@
 # =============================================================================
 # Clarity — Android CI
-#
+# =============================================================================
 # Tests the domain logic, then assembles debug + release APKs AND a release
 # AAB (App Bundle — the format Play Console requires for new apps), and
 # uploads all of them as workflow artifacts. Release signing is optional:
@@ -8,36 +8,11 @@
 # UNSIGNED release APK/AAB; add the four secrets below and it signs +
 # verifies both automatically.
 #
-# Assumptions (all true for this repo today):
-#   - Project root == repository root (settings.gradle.kts at top level).
-#     If you nest it, add `defaults: { run: { working-directory: <dir> } }`.
-#   - gradle-wrapper.jar is NOT committed (deliberate, see README), so we
-#     provision Gradle via setup-gradle pinned to the SAME version as
-#     gradle/wrapper/gradle-wrapper.properties and call `gradle` directly.
-#     If you later commit the wrapper JAR: switch every `gradle` command to
-#     `./gradlew` and un-comment the wrapper-validation step.
-#   - No signingConfig in app/build.gradle.kts, so `assembleRelease` emits
-#     app-release-unsigned.apk and `bundleRelease` emits app-release.aab
-#     (also unsigned); we sign both OUTSIDE Gradle in CI instead of teaching
-#     the build script about keystores. APKs are signed with zipalign +
-#     apksigner; the AAB is signed with jarsigner — apksigner cannot sign
-#     app bundles at all, and bundles don't need (or support) zipalign,
-#     which is an APK-specific optimization.
-#
-# Required secrets for signing (Settings -> Secrets and variables -> Actions):
-#   ANDROID_KEYSTORE_BASE64    base64 of the .keystore file (see below)
-#   ANDROID_KEYSTORE_PASSWORD  keystore password
-#   ANDROID_KEY_ALIAS          key alias inside the keystore
-#   ANDROID_KEY_PASSWORD       key password (often same as keystore password)
-# The same four secrets sign both the APK and the AAB — one keystore, one
-# upload key, both artifacts.
-#
-# Creating a release keystore + the base64 secret value:
-#   keytool -genkeypair -v -keystore clarity-release.keystore \
-#     -alias clarity -keyalg RSA -keysize 4096 -validity 10000
-#   base64 -w0 clarity-release.keystore        # (macOS: base64 -i <file>)
-# Keep the .keystore file itself OUT of the repository, and back it up —
-# losing it means losing the ability to update the app on Play.
+# Required signing secrets:
+#   ANDROID_KEYSTORE_BASE64
+#   ANDROID_KEYSTORE_PASSWORD
+#   ANDROID_KEY_ALIAS
+#   ANDROID_KEY_PASSWORD
 # =============================================================================
 
 name: Android CI
@@ -49,23 +24,18 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Least privilege: this workflow only reads the repo and uploads artifacts.
 permissions:
   contents: read
 
-# Cancel superseded runs of the same branch/PR; never cancel tag builds.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 env:
-  JAVA_VERSION: "17"        # matches compileOptions / kotlin jvmTarget
-  GRADLE_VERSION: "8.10.2"  # MUST match gradle/wrapper/gradle-wrapper.properties
-  ANDROID_API_LEVEL: "35"   # matches compileSdk
+  JAVA_VERSION: "17"
+  GRADLE_VERSION: "8.10.2"
+  ANDROID_API_LEVEL: "35"
   ANDROID_BUILD_TOOLS: "35.0.0"
-  # GitHub forbids the `secrets` context inside `if:` expressions, so the
-  # presence check is evaluated here (env allows secrets) and exposed as a
-  # plain "true"/"false" string the steps below can branch on.
   SIGNING_ENABLED: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
 
 jobs:
@@ -75,53 +45,44 @@ jobs:
     timeout-minutes: 40
 
     steps:
+
+      # --------------------------------------------------------------- checkout
+
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ----------------------------------------------------------- toolchain
+      # ------------------------------------------------------------------- Java
+
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
-          # No `cache: gradle` here on purpose — setup-gradle below owns
-          # caching; enabling both double-caches the same files.
+
+      # ----------------------------------------------------------- Android SDK
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: |
+            platforms;android-35
+            build-tools;35.0.0
+            platform-tools
 
-      - name: Install SDK packages
-        # The hosted runner pre-installs most of this; the explicit install
-        # makes the build reproducible if runner images change, and pins the
-        # build-tools that the signing step's zipalign/apksigner come from.
-        run: >
-          sdkmanager
-          "platforms;android-${{ env.ANDROID_API_LEVEL }}"
-          "build-tools;${{ env.ANDROID_BUILD_TOOLS }}"
-          "platform-tools"
+      # ---------------------------------------------------------------- Gradle
 
       - name: Set up Gradle ${{ env.GRADLE_VERSION }}
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          # Write to the cache only from long-lived refs; PR builds read it.
-          # Keeps the cache stable and fast instead of churning per-branch.
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref_type != 'tag' }}
-          # gradle.properties enables the configuration cache; persisting it
-          # across runs requires encryption. Optional — uncomment + add the
-          # secret (any random string) if cold configuration time matters:
-          # cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-
-      # Once gradle-wrapper.jar is committed, validate it (supply-chain
-      # protection) and switch the run steps to ./gradlew:
-      # - name: Validate Gradle wrapper
-      #   uses: gradle/actions/wrapper-validation@v4
 
       # -------------------------------------------------------- quality gate
-      - name: Unit tests (plan generator)
+
+      - name: Unit tests
         run: gradle testDebugUnitTest --stacktrace
 
-      - name: Upload test reports (on failure)
+      - name: Upload test reports
         if: failure()
         uses: actions/upload-artifact@v4
         with:
@@ -132,28 +93,24 @@ jobs:
           retention-days: 7
 
       # -------------------------------------------------------------- builds
+
       - name: Assemble debug APK
         run: gradle assembleDebug --stacktrace
 
-      - name: Assemble release APK (unsigned)
+      - name: Assemble release APK
         run: gradle assembleRelease --stacktrace
 
       - name: List APK outputs
         run: find app/build/outputs/apk -name "*.apk" -exec ls -lh {} \;
 
-      - name: Assemble release AAB (unsigned)
-        # Same release build type as assembleRelease (minify + shrink +
-        # proguard already configured in app/build.gradle.kts) — bundleRelease
-        # just packages it as an .aab instead of an .apk. This is the format
-        # Play Console requires uploads to be in.
+      - name: Assemble release AAB
         run: gradle bundleRelease --stacktrace
 
       - name: List AAB outputs
         run: find app/build/outputs/bundle -name "*.aab" -exec ls -lh {} \;
 
       # ------------------------------------------------------------- signing
-      # Runs only when the keystore secret exists. Signs OUTSIDE Gradle so
-      # the build script stays keystore-free; zipalign must precede apksigner.
+
       - name: Sign release APK
         if: ${{ env.SIGNING_ENABLED == 'true' }}
         env:
@@ -163,6 +120,7 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
+
           BT="$ANDROID_HOME/build-tools/${{ env.ANDROID_BUILD_TOOLS }}"
           APK_DIR="app/build/outputs/apk/release"
           KEYSTORE="$RUNNER_TEMP/release.keystore"
@@ -181,15 +139,12 @@ jobs:
             --out "$APK_DIR/clarity-release-signed.apk" \
             "$APK_DIR/app-release-aligned.apk"
 
-          "$BT/apksigner" verify --print-certs "$APK_DIR/clarity-release-signed.apk"
+          "$BT/apksigner" verify \
+            --print-certs \
+            "$APK_DIR/clarity-release-signed.apk"
 
           rm -f "$KEYSTORE" "$APK_DIR/app-release-aligned.apk"
 
-      # Runs only when the keystore secret exists, same as APK signing above.
-      # jarsigner, not apksigner: apksigner cannot sign .aab files at all —
-      # this is Google's own documented signing path for app bundles
-      # (developer.android.com/build/building-cmdline). No zipalign step
-      # either; that's an APK-only optimization, not applicable to bundles.
       - name: Sign release AAB
         if: ${{ env.SIGNING_ENABLED == 'true' }}
         env:
@@ -199,6 +154,7 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
+
           AAB_DIR="app/build/outputs/bundle/release"
           KEYSTORE="$RUNNER_TEMP/release.keystore"
 
@@ -219,6 +175,7 @@ jobs:
           rm -f "$KEYSTORE"
 
       # ----------------------------------------------------------- artifacts
+
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
@@ -236,7 +193,7 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
-      - name: Upload release APK (unsigned — signing secrets not configured)
+      - name: Upload release APK (unsigned)
         if: ${{ env.SIGNING_ENABLED != 'true' }}
         uses: actions/upload-artifact@v4
         with:
@@ -254,7 +211,7 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
-      - name: Upload release AAB (unsigned — signing secrets not configured)
+      - name: Upload release AAB (unsigned)
         if: ${{ env.SIGNING_ENABLED != 'true' }}
         uses: actions/upload-artifact@v4
         with:
